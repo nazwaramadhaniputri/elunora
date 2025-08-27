@@ -25,20 +25,26 @@ class GaleriController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'post_id' => 'required|exists:posts,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'position' => 'required|integer|min:1',
-            'status' => 'required|in:0,1',
+            'post_id' => 'nullable|exists:posts,id',
+            'position' => 'required|integer|min:0',
+            'status' => 'required|in:draft,published',
         ]);
 
-        Galeri::create([
+        $galeri = Galeri::create([
             'post_id' => $request->post_id,
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
+            'judul' => $request->post_id ? Post::find($request->post_id)->judul : 'Galeri Tanpa Judul',
+            'deskripsi' => $request->post_id ? Post::find($request->post_id)->isi : 'Deskripsi galeri',
             'position' => $request->position,
-            'status' => $request->status,
+            'status' => $request->status == 'published' ? 1 : 0,
         ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Galeri berhasil dibuat',
+                'galeri' => $galeri
+            ]);
+        }
 
         return redirect()->route('admin.galeri.index')->with('success', 'Galeri berhasil ditambahkan');
     }

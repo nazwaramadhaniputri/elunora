@@ -150,14 +150,14 @@
                             <li class="list-group-item px-0">
                                 <a href="{{ route('berita.detail', $item->id) }}" class="text-decoration-none">
                                     <div class="d-flex">
-                                        <div class="flex-shrink-0">
-                                            @if($item->galeris->isNotEmpty() && $item->galeris->first()->fotos->isNotEmpty())
-                                            <img src="{{ asset('storage/' . $item->galeris->first()->fotos->first()->file) }}" class="rounded" width="60" height="60" alt="{{ $item->judul }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
+                                        <div class="flex-shrink-0 me-3">
+                                            @if($item->gambar)
+                                            <img src="{{ asset($item->gambar) }}" class="rounded" width="60" height="60" alt="{{ $item->judul }}" style="object-fit: cover;" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
                                             @else
-                                            <img src="{{ asset('img/no-image.jpg') }}" class="rounded" width="60" height="60" alt="No Image">
+                                            <img src="{{ asset('img/no-image.jpg') }}" class="rounded" width="60" height="60" alt="No Image" style="object-fit: cover;">
                                             @endif
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
+                                        <div class="flex-grow-1">
                                             <h6 class="mb-1">{{ Str::limit($item->judul, 50) }}</h6>
                                             <small class="text-muted">{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
                                         </div>

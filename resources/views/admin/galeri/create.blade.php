@@ -85,7 +85,7 @@
                         
                         <div class="form-group">
                             <label for="position">Posisi</label>
-                            <input type="number" class="form-control @error('position') is-invalid @enderror" id="position" name="position" value="{{ old('position', 0) }}">
+                            <input type="number" class="form-control @error('position') is-invalid @enderror" id="position" name="position" value="{{ old('position', 0) }}" min="0">
                             <small class="form-text text-muted">Urutan tampilan galeri (angka lebih kecil akan ditampilkan lebih dulu).</small>
                             @error('position')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -95,7 +95,7 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
-                                <option value="draft" {{ old('status') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
                                 <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Publikasikan</option>
                             </select>
                             @error('status')

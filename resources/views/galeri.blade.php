@@ -47,7 +47,7 @@
                                     @if($galeri->fotos->count() == 1)
                                         <img src="{{ asset($galeri->fotos->first()->file) }}" 
                                              class="w-100 h-100" 
-                                             alt="{{ $galeri->post->judul }}"
+                                             alt="{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri') }}"
                                              style="object-fit: cover;">
                                     @elseif($galeri->fotos->count() == 2)
                                         <div class="row g-1 h-100">
@@ -125,14 +125,14 @@
                             </div>
                         </div>
                         <div class="card-body gallery-content d-flex flex-column">
-                            <h5 class="card-title mb-2">{{ $galeri->post->judul }}</h5>
+                            <h5 class="card-title mb-2">{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri Tanpa Judul') }}</h5>
                             <p class="card-text text-muted flex-grow-1">
-                                {{ Str::limit(strip_tags($galeri->post->isi), 100) }}
+                                {{ Str::limit(strip_tags($galeri->deskripsi ?? ($galeri->post ? $galeri->post->isi : 'Deskripsi galeri')), 100) }}
                             </p>
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <small class="text-muted">
                                     <i class="fas fa-calendar me-1"></i>
-                                    {{ \Carbon\Carbon::parse($galeri->post->created_at)->format('d M Y') }}
+                                    {{ \Carbon\Carbon::parse($galeri->created_at)->format('d M Y') }}
                                 </small>
                                 <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-success btn-sm">
                                     <i class="fas fa-eye me-1"></i>Lihat Galeri
@@ -177,16 +177,16 @@
                             <li class="list-group-item px-0">
                                 <a href="{{ route('galeri.detail', $item->id) }}" class="text-decoration-none">
                                     <div class="d-flex">
-                                        <div class="flex-shrink-0">
+                                        <div class="flex-shrink-0 me-3">
                                             @if($item->fotos->isNotEmpty())
-                                            <img src="{{ asset($item->fotos->first()->file) }}" class="rounded" width="60" height="60" alt="{{ $item->fotos->first()->judul }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
+                                            <img src="{{ asset($item->fotos->first()->file) }}" class="rounded" width="60" height="60" alt="{{ $item->fotos->first()->judul }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'" style="object-fit: cover;">
                                             @else
-                                            <img src="{{ asset('img/no-image.jpg') }}" class="rounded" width="60" height="60" alt="No Image">
+                                            <img src="{{ asset('img/no-image.jpg') }}" class="rounded" width="60" height="60" alt="No Image" style="object-fit: cover;">
                                             @endif
                                         </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <h6 class="mb-1">{{ Str::limit($item->post->judul, 50) }}</h6>
-                                            <small class="text-muted">{{ \Carbon\Carbon::parse($item->post->created_at)->format('d M Y') }}</small>
+                                        <div class="flex-grow-1">
+                                            <h6 class="mb-1">{{ Str::limit($item->judul ?? ($item->post ? $item->post->judul : 'Galeri Tanpa Judul'), 50) }}</h6>
+                                            <small class="text-muted">{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
                                         </div>
                                     </div>
                                 </a>
