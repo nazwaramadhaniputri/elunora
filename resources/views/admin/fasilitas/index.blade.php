@@ -20,17 +20,17 @@
         </div>
     </div>
 
-    <div class="modern-table-card">
-        <div class="card-body">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
 
+    <div class="modern-table-card">
+        <div class="table-card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="modern-table">
                     <thead>
                         <tr>
                             <th width="60">#</th>
@@ -98,7 +98,7 @@
                                     <i class="fas fa-building fa-3x text-muted mb-3"></i>
                                     <h5 class="text-muted">Belum Ada Fasilitas</h5>
                                     <p class="text-muted">Mulai dengan menambahkan fasilitas sekolah pertama</p>
-                                    <a href="{{ route('admin.fasilitas.create') }}" class="btn btn-primary">
+                                    <a href="{{ route('admin.fasilitas.create') }}" class="btn-modern primary">
                                         <i class="fas fa-plus me-2"></i>Tambah Fasilitas
                                     </a>
                                 </div>
@@ -108,13 +108,13 @@
                     </tbody>
                 </table>
             </div>
-
-            @if($fasilitas->hasPages())
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $fasilitas->links() }}
-                </div>
-            @endif
         </div>
     </div>
+
+    @if($fasilitas->hasPages())
+        <div class="d-flex justify-content-center mt-4">
+            {{ $fasilitas->links() }}
+        </div>
+    @endif
 </div>
 @endsection

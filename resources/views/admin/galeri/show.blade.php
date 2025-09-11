@@ -49,15 +49,22 @@
 
 @section('content')
 <div class="container-fluid">
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Detail Galeri</h1>
-        <div>
-            <a href="{{ route('admin.galeri.edit', $galeri->id) }}" class="d-none d-sm-inline-block btn btn-sm btn-success shadow-sm">
-                <i class="fas fa-edit fa-sm text-white-50"></i> Edit
-            </a>
-            <a href="{{ route('admin.galeri.index') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
-                <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
-            </a>
+    <div class="page-header-modern mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title-section">
+                <h4 class="page-title">
+                    <i class="fas fa-images me-3"></i>Detail Galeri: {{ $galeri->judul ?? ($galeri->post->judul ?? 'Galeri') }}
+                </h4>
+                <p class="page-subtitle">Kelola foto dan informasi galeri</p>
+            </div>
+            <div class="page-actions">
+                <a href="{{ route('admin.galeri.edit', $galeri->id) }}" class="btn-modern success me-2">
+                    <i class="fas fa-edit me-2"></i>Edit Galeri
+                </a>
+                <a href="{{ route('admin.galeri.index') }}" class="btn-modern secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Kembali
+                </a>
+            </div>
         </div>
     </div>
 
@@ -89,7 +96,7 @@
                 <div class="card-body">
                     <div class="mb-3">
                         <strong>Status:</strong>
-                        @if($galeri->status == 'published')
+                        @if($galeri->status == 1)
                         <span class="badge badge-success">Dipublikasikan</span>
                         @else
                         <span class="badge badge-warning">Draft</span>
@@ -115,28 +122,16 @@
                     <div class="mb-3">
                         <strong>Berita Terkait:</strong>
                         <p>
-                            <a href="{{ route('admin.berita.show', $galeri->post->id) }}">
+                            <a href="#">
                                 {{ $galeri->post->judul }}
                             </a>
                         </p>
                     </div>
                     @endif
                     
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{{ route('admin.galeri.edit', $galeri->id) }}" class="btn btn-success">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                        <form action="{{ route('admin.galeri.destroy', $galeri->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus galeri ini?')">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                        </form>
-                    </div>
                     
                     <div class="mt-3">
-                        <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-info btn-block" target="_blank">
+                        <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn-modern info btn-block" target="_blank">
                             <i class="fas fa-eye"></i> Lihat di Halaman Publik
                         </a>
                     </div>
@@ -162,15 +157,15 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="judul">Judul Foto (Opsional)</label>
-                            <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul') }}">
+                            <label for="judul">Judul Foto</label>
+                            <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul') }}" placeholder="Masukkan judul foto (opsional)">
                             @error('judul')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         
-                        <button type="submit" class="btn btn-success btn-block">
-                            <i class="fas fa-upload"></i> Unggah Foto
+                        <button type="submit" class="btn-modern primary">
+                            <i class="fas fa-plus me-2"></i>Upload Foto
                         </button>
                     </form>
                 </div>
@@ -189,21 +184,17 @@
                     <div class="foto-grid">
                         @foreach($galeri->fotos as $foto)
                         <div class="foto-item">
-                            <a href="/{{ $foto->file }}" data-lightbox="galeri" data-title="{{ $foto->judul ?: 'Foto Galeri' }}">
-                                <img src="/{{ $foto->file }}" alt="{{ $foto->judul }}">
+                            <a href="{{ asset($foto->file) }}" data-lightbox="galeri" data-title="{{ $foto->judul ?: 'Foto Galeri' }}">
+                                <img src="{{ asset($foto->file) }}" alt="{{ $foto->judul }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
                             </a>
                             <div class="foto-actions">
-                                <button type="button" class="btn btn-sm btn-info edit-foto" 
-                                        data-id="{{ $foto->id }}" 
-                                        data-judul="{{ $foto->judul }}" 
-                                        data-toggle="modal" 
-                                        data-target="#editFotoModal">
+                                <button type="button" class="action-btn primary edit-foto" data-id="{{ $foto->id }}" data-judul="{{ $foto->judul }}" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <form action="{{ route('admin.foto.destroy', $foto->id) }}" method="POST">
+                                <form action="{{ route('admin.galeri.delete-photo', $foto->id) }}" method="POST">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus foto ini?')">
+                                    <button type="submit" class="action-btn danger" onclick="return confirm('Apakah Anda yakin ingin menghapus foto ini?')" title="Hapus">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </form>
@@ -236,9 +227,7 @@
                 @method('PUT')
                 <div class="modal-header">
                     <h5 class="modal-title" id="editFotoModalLabel">Edit Judul Foto</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
@@ -247,8 +236,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-modern success">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -273,7 +262,8 @@
             const judul = $(this).data('judul');
             
             $('#edit_judul').val(judul);
-            $('#editFotoForm').attr('action', `/admin/foto/${id}`);
+            $('#editFotoForm').attr('action', `/admin/galeri/photo/${id}`);
+            $('#editFotoModal').modal('show');
         });
     });
 </script>

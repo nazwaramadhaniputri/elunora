@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $galeri->post->judul)
+@section('title', $galeri->judul ?? ($galeri->post->judul ?? 'Detail Galeri'))
 
 @section('hero')
 <div class="hero-section">
@@ -11,26 +11,24 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white-50">Beranda</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('galeri') }}" class="text-white-50">Galeri</a></li>
-                        <li class="breadcrumb-item active text-white" aria-current="page">{{ Str::limit($galeri->post->judul, 30) }}</li>
+                        <li class="breadcrumb-item active text-white" aria-current="page">{{ Str::limit($galeri->judul ?? ($galeri->post->judul ?? 'Detail Galeri'), 30) }}</li>
                     </ol>
                 </nav>
-                <h1 class="display-4 fw-bold mb-3">{{ $galeri->post->judul }}</h1>
+                <h1 class="display-4 fw-bold mb-3">{{ $galeri->judul ?? ($galeri->post->judul ?? 'Detail Galeri') }}</h1>
                 <div class="d-flex gap-3 mb-3">
-                    <span class="badge bg-success fs-6 px-3 py-2">
+                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
                         <i class="fas fa-images me-2"></i>{{ $galeri->fotos->count() }} Foto
                     </span>
-                    <span class="badge bg-success fs-6 px-3 py-2">
-                        <i class="fas fa-calendar me-2"></i>{{ \Carbon\Carbon::parse($galeri->post->created_at)->format('d M Y') }}
+                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                        <i class="fas fa-calendar me-2"></i>{{ \Carbon\Carbon::parse($galeri->created_at)->format('d M Y') }}
                     </span>
                 </div>
-                <p class="lead mb-0">{{ Str::limit(strip_tags($galeri->post->isi), 120) }}</p>
+                <p class="lead mb-0">{{ Str::limit(strip_tags($galeri->deskripsi ?? ($galeri->post->isi ?? 'Galeri foto menarik')), 120) }}</p>
             </div>
             <div class="col-md-4 text-center">
                 <div class="hero-stats">
-                    <div class="stat-circle">
-                        <div class="stat-number">{{ $galeri->fotos->count() }}</div>
-                        <div class="stat-label">Foto</div>
-                    </div>
+                    <h2 class="display-2 fw-bold text-white mb-2">{{ $galeri->fotos->count() }}</h2>
+                    <p class="text-white-50 fs-4">Foto dalam galeri</p>
                 </div>
             </div>
         </div>
@@ -52,11 +50,17 @@
         </div>
 
         <!-- Gallery Photos -->
-        <div class="text-box">
+        <div class="gallery-section">
+            <div class="section-header mb-4">
+                <h3 class="section-title">
+                    <i class="fas fa-images me-2"></i>Koleksi Foto
+                </h3>
+                <p class="section-subtitle fs-5 fw-semibold">{{ $galeri->fotos->count() }} foto dalam galeri ini</p>
+            </div>
             <div class="row gallery-photos">
                 @forelse($galeri->fotos as $foto)
-                <div class="col-md-4 col-lg-3 mb-4">
-                    <div class="gallery-photo-item">
+                <div class="col-md-6 col-lg-4 mb-2">
+                    <div class="modern-card photo-card">
                         <div class="photo-container">
                             <img src="{{ asset($foto->file) }}" 
                                  alt="{{ $foto->judul }}" 
@@ -67,18 +71,20 @@
                                     <a href="{{ asset($foto->file) }}" 
                                        data-lightbox="gallery" 
                                        data-title="{{ $foto->judul }}" 
-                                       class="btn btn-light btn-sm me-2">
-                                        <i class="fas fa-expand"></i>
+                                       class="btn-modern light">
+                                        <i class="fas fa-expand me-1"></i>Lihat
                                     </a>
-                                    <button class="btn btn-success btn-sm" onclick="downloadImage('{{ asset($foto->file) }}', '{{ $foto->judul }}')">
-                                        <i class="fas fa-download"></i>
+                                    <button class="btn-modern success" onclick="downloadImage('{{ asset($foto->file) }}', '{{ $foto->judul }}')">
+                                        <i class="fas fa-download me-1"></i>Unduh
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <div class="photo-info">
-                            <h6 class="photo-title">{{ $foto->judul }}</h6>
-                            <small class="text-muted">Foto {{ $loop->iteration }} dari {{ $galeri->fotos->count() }}</small>
+                        <div class="card-body-modern" style="padding: 0.5rem;">
+                            <h6 class="photo-title" style="margin-bottom: 0.1rem; font-size: 0.9rem;">{{ $foto->judul }}</h6>
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-camera me-1"></i>Foto {{ $loop->iteration }} dari {{ $galeri->fotos->count() }}
+                            </small>
                         </div>
                     </div>
                 </div>
@@ -134,9 +140,9 @@
                         </div>
                     </div>
                     <div class="related-content">
-                        <h5 class="related-title">{{ Str::limit($item->post->judul, 40) }}</h5>
+                        <h5 class="related-title">{{ Str::limit($item->judul ?? ($item->post->judul ?? 'Galeri'), 40) }}</h5>
                         <p class="related-date text-muted">
-                            <i class="fas fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($item->post->created_at)->format('d M Y') }}
+                            <i class="fas fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
                         </p>
                         <a href="{{ route('galeri.detail', $item->id) }}" class="btn btn-success btn-sm w-100">
                             <i class="fas fa-arrow-right me-1"></i>Lihat Galeri
@@ -169,10 +175,10 @@
                                     <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('galeri.detail', $galeri->id)) }}" target="_blank" class="btn btn-facebook">
                                         <i class="fab fa-facebook-f"></i>
                                     </a>
-                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('galeri.detail', $galeri->id)) }}&text={{ urlencode($galeri->post->judul) }}" target="_blank" class="btn btn-twitter">
+                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('galeri.detail', $galeri->id)) }}&text={{ urlencode($galeri->judul ?? ($galeri->post->judul ?? 'Galeri')) }}" target="_blank" class="btn btn-twitter">
                                         <i class="fab fa-twitter"></i>
                                     </a>
-                                    <a href="https://wa.me/?text={{ urlencode($galeri->post->judul . ' ' . route('galeri.detail', $galeri->id)) }}" target="_blank" class="btn btn-whatsapp">
+                                    <a href="https://wa.me/?text={{ urlencode(($galeri->judul ?? ($galeri->post->judul ?? 'Galeri')) . ' ' . route('galeri.detail', $galeri->id)) }}" target="_blank" class="btn btn-whatsapp">
                                         <i class="fab fa-whatsapp"></i>
                                     </a>
                                     <button class="btn btn-secondary" onclick="copyToClipboard('{{ route('galeri.detail', $galeri->id) }}')">
@@ -192,30 +198,69 @@
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
 <style>
-.stat-circle {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: #007bff;
+.info-badge {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
+    gap: 0.75rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    padding: 0.75rem 1.25rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
 }
 
-.stat-number {
-    font-size: 2rem;
-    font-weight: 700;
+.info-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.info-badge-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--elunora-primary), #0056b3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.info-badge-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.info-badge-number {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--elunora-dark);
     line-height: 1;
 }
 
-.stat-label {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.8);
-    margin-top: 0.2rem;
+.info-badge-label {
+    font-size: 0.85rem;
+    color: var(--elunora-secondary);
+    font-weight: 500;
+}
+
+.info-badge-date {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--elunora-dark);
+}
+
+.hero-stats {
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 
 .description-card {
@@ -262,10 +307,11 @@
 
 .photo-card {
     background: white;
-    border-radius: 15px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: all 0.3s ease;
+    margin-bottom: 1rem;
 }
 
 .photo-card.seamless {
@@ -286,13 +332,13 @@
 
 .photo-container {
     position: relative;
-    height: 350px;
+    height: 250px;
     overflow: hidden;
 }
 
 .photo-image {
     width: 100%;
-    height: 350px;
+    height: 250px;
     object-fit: cover;
     transition: all 0.4s ease;
 }
@@ -495,7 +541,7 @@
 
 @media (max-width: 768px) {
     .photo-container {
-        height: 200px;
+        height: 180px;
     }
     
     .related-image-container {
@@ -509,6 +555,14 @@
     
     .stat-number {
         font-size: 1.5rem;
+    }
+    
+    .photo-card {
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-body-modern {
+        padding: 0.4rem !important;
     }
 }
 </style>

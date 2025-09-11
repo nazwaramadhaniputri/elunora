@@ -2,11 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Admin\AuthController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\GaleriController;
-use App\Http\Controllers\Admin\BeritaController;
-use App\Http\Controllers\Admin\ProfilController;
+use App\Http\Controllers\Admin\
+{
+    AuthController,
+    DashboardController,
+    GaleriController,
+    BeritaController,
+    ProfilController,
+    ContactController,
+    AgendaController as AdminAgendaController
+};
+use App\Http\Controllers\AgendaController;
 
 // Rute untuk halaman utama (guest)
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -15,8 +21,13 @@ Route::get('/berita/{id}', [HomeController::class, 'beritaDetail'])->name('berit
 Route::get('/galeri', [HomeController::class, 'galeri'])->name('galeri');
 Route::get('/galeri/{id}', [HomeController::class, 'galeriDetail'])->name('galeri.detail');
 Route::get('/profil', [HomeController::class, 'profil'])->name('profil');
+Route::get('/fasilitas-all', [HomeController::class, 'fasilitasAll'])->name('fasilitas.all');
+Route::get('/guru-all', [HomeController::class, 'guruAll'])->name('guru.all');
 Route::get('/kontak', [HomeController::class, 'kontak'])->name('kontak');
 Route::post('/kontak', [HomeController::class, 'kirimPesan'])->name('kontak.kirim');
+Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
+Route::get('/agenda/{id}', [AgendaController::class, 'show'])->name('agenda.show');
+Route::get('/fasilitas', [HomeController::class, 'fasilitasAll'])->name('fasilitas');
 
 // Rute untuk autentikasi admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
@@ -31,11 +42,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
-    // Rute untuk    // Admin Galeri routes
+    // Admin Galeri routes
     Route::resource('galeri', GaleriController::class);
     Route::get('galeri/{id}/add-photo', [GaleriController::class, 'addPhoto'])->name('galeri.add-photo');
     Route::post('galeri/{id}/store-photo', [GaleriController::class, 'storePhoto'])->name('galeri.store-photo');
+    Route::put('galeri/photo/{id}', [GaleriController::class, 'updatePhoto'])->name('galeri.update-photo');
     Route::delete('galeri/photo/{id}', [GaleriController::class, 'deletePhoto'])->name('galeri.delete-photo');
+    
+    // Contact routes
+    Route::get('contact', [ContactController::class, 'index'])->name('contact.index');
+    Route::get('contact/{id}', [ContactController::class, 'show'])->name('contact.show');
+    Route::patch('contact/{id}/read', [ContactController::class, 'markAsRead'])->name('contact.read');
+    Route::patch('contact/{id}/unread', [ContactController::class, 'markAsUnread'])->name('contact.unread');
+    Route::delete('contact/{id}', [ContactController::class, 'destroy'])->name('contact.destroy');
     
     // Admin Fasilitas routes
     Route::resource('fasilitas', App\Http\Controllers\Admin\FasilitasController::class);
@@ -54,12 +73,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::put('/kategori/{id}', [BeritaController::class, 'kategoriUpdate'])->name('berita.kategori.update');
     Route::delete('/kategori/{id}', [BeritaController::class, 'kategoriDestroy'])->name('berita.kategori.destroy');
     
-    // Rute untuk manajemen profil sekolah
-    Route::get('/profil', [ProfilController::class, 'index'])->name('profil.index');
-    Route::get('/profil/create', [ProfilController::class, 'create'])->name('profil.create');
-    Route::post('/profil', [ProfilController::class, 'store'])->name('profil.store');
-    Route::get('/profil/{id}', [ProfilController::class, 'show'])->name('profil.show');
-    Route::get('/profil/{id}/edit', [ProfilController::class, 'edit'])->name('profil.edit');
-    Route::put('/profil/{id}', [ProfilController::class, 'update'])->name('profil.update');
-    Route::delete('/profil/{id}', [ProfilController::class, 'destroy'])->name('profil.destroy');
+    // Admin Profil routes
+    Route::resource('profil', ProfilController::class);
+    
+    // Admin Agenda routes
+    Route::resource('agenda', AdminAgendaController::class);
+    Route::patch('agenda/{agenda}/toggle-status', [AdminAgendaController::class, 'toggleStatus'])->name('agenda.toggle-status');
 });

@@ -4,182 +4,250 @@
 
 @section('content')
 <div class="fade-in">
-    <div class="page-header-modern mb-4">
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="page-title-section">
-                <h4 class="page-title">
-                    <i class="fas fa-tachometer-alt me-3"></i>Dashboard Admin
-                </h4>
-                <p class="page-subtitle">Selamat datang di panel admin Elunora School</p>
+    <!-- Welcome Header -->
+    <div class="dashboard-welcome mb-5">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="welcome-content">
+                    <h2 class="welcome-title" style="display: flex; align-items: center; justify-content: center;">
+                        <img src="{{ asset('img/logo.png') }}" alt="Elunora School" style="height: 100px; width: auto; margin-right: 20px;">
+                        Selamat Datang di Dashboard Admin
+                    </h2>
+                    <p class="welcome-subtitle">Panel kontrol untuk mengelola sistem Elunora School</p>
+                </div>
             </div>
-            <div class="page-actions">
-                <div class="dashboard-time-info">
-                    <span class="time-badge">
-                        <i class="fas fa-calendar me-1"></i>{{ now()->format('d M Y') }}
-                    </span>
-                    <span class="time-badge ms-2">
-                        <i class="fas fa-clock me-1"></i>{{ now()->format('H:i') }} WIB
-                    </span>
+            <div class="col-md-4 text-end">
+                <div class="dashboard-time">
+                    <div class="time-info">
+                        <i class="fas fa-calendar-alt text-primary me-2"></i>
+                        <span class="fw-bold">{{ now()->format('d M Y') }}</span>
+                    </div>
+                    <div class="time-info mt-2">
+                        <i class="fas fa-clock text-primary me-2"></i>
+                        <span class="fw-bold">{{ now()->format('H:i') }} WIB</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="modern-stats-card primary">
-            <div class="stats-content">
-                <div class="stats-icon">
-                    <i class="fas fa-newspaper"></i>
-                </div>
-                <div class="stats-info">
-                    <h3 class="stats-number">{{ $totalBerita }}</h3>
-                    <p class="stats-label">Total Berita</p>
-                </div>
-            </div>
-            <div class="stats-trend">
-                <i class="fas fa-arrow-up"></i>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="modern-stats-card success">
-            <div class="stats-content">
-                <div class="stats-icon">
-                    <i class="fas fa-images"></i>
-                </div>
-                <div class="stats-info">
-                    <h3 class="stats-number">{{ $totalGaleri }}</h3>
-                    <p class="stats-label">Total Galeri</p>
-                </div>
-            </div>
-            <div class="stats-trend">
-                <i class="fas fa-arrow-up"></i>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="modern-stats-card info">
-            <div class="stats-content">
-                <div class="stats-icon">
-                    <i class="fas fa-camera"></i>
-                </div>
-                <div class="stats-info">
-                    <h3 class="stats-number">{{ $totalFoto }}</h3>
-                    <p class="stats-label">Total Foto</p>
-                </div>
-            </div>
-            <div class="stats-trend">
-                <i class="fas fa-arrow-up"></i>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="modern-stats-card warning">
-            <div class="stats-content">
-                <div class="stats-icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <div class="stats-info">
-                    <h3 class="stats-number">{{ $totalKategori }}</h3>
-                    <p class="stats-label">Total Kategori</p>
-                </div>
-            </div>
-            <div class="stats-trend">
-                <i class="fas fa-arrow-up"></i>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="modern-card">
-            <div class="card-header-modern">
-                <h5 class="card-title-modern">
-                    <i class="fas fa-chart-line me-2"></i>Statistik Sekolah
-                </h5>
-            </div>
-            <div class="card-body-modern">
-                <div class="school-stats-list">
-                    <div class="school-stat-item">
-                        <div class="stat-icon-wrapper">
-                            <i class="fas fa-chalkboard-teacher text-primary"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h6>Total Guru & Staff</h6>
-                            <span class="stat-number">{{ \App\Models\Guru::where('status', 1)->count() }}</span>
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="dashboard-stat-card">
+                <div class="stat-card-body">
+                    <div class="stat-icon-container">
+                        <div class="stat-icon bg-primary">
+                            <i class="fas fa-newspaper"></i>
                         </div>
                     </div>
-                    <div class="school-stat-item">
-                        <div class="stat-icon-wrapper">
-                            <i class="fas fa-building text-info"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h6>Fasilitas Sekolah</h6>
-                            <span class="stat-number">{{ \App\Models\Fasilitas::where('status', 1)->count() }}</span>
-                        </div>
-                    </div>
-                    <div class="school-stat-item">
-                        <div class="stat-icon-wrapper">
-                            <i class="fas fa-envelope text-warning"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h6>Pesan Masuk</h6>
-                            <span class="stat-number">{{ \App\Models\Contact::where('status', 0)->count() }}</span>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ $totalBerita }}</h4>
+                        <p class="stat-label">Total Berita</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            <small class="text-success">Aktif</small>
                         </div>
                     </div>
                 </div>
+                <a href="{{ route('admin.berita.index') }}" class="stat-card-footer">
+                    Lihat Semua <i class="fas fa-arrow-right ms-2"></i>
+                </a>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-6 mb-4">
-        <div class="modern-card">
-            <div class="card-header-modern">
-                <h5 class="card-title-modern">
-                    <i class="fas fa-bolt me-2"></i>Aksi Cepat
-                </h5>
-            </div>
-            <div class="card-body-modern">
-                <div class="quick-actions">
-                    <a href="{{ route('admin.berita.create') }}" class="quick-action-btn primary">
-                        <div class="action-icon">
-                            <i class="fas fa-plus-circle"></i>
-                        </div>
-                        <div class="action-content">
-                            <h6>Tambah Berita</h6>
-                            <p>Buat artikel berita baru</p>
-                        </div>
-                    </a>
-                    <a href="{{ route('admin.galeri.index') }}" class="quick-action-btn success">
-                        <div class="action-icon">
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="dashboard-stat-card">
+                <div class="stat-card-body">
+                    <div class="stat-icon-container">
+                        <div class="stat-icon bg-success">
                             <i class="fas fa-images"></i>
                         </div>
-                        <div class="action-content">
-                            <h6>Kelola Galeri</h6>
-                            <p>Tambah foto ke galeri</p>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ $totalGaleri }}</h4>
+                        <p class="stat-label">Total Galeri</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            <small class="text-success">Aktif</small>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('admin.galeri.index') }}" class="stat-card-footer">
+                    Lihat Semua <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="dashboard-stat-card">
+                <div class="stat-card-body">
+                    <div class="stat-icon-container">
+                        <div class="stat-icon bg-info">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ $totalFoto }}</h4>
+                        <p class="stat-label">Total Foto</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            <small class="text-success">Aktif</small>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('admin.galeri.index') }}" class="stat-card-footer">
+                    Lihat Semua <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+        
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="dashboard-stat-card">
+                <div class="stat-card-body">
+                    <div class="stat-icon-container">
+                        <div class="stat-icon bg-warning">
+                            <i class="fas fa-tags"></i>
+                        </div>
+                    </div>
+                    <div class="stat-content">
+                        <h4 class="stat-number">{{ $totalKategori }}</h4>
+                        <p class="stat-label">Total Kategori</p>
+                        <div class="stat-trend">
+                            <i class="fas fa-arrow-up text-success me-1"></i>
+                            <small class="text-success">Aktif</small>
+                        </div>
+                    </div>
+                </div>
+                <a href="{{ route('admin.berita.kategori.index') }}" class="stat-card-footer">
+                    Lihat Semua <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Management Cards -->
+
+    <div class="row">
+        <div class="col-md-8 mb-4">
+            <div class="dashboard-management-card">
+                <div class="management-header">
+                    <h5 class="management-title">
+                        <i class="fas fa-cogs me-2 text-primary"></i>
+                        Manajemen Sekolah
+                    </h5>
+                    <p class="management-subtitle">Kelola data dan informasi sekolah</p>
+                </div>
+                <div class="management-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="management-item">
+                                <div class="management-icon">
+                                    <i class="fas fa-chalkboard-teacher text-primary"></i>
+                                </div>
+                                <div class="management-content">
+                                    <h6 class="management-count">{{ \App\Models\Guru::where('status', 1)->count() }}</h6>
+                                    <p class="management-label">Guru & Staff</p>
+                                    <a href="{{ route('admin.guru.index') }}" class="management-link">
+                                        Kelola <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="management-item">
+                                <div class="management-icon">
+                                    <i class="fas fa-building text-success"></i>
+                                </div>
+                                <div class="management-content">
+                                    <h6 class="management-count">{{ \App\Models\Fasilitas::where('status', 1)->count() }}</h6>
+                                    <p class="management-label">Fasilitas</p>
+                                    <a href="{{ route('admin.fasilitas.index') }}" class="management-link">
+                                        Kelola <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="management-item">
+                                <div class="management-icon">
+                                    <i class="fas fa-calendar-alt text-info"></i>
+                                </div>
+                                <div class="management-content">
+                                    <h6 class="management-count">{{ \App\Models\Agenda::where('tanggal', '>=', now())->count() }}</h6>
+                                    <p class="management-label">Agenda Mendatang</p>
+                                    <a href="{{ route('admin.agenda.index') }}" class="management-link">
+                                        Kelola <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="management-item">
+                                <div class="management-icon">
+                                    <i class="fas fa-envelope text-warning"></i>
+                                </div>
+                                <div class="management-content">
+                                    <h6 class="management-count">{{ \App\Models\Contact::where('status', 0)->count() }}</h6>
+                                    <p class="management-label">Pesan Baru</p>
+                                    <a href="{{ route('admin.contact.index') }}" class="management-link">
+                                        Lihat <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="dashboard-quick-actions">
+                <div class="quick-actions-header">
+                    <h5 class="quick-actions-title">
+                        <i class="fas fa-bolt me-2 text-primary"></i>
+                        Aksi Cepat
+                    </h5>
+                    <p class="quick-actions-subtitle">Tambah konten baru dengan cepat</p>
+                </div>
+                <div class="quick-actions-body">
+                    <a href="{{ route('admin.berita.create') }}" class="dashboard-quick-btn">
+                        <div class="quick-btn-icon bg-primary">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="quick-btn-content">
+                            <span class="quick-btn-title">Tambah Berita</span>
+                            <small class="quick-btn-desc">Buat artikel baru</small>
                         </div>
                     </a>
-                    <a href="{{ route('admin.guru.create') }}" class="quick-action-btn info">
-                        <div class="action-icon">
-                            <i class="fas fa-chalkboard-teacher"></i>
+                    
+                    <a href="{{ route('admin.galeri.create') }}" class="dashboard-quick-btn">
+                        <div class="quick-btn-icon bg-success">
+                            <i class="fas fa-images"></i>
                         </div>
-                        <div class="action-content">
-                            <h6>Tambah Guru</h6>
-                            <p>Daftarkan guru baru</p>
+                        <div class="quick-btn-content">
+                            <span class="quick-btn-title">Tambah Galeri</span>
+                            <small class="quick-btn-desc">Upload foto baru</small>
                         </div>
                     </a>
-                    <a href="{{ route('admin.fasilitas.create') }}" class="quick-action-btn warning">
-                        <div class="action-icon">
-                            <i class="fas fa-building"></i>
+                    
+                    <a href="{{ route('admin.guru.create') }}" class="dashboard-quick-btn">
+                        <div class="quick-btn-icon bg-info">
+                            <i class="fas fa-user-plus"></i>
                         </div>
-                        <div class="action-content">
-                            <h6>Tambah Fasilitas</h6>
-                            <p>Daftarkan fasilitas baru</p>
+                        <div class="quick-btn-content">
+                            <span class="quick-btn-title">Tambah Guru</span>
+                            <small class="quick-btn-desc">Daftarkan guru baru</small>
+                        </div>
+                    </a>
+                    
+                    <a href="{{ route('admin.fasilitas.create') }}" class="dashboard-quick-btn">
+                        <div class="quick-btn-icon bg-warning">
+                            <i class="fas fa-plus-square"></i>
+                        </div>
+                        <div class="quick-btn-content">
+                            <span class="quick-btn-title">Tambah Fasilitas</span>
+                            <small class="quick-btn-desc">Daftarkan fasilitas</small>
                         </div>
                     </a>
                 </div>
@@ -187,5 +255,305 @@
         </div>
     </div>
 </div>
-</div>
+@endsection
+
+@section('styles')
+<style>
+/* Stat Card Footer */
+.stat-card-footer {
+    background: rgba(37, 99, 235, 0.05);
+    padding: 1rem;
+    text-align: center;
+    border-top: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    color: var(--elunora-primary) !important;
+    text-decoration: none !important;
+    display: block;
+    font-weight: 500;
+}
+
+.stat-card-footer:hover {
+    background: var(--elunora-primary);
+    color: white !important;
+    text-decoration: none !important;
+}
+/* Dashboard Welcome Section */
+.dashboard-welcome {
+    background: linear-gradient(135deg, var(--elunora-light) 0%, #e9ecef 100%);
+    border-radius: 15px;
+    padding: 2rem;
+    border: 1px solid #dee2e6;
+}
+
+.welcome-title {
+    color: #2c3e50;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+    color: #6c757d;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+.dashboard-time {
+    text-align: right;
+}
+
+.time-info {
+    font-size: 0.95rem;
+    color: #495057;
+}
+
+/* Dashboard Statistics Cards */
+.dashboard-stat-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #f1f3f4;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.dashboard-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.stat-card-body {
+    padding: 1.25rem;
+    position: relative;
+}
+
+.stat-icon-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+}
+
+.stat-content {
+    padding-right: 65px;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.stat-trend {
+    font-size: 0.875rem;
+}
+
+/* Management Card */
+.dashboard-management-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #f1f3f4;
+    overflow: hidden;
+}
+
+.management-header {
+    background: var(--elunora-gradient-primary);
+    color: white;
+    padding: 1.5rem;
+}
+
+.management-title {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.management-subtitle {
+    margin-bottom: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.management-body {
+    padding: 1.5rem;
+}
+
+.management-item {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 1.25rem;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.management-item:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.management-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.management-count {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+}
+
+.management-label {
+    color: #6c757d;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.management-link {
+    color: var(--elunora-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.management-link:hover {
+    color: var(--elunora-primary-dark);
+}
+
+/* Quick Actions */
+.dashboard-quick-actions {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #f1f3f4;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.quick-actions-header {
+    background: var(--elunora-gradient-success);
+    color: white;
+    padding: 1.5rem;
+}
+
+.quick-actions-title {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.quick-actions-subtitle {
+    margin-bottom: 0;
+    opacity: 0.9;
+    font-size: 0.95rem;
+}
+
+.quick-actions-body {
+    padding: 1.5rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.dashboard-quick-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 1rem;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.dashboard-quick-btn:last-child {
+    margin-bottom: 0;
+}
+
+.dashboard-quick-btn:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+    text-decoration: none;
+    color: inherit;
+}
+
+.quick-btn-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 1rem;
+    font-size: 1.1rem;
+}
+
+.quick-btn-content {
+    flex: 1;
+}
+
+.quick-btn-title {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+}
+
+.quick-btn-desc {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-welcome {
+        padding: 1.5rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .management-body {
+        padding: 1rem;
+    }
+    
+    .quick-actions-body {
+        padding: 1rem;
+    }
+}
+
+</style>
+
 @endsection

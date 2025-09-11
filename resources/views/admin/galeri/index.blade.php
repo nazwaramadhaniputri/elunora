@@ -134,7 +134,7 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Posisi</label>
-                                <input type="number" class="form-control" name="position" value="1" min="1" required>
+                                <input type="number" class="form-control" name="position" value="0" min="0" required>
                             </div>
                         </div>
                     </div>
@@ -166,8 +166,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save me-2"></i>Simpan Galeri</button>
+                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-modern success"><i class="fas fa-save me-2"></i>Simpan Galeri</button>
                 </div>
             </form>
         </div>
@@ -228,8 +228,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-warning"><i class="fas fa-save me-2"></i>Update Galeri</button>
+                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-modern warning"><i class="fas fa-save me-2"></i>Update Galeri</button>
                 </div>
             </form>
         </div>

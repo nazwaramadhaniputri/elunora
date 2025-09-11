@@ -105,8 +105,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Simpan</button>
+                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-modern primary">Tambah Kategori</button>
                 </div>
             </form>
         </div>
@@ -134,8 +134,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-modern success">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -152,7 +152,7 @@
             const nama = $(this).data('nama');
             
             $('#edit_nama_kategori').val(nama);
-            $('#editKategoriForm').attr('action', `/admin/berita/kategori/${id}`);
+            $('#editKategoriForm').attr('action', `/admin/kategori/${id}`);
         });
     });
 </script>

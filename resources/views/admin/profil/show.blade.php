@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Detail Profil')
+@section('title', 'Detail Profile')
 
 @section('content')
 <div class="container-fluid">
@@ -9,13 +9,13 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">
-                        <i class="fas fa-eye me-2"></i>Detail Profil Sekolah
+                        <i class="fas fa-eye me-2"></i>Detail Profile Sekolah
                     </h3>
                     <div>
-                        <a href="{{ route('admin.profil.edit', $profile->id) }}" class="btn btn-warning">
+                        <a href="{{ route('admin.profil.edit', $profile->id) }}" class="btn-modern warning">
                             <i class="fas fa-edit me-2"></i>Edit
                         </a>
-                        <a href="{{ route('admin.profil.index') }}" class="btn btn-secondary">
+                        <a href="{{ route('admin.profil.index') }}" class="btn-modern secondary">
                             <i class="fas fa-arrow-left me-2"></i>Kembali
                         </a>
                     </div>
@@ -55,7 +55,7 @@
                     </div>
                     
                     <div class="mt-3">
-                        <a href="{{ route('profil') }}" class="btn btn-info" target="_blank">
+                        <a href="{{ route('profil') }}" class="btn-modern info" target="_blank">
                             <i class="fas fa-eye me-2"></i>Lihat di Halaman Publik
                         </a>
                     </div>

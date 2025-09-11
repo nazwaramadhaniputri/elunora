@@ -6,33 +6,59 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
 use App\Models\Petugas;
 
 class AuthController extends Controller
 {
     public function showLoginForm()
     {
+        if (Auth::guard('petugas')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
         return view('admin.auth.login');
     }
 
     public function login(Request $request)
     {
+        // Validate request
         $credentials = $request->validate([
             'email' => 'required|email',
-            'password' => 'required',
+            'password' => 'required|string',
         ]);
 
-        $petugas = Petugas::where('email', $credentials['email'])->first();
-
-        if ($petugas && Hash::check($credentials['password'], $petugas->password)) {
-            Auth::guard('petugas')->login($petugas, $request->has('remember'));
-            $request->session()->regenerate();
-            return redirect()->intended(route('admin.dashboard'));
+        // Rate limiting
+        $throttleKey = $this->throttleKey($request);
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return back()->withErrors([
+                'email' => "Terlalu banyak percobaan login. Silakan coba lagi dalam {$seconds} detik.",
+            ]);
         }
 
+        // Attempt to authenticate
+        if (Auth::guard('petugas')->attempt([
+            'email' => $credentials['email'],
+            'password' => $credentials['password']
+        ], $request->boolean('remember'))) {
+            $request->session()->regenerate();
+            RateLimiter::clear($throttleKey);
+            
+            return redirect()->intended(route('admin.dashboard'))
+                ->with('success', 'Login berhasil! Selamat datang kembali.');
+        }
+
+        // If authentication fails
+        RateLimiter::hit($throttleKey, 300); // 5 minutes cooldown
+        
         return back()->withErrors([
             'email' => 'Email atau password yang Anda masukkan salah.',
         ])->withInput($request->only('email', 'remember'));
+    }
+    
+    protected function throttleKey(Request $request)
+    {
+        return 'login.'.$request->ip();
     }
 
     public function logout(Request $request)

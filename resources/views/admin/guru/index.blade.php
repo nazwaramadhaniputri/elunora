@@ -3,27 +3,35 @@
 @section('title', 'Manajemen Guru & Staff')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="fas fa-chalkboard-teacher me-2"></i>Manajemen Guru & Staff</h4>
-                    <a href="{{ route('admin.guru.create') }}" class="btn btn-success">
-                        <i class="fas fa-plus me-2"></i>Tambah Guru
-                    </a>
-                </div>
-                <div class="card-body">
-                    @if(session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    @endif
+<div class="fade-in">
+    <div class="page-header-modern mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="page-title-section">
+                <h4 class="page-title">
+                    <i class="fas fa-chalkboard-teacher me-3"></i>Manajemen Guru & Staff
+                </h4>
+                <p class="page-subtitle">Kelola data guru dan staff sekolah</p>
+            </div>
+            <div class="page-actions">
+                <a href="{{ route('admin.guru.create') }}" class="btn-modern primary">
+                    <i class="fas fa-plus me-2"></i>Tambah Guru
+                </a>
+            </div>
+        </div>
+    </div>
 
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-dark">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    @endif
+
+    <div class="modern-table-card">
+        <div class="table-card-body">
+            <div class="table-responsive">
+                <table class="modern-table">
+                            <thead>
                                 <tr>
                                     <th>No</th>
                                     <th>Foto</th>
@@ -58,27 +66,27 @@
                                     <td>{{ $guru->mata_pelajaran ?: '-' }}</td>
                                     <td>
                                         @if($guru->status)
-                                            <span class="badge bg-success">Aktif</span>
+                                            <span class="status-badge published">
+                                                <i class="fas fa-check-circle me-1"></i>Aktif
+                                            </span>
                                         @else
-                                            <span class="badge bg-danger">Tidak Aktif</span>
+                                            <span class="status-badge draft">
+                                                <i class="fas fa-pause-circle me-1"></i>Tidak Aktif
+                                            </span>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.guru.show', $guru->id) }}" 
-                                               class="btn btn-info btn-sm" title="Lihat Detail">
+                                        <div class="action-buttons">
+                                            <a href="{{ route('admin.guru.show', $guru->id) }}" class="action-btn info" title="Detail">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.guru.edit', $guru->id) }}" 
-                                               class="btn btn-warning btn-sm" title="Edit">
+                                            <a href="{{ route('admin.guru.edit', $guru->id) }}" class="action-btn primary" title="Edit">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <form action="{{ route('admin.guru.destroy', $guru->id) }}" 
-                                                  method="POST" class="d-inline"
-                                                  onsubmit="return confirm('Apakah Anda yakin ingin menghapus guru ini?')">
+                                            <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus guru ini?')">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" title="Hapus">
+                                                <button type="submit" class="action-btn danger" title="Hapus">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -91,7 +99,7 @@
                                         <div class="text-muted">
                                             <i class="fas fa-chalkboard-teacher fa-3x mb-3"></i>
                                             <p>Belum ada data guru.</p>
-                                            <a href="{{ route('admin.guru.create') }}" class="btn btn-success">
+                                            <a href="{{ route('admin.guru.create') }}" class="btn-modern primary">
                                                 <i class="fas fa-plus me-2"></i>Tambah Guru Pertama
                                             </a>
                                         </div>
@@ -99,18 +107,16 @@
                                 </tr>
                                 @endforelse
                             </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    @if($gurus->hasPages())
-                        <div class="d-flex justify-content-center mt-4">
-                            {{ $gurus->links() }}
-                        </div>
-                    @endif
-                </div>
+                </table>
             </div>
         </div>
     </div>
+
+    <!-- Pagination -->
+    @if($gurus->hasPages())
+        <div class="d-flex justify-content-center mt-4">
+            {{ $gurus->links() }}
+        </div>
+    @endif
 </div>
 @endsection

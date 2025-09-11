@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Profil Sekolah')
+@section('title', 'Profile Sekolah')
 
 @section('content')
 <div class="fade-in">
@@ -8,14 +8,20 @@
         <div class="d-flex justify-content-between align-items-center">
             <div class="page-title-section">
                 <h4 class="page-title">
-                    <i class="fas fa-school me-3"></i>Profil Sekolah
+                    <i class="fas fa-school me-3"></i>Profile Sekolah
                 </h4>
-                <p class="page-subtitle">Kelola informasi profil sekolah</p>
+                <p class="page-subtitle">Kelola informasi profile sekolah</p>
             </div>
             <div class="page-actions">
-                <a href="{{ route('admin.profil.create') }}" class="btn-modern primary">
-                    <i class="fas fa-plus me-2"></i>Tambah Profil
-                </a>
+                @if($profiles->count() > 0)
+                    <a href="{{ route('admin.profil.edit', $profiles->first()->id) }}" class="btn-modern primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                @else
+                    <a href="{{ route('admin.profil.create') }}" class="btn-modern primary">
+                        <i class="fas fa-plus me-2"></i>Tambah Profile
+                    </a>
+                @endif
             </div>
         </div>
     </div>
@@ -49,44 +55,49 @@
                     </thead>
                     <tbody>
                         @forelse($profiles as $index => $profile)
-                        <tr>
-                            <td class="text-center">{{ $index + 1 }}</td>
-                            <td>{{ $profile->nama_sekolah }}</td>
-                            <td>{{ $profile->email }}</td>
-                            <td>{{ $profile->telepon }}</td>
-                            <td class="text-center">
-                                <div class="action-buttons">
-                                    <a href="{{ route('admin.profil.show', $profile->id) }}" class="action-btn info" title="Lihat">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('admin.profil.edit', $profile->id) }}" class="action-btn primary" title="Edit">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('admin.profil.destroy', $profile->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="action-btn danger" onclick="return confirm('Apakah Anda yakin ingin mengedit profil ini?')" title="Hapus">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-5">
-                                <div class="empty-state">
-                                    <div class="empty-icon">
-                                        <i class="fas fa-school"></i>
+                            <tr>
+                                <td class="text-center">{{ $index + 1 }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3 bg-light rounded d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-school text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <strong>{{ $profile->nama_sekolah }}</strong>
+                                            <br><small class="text-muted">{{ Str::limit($profile->deskripsi ?? 'Profil sekolah', 50) }}</small>
+                                        </div>
                                     </div>
-                                    <h5 class="empty-title">Belum Ada Profil Sekolah</h5>
-                                    <p class="empty-text">Mulai dengan menambahkan profil sekolah pertama</p>
-                                    <a href="{{ route('admin.profil.create') }}" class="btn-modern primary">
-                                        <i class="fas fa-plus me-2"></i>Tambah Profil
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                                </td>
+                                <td>
+                                    <span class="status-badge published">
+                                        <i class="fas fa-envelope me-1"></i>{{ $profile->email }}
+                                    </span>
+                                </td>
+                                <td>{{ $profile->telepon }}</td>
+                                <td class="text-center">
+                                    <div class="action-buttons">
+                                        <a href="{{ route('admin.profil.show', $profile->id) }}" class="action-btn info" title="Lihat">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ route('admin.profil.edit', $profile->id) }}" class="action-btn primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="empty-state">
+                                        <div class="empty-icon">
+                                            <i class="fas fa-school"></i>
+                                        </div>
+                                        <h5 class="empty-title">Belum Ada Profil Sekolah</h5>
+                                        <p class="empty-text">Hubungi administrator untuk menambahkan profil sekolah</p>
+                                    </div>
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>

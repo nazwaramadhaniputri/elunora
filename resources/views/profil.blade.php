@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Profil Sekolah')
+@section('title', 'Profile Sekolah')
 
 @section('hero')
 <div class="hero-section">
@@ -8,21 +8,21 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="display-4 fw-bold text-white mb-3">
-                    <i class="fas fa-school me-3"></i>Profil Elunora School
+                    <i class="fas fa-school me-3"></i>Profile Sekolah
                 </h1>
-                <p class="lead mb-4 text-white">Sekolah Menengah Kejuruan Unggulan dengan Prestasi Membanggakan</p>
+                <p class="lead mb-4 text-white">Mengenal lebih dekat tentang profile dan sejarah Elunora School</p>
                 <div class="d-flex gap-3">
                     <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="fas fa-award me-2"></i>Terakreditasi A
+                        <i class="fas fa-graduation-cap me-2"></i>School of Art
                     </span>
                     <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="fas fa-graduation-cap me-2"></i>5 Jurusan
+                        <i class="fas fa-star me-2"></i>Sekolah Unggulan
                     </span>
                 </div>
             </div>
             <div class="col-md-4 text-center">
                 <div class="hero-icon">
-                    <i class="fas fa-university" style="font-size: 8rem; color: rgba(255, 255, 255, 0.2);"></i>
+                    <i class="fas fa-school" style="font-size: 8rem; color: rgba(255, 255, 255, 0.2);"></i>
                 </div>
             </div>
         </div>
@@ -30,31 +30,96 @@
 </div>
 @endsection
 
+
 @section('content')
-@if($profile)
-<section class="py-5">
+<!-- Profil Detail Section -->
+<section class="py-5 bg-light">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-lg">
-                    <div class="card-header bg-primary text-white">
-                        <h3 class="mb-0"><i class="fas fa-info-circle me-2"></i>{{ $profile->nama_sekolah }}</h3>
+            <div class="col-lg-12">
+                <div class="modern-profile-card">
+                    <div class="profile-header">
+                        <div class="profile-header-content">
+                            <div class="profile-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <div class="profile-header-text">
+                                <h3 class="profile-header-title">{{ $profile ? $profile->nama_sekolah : 'Elunora School' }}</h3>
+                                <p class="profile-header-subtitle">Informasi Lengkap Sekolah</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="profile-content">
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <p><strong>Nama Sekolah:</strong> {{ $profile->nama_sekolah }}</p>
-                                    <p><strong>Alamat:</strong> {{ $profile->alamat }}</p>
-                                    <p><strong>Telepon:</strong> {{ $profile->telepon }}</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Email:</strong> {{ $profile->email }}</p>
+                    <div class="profile-body">
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="video-container mb-4">
+                                    <iframe src="https://www.youtube.com/embed/hfKhYKXdFmM?autoplay=0&mute=0&loop=1&playlist=hfKhYKXdFmM&controls=1&showinfo=0&rel=0&iv_load_policy=3&modestbranding=1&vq=hd1080" 
+                                            frameborder="0" 
+                                            allow="autoplay; encrypted-media" 
+                                            allowfullscreen>
+                                    </iframe>
                                 </div>
                             </div>
-                            <div class="mt-4">
-                                <h5>Deskripsi Sekolah</h5>
-                                <p>{!! nl2br(e($profile->deskripsi)) !!}</p>
+                            <div class="col-lg-6">
+                                <div class="school-info-grid">
+                                    <div class="info-item-modern">
+                                        <div class="info-icon-modern">
+                                            <i class="fas fa-school"></i>
+                                        </div>
+                                        <div class="info-content-modern">
+                                            <span class="info-label-modern">Nama Sekolah</span>
+                                            <span class="info-value-modern">{{ $profile ? $profile->nama_sekolah : 'Elunora School' }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item-modern">
+                                        <div class="info-icon-modern">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </div>
+                                        <div class="info-content-modern">
+                                            <span class="info-label-modern">Alamat</span>
+                                            <span class="info-value-modern">{{ $profile ? $profile->alamat : 'Alamat belum diatur' }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item-modern">
+                                        <div class="info-icon-modern">
+                                            <i class="fas fa-phone"></i>
+                                        </div>
+                                        <div class="info-content-modern">
+                                            <span class="info-label-modern">Telepon</span>
+                                            <span class="info-value-modern">{{ $profile ? $profile->telepon : 'Telepon belum diatur' }}</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="info-item-modern">
+                                        <div class="info-icon-modern">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="info-content-modern">
+                                            <span class="info-label-modern">Email</span>
+                                            <span class="info-value-modern">{{ $profile ? $profile->email : 'Email belum diatur' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="description-section">
+                                    <div class="description-header">
+                                        <div class="description-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                        <h5 class="description-title">Deskripsi Sekolah</h5>
+                                    </div>
+                                    <div class="description-content">
+                                        <p>{!! nl2br(e($profile->deskripsi ?? 'Elunora School merupakan lembaga pendidikan yang berlandaskan pada filosofi Art of School, yakni perpaduan antara ilmu pengetahuan, seni, dan pembentukan karakter. Dengan komitmen mencetak generasi unggul, Elunora School menghadirkan suasana belajar yang tidak hanya berfokus pada aspek akademik, tetapi juga pada pengembangan kreativitas, kepribadian, dan nilai-nilai kemanusiaan.
+
+Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elunora School menjadi wadah bagi siswa untuk menemukan dan mengasah potensi terbaiknya. Melalui program pembelajaran yang inovatif, kegiatan seni dan budaya, serta pendidikan karakter yang kuat, Elunora School bertekad melahirkan generasi yang berwawasan luas, berjiwa kreatif, dan siap menghadapi tantangan global.')) !!}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -63,7 +128,6 @@
         </div>
     </div>
 </section>
-@endif
 
 <!-- Visi dan Kompetensi Keahlian -->
 <section class="py-5">
@@ -76,7 +140,7 @@
                             <i class="fas fa-bullseye"></i>
                         </div>
                         <h3 class="info-title mb-4">Visi Sekolah</h3>
-                        <p class="text-justify">"Menjadi sekolah kejuruan unggulan yang melahirkan lulusan profesional, kreatif, dan siap bersaing di dunia kerja nasional maupun internasional."</p>
+                        <p class="text-justify">"Menjadi School of Art yang melahirkan lulusan kreatif, berbakat, dan siap bersaing di dunia seni nasional maupun internasional."</p>
                     </div>
                 </div>
             </div>
@@ -86,22 +150,22 @@
                         <div class="info-icon mb-3">
                             <i class="fas fa-graduation-cap"></i>
                         </div>
-                        <h3 class="info-title mb-4">Kompetensi Keahlian</h3>
+                        <h3 class="info-title mb-4">Kategori</h3>
                         <ul class="list-unstyled">
                             <li class="mb-2">
-                                <i class="fas fa-check-circle text-success me-2"></i>Teknik Komputer dan Jaringan (TKJ)
+                                <i class="fas fa-music text-success me-2"></i>Seni Musik
                             </li>
                             <li class="mb-2">
-                                <i class="fas fa-check-circle text-success me-2"></i>Rekayasa Perangkat Lunak (RPL)
+                                <i class="fas fa-theater-masks text-success me-2"></i>Seni Teater
                             </li>
                             <li class="mb-2">
-                                <i class="fas fa-check-circle text-success me-2"></i>Multimedia (MM)
+                                <i class="fas fa-palette text-success me-2"></i>Seni Rupa
                             </li>
                             <li class="mb-2">
-                                <i class="fas fa-check-circle text-success me-2"></i>Akuntansi dan Keuangan Lembaga (AKL)
+                                <i class="fas fa-video text-success me-2"></i>Seni Media Digital
                             </li>
                             <li class="mb-2">
-                                <i class="fas fa-check-circle text-success me-2"></i>Otomatisasi dan Tata Kelola Perkantoran (OTKP)
+                                <i class="fas fa-camera text-success me-2"></i>Fotografi & Sinematografi
                             </li>
                         </ul>
                     </div>
@@ -147,6 +211,14 @@
             </div>
             @endforelse
         </div>
+        
+        @if($fasilitas->count() > 0)
+        <div class="text-center mt-4">
+            <a href="{{ route('fasilitas.all') }}" class="btn-modern primary">
+                <i class="fas fa-building me-2"></i>Lihat Semua Fasilitas
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 
@@ -189,6 +261,14 @@
             </div>
             @endforelse
         </div>
+        
+        @if($gurus->count() > 0)
+        <div class="text-center mt-4">
+            <a href="{{ route('guru.all') }}" class="btn-modern primary">
+                <i class="fas fa-chalkboard-teacher me-2"></i>Lihat Semua Guru & Staff
+            </a>
+        </div>
+        @endif
     </div>
 </section>
 
@@ -196,6 +276,432 @@
 
 @section('styles')
 <style>
+.modern-profile-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    border: none;
+    margin-bottom: 2rem;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, var(--elunora-primary), #0056b3);
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.05);
+    transform: rotate(45deg);
+}
+
+.profile-header-content {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-header-title {
+    color: white;
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.profile-header-subtitle {
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0.5rem 0 0 0;
+    font-size: 1.1rem;
+}
+
+.profile-body {
+    padding: 2.5rem;
+}
+
+.school-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item-modern {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem;
+    background: #f8fafc;
+    border-radius: 12px;
+    border-left: 3px solid var(--elunora-primary);
+}
+
+
+.info-icon-modern {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--elunora-primary), #0056b3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    flex-shrink: 0;
+    box-shadow: 0 3px 10px rgba(30, 58, 138, 0.2);
+}
+
+.info-content-modern {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.info-label-modern {
+    font-size: 0.8rem;
+    color: var(--elunora-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value-modern {
+    font-size: 0.95rem;
+    color: var(--elunora-dark);
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.description-section {
+    background: #f8fafc;
+    border-radius: 20px;
+    padding: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.description-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Page Header */
+.page-header {
+    padding: 6rem 0 8rem;
+    position: relative;
+    overflow: hidden;
+    color: #fff;
+}
+
+.page-header h1 {
+    position: relative;
+    z-index: 2;
+}
+
+.page-header .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 1rem 0 0;
+    justify-content: center;
+}
+
+.page-header .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.page-header .breadcrumb-item a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.page-header .breadcrumb-item.active {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.page-header .breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Icon Box */
+.icon-box {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.75rem;
+}
+
+.bg-soft-primary {
+    background-color: rgba(30, 58, 138, 0.1);
+}
+
+/* Divider */
+.divider {
+    width: 80px;
+    height: 4px;
+    border-radius: 2px;
+    margin: 0 auto;
+}
+
+/* Card Hover Effect */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Video Play Button */
+.btn-play {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--elunora-primary);
+    border: none;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.btn-play:hover {
+    background: #fff;
+    transform: translate(-50%, -50%) scale(1.1);
+    color: var(--elunora-primary);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 991.98px) {
+    .page-header {
+        padding: 5rem 0 7rem;
+    }
+    
+    .icon-box {
+        width: 70px;
+        height: 70px;
+        font-size: 1.5rem;
+    }
+    
+    .btn-play {
+        width: 70px;
+        height: 70px;
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .page-header {
+        padding: 4rem 0 6rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        font-size: 1.25rem;
+    }
+    
+    .btn-play {
+        width: 60px;
+        height: 60px;
+        font-size: 1rem;
+    }
+}
+
+/* Modern Profile Card */
+/* Gallery Styles */
+.gallery-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    height: 250px;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.gallery-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 58, 138, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gallery-caption {
+    text-align: center;
+    color: #fff;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-overlay {
+    opacity: 1;
+}
+
+.gallery-item:hover .gallery-caption {
+    transform: translateY(0);
+}
+
+.gallery-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Modern Profile Card */
+.modern-profile-card {
+    background: #fff;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.profile-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    padding: 2rem;
+    color: #fff;
+    position: relative;
+}
+
+.profile-header-content {
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.profile-icon {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin-right: 1.5rem;
+}
+
+.profile-header-text h3 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.profile-header-subtitle {
+    opacity: 0.9;
+    margin: 0.25rem 0 0;
+}
+
+.profile-body {
+    padding: 2rem;
+}
+
+.description-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--elunora-primary), #1e40af);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.description-title {
+    color: var(--elunora-dark);
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.description-content {
+    color: var(--elunora-secondary);
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+.description-content p {
+    margin: 0;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .hero-icon {
     animation: float 3s ease-in-out infinite;
 }

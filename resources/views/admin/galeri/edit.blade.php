@@ -57,7 +57,7 @@
 <div class="container-fluid">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Edit Galeri</h1>
-        <a href="{{ route('admin.galeri.index') }}" class="d-none d-sm-inline-block btn btn-sm btn-secondary shadow-sm">
+        <a href="{{ route('admin.galeri.index') }}" class="d-none d-sm-inline-block btn-modern secondary shadow-sm">
             <i class="fas fa-arrow-left fa-sm text-white-50"></i> Kembali
         </a>
     </div>
@@ -92,6 +92,24 @@
                         @method('PUT')
                         
                         <div class="form-group">
+                            <label for="judul">Judul Galeri *</label>
+                            <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul', $galeri->judul) }}" required>
+                            <small class="form-text text-muted">Masukkan judul untuk galeri ini.</small>
+                            @error('judul')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="deskripsi">Deskripsi</label>
+                            <textarea class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi', $galeri->deskripsi) }}</textarea>
+                            <small class="form-text text-muted">Deskripsi singkat tentang galeri ini.</small>
+                            @error('deskripsi')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="post_id">Berita Terkait</label>
                             <select class="form-control @error('post_id') is-invalid @enderror" id="post_id" name="post_id">
                                 <option value="">-- Pilih Berita (Opsional) --</option>
@@ -117,15 +135,15 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
-                                <option value="draft" {{ old('status', $galeri->status) == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="published" {{ old('status', $galeri->status) == 'published' ? 'selected' : '' }}>Publikasikan</option>
+                                <option value="0" {{ old('status', $galeri->status) == 0 ? 'selected' : '' }}>Draft</option>
+                                <option value="1" {{ old('status', $galeri->status) == 1 ? 'selected' : '' }}>Publikasikan</option>
                             </select>
                             @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         
-                        <button type="submit" class="btn btn-success">Simpan Perubahan</button>
+                        <button type="submit" class="btn-modern success">Simpan Perubahan</button>
                     </form>
                 </div>
             </div>
@@ -137,7 +155,7 @@
             <div class="card shadow mb-4">
                 <div class="card-header py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 font-weight-bold text-primary">Foto Galeri</h6>
-                    <a href="{{ route('admin.galeri.show', $galeri->id) }}" class="btn btn-sm btn-info">
+                    <a href="{{ route('admin.galeri.show', $galeri->id) }}" class="btn-modern info">
                         <i class="fas fa-eye"></i> Lihat Semua Foto
                     </a>
                 </div>
@@ -146,7 +164,7 @@
                         @forelse($galeri->fotos as $foto)
                         <div class="col-md-3 col-sm-6">
                             <div class="foto-preview">
-                                <img src="/storage/{{ $foto->file }}" alt="{{ $foto->judul }}">
+                                <img src="{{ asset($foto->file) }}" alt="{{ $foto->judul }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
                                 <div class="overlay">
                                     <div class="actions">
                                         <button type="button" class="btn btn-sm btn-info edit-foto" 
@@ -156,7 +174,7 @@
                                                 data-target="#editFotoModal">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <form action="{{ route('admin.foto.destroy', $foto->id) }}" method="POST">
+                                        <form action="{{ route('admin.galeri.delete-photo', $foto->id) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus foto ini?')">
@@ -181,9 +199,8 @@
                     <hr>
                     
                     <h5 class="mb-3">Unggah Foto Baru</h5>
-                    <form action="{{ route('admin.foto.store') }}" class="dropzone" id="fotoDropzone">
+                    <form action="{{ route('admin.galeri.store-photo', $galeri->id) }}" class="dropzone" id="fotoDropzone">
                         @csrf
-                        <input type="hidden" name="galeri_id" value="{{ $galeri->id }}">
                         <div class="dz-message" data-dz-message>
                             <span>Seret file foto ke sini atau klik untuk mengunggah</span>
                             <span class="note">(Foto akan diunggah secara otomatis. Format yang didukung: JPG, PNG, GIF. Ukuran maksimal: 5MB)</span>
@@ -204,8 +221,11 @@
                 @method('PUT')
                 <div class="modal-header">
                     <h5 class="modal-title" id="editFotoModalLabel">Edit Judul Foto</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-modern secondary" onclick="window.history.back()">
+                        <i class="fas fa-arrow-left me-2"></i>Kembali
+                    </button>
+                    <button type="submit" class="btn-modern primary">
+                        <i class="fas fa-save me-2"></i>Perbarui Galeri
                     </button>
                 </div>
                 <div class="modal-body">
@@ -215,8 +235,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-modern success">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
@@ -238,7 +258,7 @@
             acceptedFiles: ".jpeg,.jpg,.png,.gif",
             addRemoveLinks: true,
             dictRemoveFile: "Hapus",
-            dictFileTooBig: "File terlalu besar ({{filesize}}MB). Ukuran maksimal: {{maxFilesize}}MB.",
+            dictFileTooBig: "File terlalu besar. Ukuran maksimal: 5MB.",
             dictInvalidFileType: "Format file tidak didukung.",
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -269,7 +289,7 @@
             const judul = $(this).data('judul');
             
             $('#edit_judul').val(judul);
-            $('#editFotoForm').attr('action', `/admin/foto/${id}`);
+            $('#editFotoForm').attr('action', `/admin/galeri/photo/${id}`);
         });
     });
 </script>

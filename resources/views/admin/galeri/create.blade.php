@@ -70,6 +70,24 @@
                         @csrf
                         
                         <div class="form-group">
+                            <label for="judul">Judul Galeri *</label>
+                            <input type="text" class="form-control @error('judul') is-invalid @enderror" id="judul" name="judul" value="{{ old('judul') }}" required>
+                            <small class="form-text text-muted">Masukkan judul untuk galeri ini.</small>
+                            @error('judul')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="deskripsi">Deskripsi</label>
+                            <textarea class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
+                            <small class="form-text text-muted">Deskripsi singkat tentang galeri ini.</small>
+                            @error('deskripsi')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
                             <label for="post_id">Berita Terkait</label>
                             <select class="form-control @error('post_id') is-invalid @enderror" id="post_id" name="post_id">
                                 <option value="">-- Pilih Berita (Opsional) --</option>
@@ -95,8 +113,8 @@
                         <div class="form-group">
                             <label for="status">Status</label>
                             <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
-                                <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="published" {{ old('status') == 'published' ? 'selected' : '' }}>Publikasikan</option>
+                                <option value="0" {{ old('status', '0') == '0' ? 'selected' : '' }}>Draft</option>
+                                <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Publikasikan</option>
                             </select>
                             @error('status')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -126,9 +144,10 @@
                     </div>
                     
                     <div id="uploadSection" class="d-none">
-                        <form action="{{ route('admin.foto.store') }}" class="dropzone" id="fotoDropzone">
+                        <form action="{{ route('admin.galeri.store-photo', 0) }}" class="dropzone" id="fotoDropzone">
                             @csrf
                             <input type="hidden" name="galeri_id" id="galeri_id" value="">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
                             <div class="dz-message" data-dz-message>
                                 <span>Seret file foto ke sini atau klik untuk mengunggah</span>
                                 <span class="note">(Foto akan diunggah secara otomatis. Format yang didukung: JPG, PNG, GIF. Ukuran maksimal: 5MB)</span>
@@ -162,7 +181,7 @@
             acceptedFiles: ".jpeg,.jpg,.png,.gif",
             addRemoveLinks: true,
             dictRemoveFile: "Hapus",
-            dictFileTooBig: "File terlalu besar ({{filesize}}MB). Ukuran maksimal: {{maxFilesize}}MB.",
+            dictFileTooBig: "File terlalu besar. Ukuran maksimal: 5MB.",
             dictInvalidFileType: "Format file tidak didukung.",
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -185,6 +204,9 @@
                         
                         // Update galeri_id for dropzone
                         $('#galeri_id').val(response.galeri.id);
+                        
+                        // Update dropzone action URL
+                        myDropzone.options.url = '/admin/galeri/' + response.galeri.id + '/store-photo';
                         
                         // Show upload section
                         $('#uploadSection').removeClass('d-none');

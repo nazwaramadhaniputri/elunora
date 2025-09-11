@@ -124,12 +124,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body gallery-content d-flex flex-column">
+                        <div class="card-body gallery-content d-flex flex-column" style="padding: 1rem;">
                             <h5 class="card-title mb-2">{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri Tanpa Judul') }}</h5>
                             <p class="card-text text-muted flex-grow-1">
                                 {{ Str::limit(strip_tags($galeri->deskripsi ?? ($galeri->post ? $galeri->post->isi : 'Deskripsi galeri')), 100) }}
                             </p>
-                            <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="d-flex justify-content-between align-items-center mt-2">
                                 <small class="text-muted">
                                     <i class="fas fa-calendar me-1"></i>
                                     {{ \Carbon\Carbon::parse($galeri->created_at)->format('d M Y') }}

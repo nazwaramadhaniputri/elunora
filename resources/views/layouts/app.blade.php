@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Elunora School</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -12,32 +13,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Global Spacing CSS -->
     <link rel="stylesheet" href="{{ asset('css/global-spacing.css') }}">
+    <!-- Elunora Theme CSS -->
+    <link rel="stylesheet" href="{{ asset('css/elunora-theme.css') }}">
     <!-- Custom CSS -->
     <style>
-        :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --accent-color: #dc3545;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --light-bg: #f8f9fa;
-            --dark-text: #495057;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: var(--dark-text);
-            background: #f8f9fa;
+            color: var(--elunora-dark);
+            background: var(--elunora-light);
             min-height: 100vh;
-            scroll-behavior: smooth;
         }
         
         .navbar {
-            background: #007bff !important;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            background: var(--elunora-primary) !important;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 1rem 0;
+            padding: 0.8rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            padding: 0.5rem 0;
+            background: rgba(30, 58, 138, 0.98) !important;
             backdrop-filter: blur(10px);
         }
         
@@ -45,36 +42,53 @@
             font-weight: 700;
             font-size: 1.5rem;
             color: white !important;
+            display: flex;
+            align-items: center;
         }
         
-        .navbar-dark .navbar-nav .nav-link {
-            color: rgba(255, 255, 255, 0.9);
+        .navbar-brand img {
+            height: 35px;
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .navbar .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.2rem !important;
             margin: 0 0.2rem;
             border-radius: 25px;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
-        .navbar-dark .navbar-nav .nav-link:hover {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
+        /* Removed ::after pseudo-elements that created underlines */
+        
+        .navbar .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            border: none !important;
+            text-decoration: none !important;
         }
         
-        .navbar-dark .navbar-nav .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.2);
+        .navbar .nav-link.active {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.25) !important;
             font-weight: 600;
+            border: none !important;
+            text-decoration: none !important;
         }
         
         .hero-section {
-            background: #007bff;
+            background: var(--elunora-primary);
             color: white;
-            padding: 4rem 0;
+            padding: 6rem 0 4rem;
             text-align: center;
             position: relative;
             overflow: hidden;
+            margin-top: -76px;
+            padding-top: 120px;
         }
         
         .hero-section::before {
@@ -94,6 +108,8 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
             transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            border: none;
         }
         
         .card:hover {
@@ -118,38 +134,38 @@
         }
         
         .btn-primary {
-            background: #007bff;
-            border: 1px solid #007bff;
+            background: var(--elunora-primary);
+            border: 1px solid var(--elunora-primary);
             border-radius: 8px;
             padding: 12px 24px;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
         }
         
         .btn-primary:hover {
-            background: #0056b3;
-            border-color: #0056b3;
+            background: var(--elunora-primary-dark);
+            border-color: var(--elunora-primary-dark);
             transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 86, 179, 0.3);
+            box-shadow: 0 4px 8px rgba(29, 78, 216, 0.3);
         }
         
         .btn-success {
-            background: #28a745;
-            border: 1px solid #28a745;
-            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+            background: var(--success-color);
+            border: 1px solid var(--success-color);
+            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
         }
         
         .btn-info {
-            background: #17a2b8;
-            border: 1px solid #17a2b8;
-            box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2);
+            background: #0ea5e9;
+            border: 1px solid #0ea5e9;
+            box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
         }
         
         .btn-warning {
-            background: #ffc107;
-            border: 1px solid #ffc107;
-            box-shadow: 0 2px 4px rgba(255, 193, 7, 0.2);
+            background: var(--warning-color);
+            border: 1px solid var(--warning-color);
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
         }
         
         .btn-danger {
@@ -172,7 +188,7 @@
         }
         
         .table thead th {
-            background: #28a745;
+            background: var(--success-color);
             color: white;
             border: none;
             font-weight: 600;
@@ -193,7 +209,7 @@
             color: white;
             padding: 3rem 0 2rem;
             margin-top: 4rem;
-            border-top: 3px solid #007bff;
+            border-top: 3px solid var(--elunora-primary);
         }
         
         footer h5 {
@@ -293,9 +309,11 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top elunora-navbar">
         <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">Elunora School</a>
+            <a class="navbar-brand" href="{{ route('home') }}">
+                <img src="{{ asset('img/logo.png') }}" alt="Elunora School"> Elunora School
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -311,7 +329,10 @@
                         <a class="nav-link {{ request()->routeIs('galeri*') ? 'active' : '' }}" href="{{ route('galeri') }}">Galeri</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('profil') ? 'active' : '' }}" href="{{ route('profil') }}">Profil</a>
+                        <a class="nav-link {{ request()->routeIs('agenda*') ? 'active' : '' }}" href="{{ route('agenda') }}">Agenda</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('profil') ? 'active' : '' }}" href="{{ route('profil') }}">Profile</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}" href="{{ route('kontak') }}">Kontak</a>
@@ -355,7 +376,7 @@
             <div class="row">
                 <div class="col-md-4">
                     <h5>Elunora School</h5>
-                    <p>Sekolah Menengah Kejuruan unggulan yang melahirkan lulusan profesional dan kreatif.</p>
+                    <p>School of Art yang melahirkan lulusan kreatif dan berbakat.</p>
                 </div>
                 <div class="col-md-4">
                     <h5>Link Cepat</h5>
@@ -363,7 +384,8 @@
                         <li><a href="{{ route('home') }}" class="text-white">Beranda</a></li>
                         <li><a href="{{ route('berita') }}" class="text-white">Berita</a></li>
                         <li><a href="{{ route('galeri') }}" class="text-white">Galeri</a></li>
-                        <li><a href="{{ route('profil') }}" class="text-white">Profil</a></li>
+                        <li><a href="{{ route('agenda') }}" class="text-white">Agenda</a></li>
+                        <li><a href="{{ route('profil') }}" class="text-white">Profile</a></li>
                         <li><a href="{{ route('kontak') }}" class="text-white">Kontak</a></li>
                     </ul>
                 </div>
@@ -386,7 +408,39 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Add smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @yield('scripts')
 </body>

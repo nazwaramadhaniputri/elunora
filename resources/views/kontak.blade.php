@@ -100,7 +100,7 @@
                         </div>
                         @endif
                         
-                        <form action="{{ route('kontak.kirim') }}" method="POST">
+                        <form action="{{ route('kontak.kirim') }}" method="POST" class="d-flex flex-column h-100">
                             @csrf
                             <div class="row">
                                 <div class="col-md-6 mb-3">
@@ -127,18 +127,20 @@
                                 @enderror
                             </div>
                             
-                            <div class="mb-3">
+                            <div class="mb-3 flex-grow-1 d-flex flex-column">
                                 <label for="pesan" class="form-label">Pesan</label>
-                                <textarea class="form-control @error('pesan') is-invalid @enderror" id="pesan" name="pesan" rows="5" required>{{ old('pesan') }}</textarea>
+                                <textarea class="form-control flex-grow-1 @error('pesan') is-invalid @enderror" id="pesan" name="pesan" style="min-height: 250px; resize: vertical;" required>{{ old('pesan') }}</textarea>
                                 @error('pesan')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             
-                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-paper-plane me-2"></i>Kirim Pesan
-                                </button>
+                            <div class="mt-auto pt-3">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-paper-plane me-2"></i>Kirim Pesan
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -159,7 +161,7 @@
                             <i class="fas fa-map-marked-alt me-2 text-primary"></i>Lokasi Kami
                         </h3>
                         <div class="ratio ratio-16x9">
-                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.6664672948397!2d106.82496851476883!3d-6.175392395532964!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bcc8!2sMonumen%20Nasional!5e0!3m2!1sid!2sid!4v1629789960367!5m2!1sid!2sid" allowfullscreen="" loading="lazy"></iframe>
+                            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3162.4!2d126.9779!3d37.5665!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357ca2eb7b5b5b5b%3A0x5b5b5b5b5b5b5b5b!2sHanlim%20Multi%20Art%20School!5e0!3m2!1sen!2skr!4v1629789960367!5m2!1sen!2skr" allowfullscreen="" loading="lazy"></iframe>
                         </div>
                     </div>
                 </div>
@@ -254,6 +256,7 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     overflow: hidden;
     border: none;
+    height: 100%;
 }
 
 .contact-form-body {

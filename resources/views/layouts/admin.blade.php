@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title') - Admin Elunora School</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -12,19 +13,22 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Global Spacing CSS -->
     <link rel="stylesheet" href="{{ asset('css/global-spacing.css') }}">
+    <!-- Elunora Theme CSS -->
+    <link rel="stylesheet" href="{{ asset('css/elunora-theme.css') }}">
     <!-- Custom CSS -->
     <style>
+        /* Using variables from elunora-theme.css */
         :root {
-            --admin-primary: #007bff;
-            --admin-secondary: #6c757d;
-            --admin-accent: #0056b3;
-            --admin-success: #28a745;
-            --admin-warning: #ffc107;
-            --admin-danger: #dc3545;
-            --admin-info: #17a2b8;
-            --admin-light: #f8f9fa;
-            --admin-dark: #343a40;
-            --admin-gradient: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            --primary: var(--elunora-primary);
+            --secondary: var(--elunora-secondary);
+            --accent: var(--elunora-accent);
+            --success: var(--elunora-success);
+            --warning: var(--elunora-warning);
+            --danger: var(--elunora-danger);
+            --info: var(--elunora-info);
+            --light: var(--elunora-light);
+            --dark: var(--elunora-dark);
+            --gradient: var(--elunora-gradient-primary);
         }
         
         body {
@@ -35,7 +39,7 @@
         }
         
         .sidebar {
-            background: linear-gradient(180deg, #ffffff 0%, #f8f9fc 100%);
+            background: #ffffff;
             min-height: 100vh;
             box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
         }
@@ -57,13 +61,13 @@
         
         .sidebar .nav-item .nav-link:hover {
             color: var(--admin-primary);
-            background-color: rgba(0, 123, 255, 0.1);
+            background-color: rgba(30, 58, 138, 0.1);
         }
         
         .sidebar .nav-item .nav-link.active {
-            color: white;
-            background: linear-gradient(135deg, var(--admin-primary), var(--admin-accent));
-            box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+            color: white !important;
+            background: var(--elunora-primary) !important;
+            box-shadow: 0 3px 10px rgba(26, 54, 93, 0.3) !important;
         }
         
         .sidebar .nav-link i {
@@ -73,33 +77,33 @@
         
         /* Remove yellow/orange colors */
         .btn-warning {
-            background: var(--admin-primary) !important;
-            border-color: var(--admin-primary) !important;
+            background: var(--elunora-primary) !important;
+            border-color: var(--elunora-primary) !important;
             color: white !important;
         }
         
         .btn-warning:hover {
-            background: var(--admin-accent) !important;
-            border-color: var(--admin-accent) !important;
+            background: var(--elunora-accent) !important;
+            border-color: var(--elunora-accent) !important;
             color: white !important;
         }
         
         .text-warning {
-            color: var(--admin-primary) !important;
+            color: var(--elunora-primary) !important;
         }
         
         .bg-warning {
-            background-color: var(--admin-primary) !important;
+            background-color: var(--elunora-primary) !important;
         }
         
         .border-warning {
-            border-color: var(--admin-primary) !important;
+            border-color: var(--elunora-primary) !important;
         }
         
         .alert-warning {
-            color: #004085;
-            background-color: rgba(0, 123, 255, 0.1);
-            border-color: rgba(0, 123, 255, 0.2);
+            color: #1e40af;
+            background-color: rgba(30, 58, 138, 0.1);
+            border-color: rgba(30, 58, 138, 0.2);
         }
         
         /* Dashboard Time Info */
@@ -109,13 +113,13 @@
         }
         
         .time-badge {
-            background: rgba(0, 123, 255, 0.1);
+            background: rgba(37, 99, 235, 0.1);
             color: var(--admin-primary);
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-size: 0.875rem;
             font-weight: 500;
-            border: 1px solid rgba(0, 123, 255, 0.2);
+            border: 1px solid rgba(37, 99, 235, 0.2);
         }
         
         .main-content {
@@ -267,20 +271,22 @@
         }
         
         .btn-primary {
-            background: var(--admin-primary);
-            border: 1px solid var(--admin-primary);
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+            background: var(--admin-primary) !important;
+            border: 1px solid var(--admin-primary) !important;
+            border-radius: 8px !important;
+            padding: 0.75rem 1.5rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 2px 4px rgba(30, 58, 138, 0.3) !important;
+            color: white !important;
         }
         
         .btn-primary:hover {
-            background: var(--admin-accent);
-            border-color: var(--admin-accent);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 86, 179, 0.4);
+            background: var(--admin-accent) !important;
+            border-color: var(--admin-accent) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(30, 58, 138, 0.4) !important;
+            color: white !important;
         }
         
         .btn-success {
@@ -340,8 +346,8 @@
         }
         
         .page-item.active .page-link {
-            background: #007bff;
-            border: 1px solid #007bff;
+            background: var(--admin-primary);
+            border: 1px solid var(--admin-primary);
         }
         
         /* Modern Admin Components */
@@ -386,7 +392,7 @@
         .btn-modern.primary:hover {
             background: var(--admin-accent);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
             color: white;
         }
         
@@ -434,7 +440,7 @@
         }
         
         .modern-table tbody tr:hover {
-            background: rgba(0, 123, 255, 0.05);
+            background: rgba(37, 99, 235, 0.05);
             transform: scale(1.01);
         }
         
@@ -492,8 +498,8 @@
         }
         
         .action-btn.primary {
-            background: rgba(0, 123, 255, 0.1);
-            color: var(--admin-primary);
+            background: #e9ecef !important;
+            color: #6c757d !important;
         }
         
         .action-btn.danger {
@@ -512,8 +518,8 @@
         }
         
         .action-btn.primary:hover {
-            background: var(--admin-primary);
-            color: white;
+            background: #dee2e6 !important;
+            color: #495057 !important;
         }
         
         .action-btn.danger:hover {
@@ -530,7 +536,7 @@
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: rgba(0, 123, 255, 0.1);
+            background: rgba(37, 99, 235, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -588,7 +594,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 123, 255, 0.8);
+            background: rgba(37, 99, 235, 0.8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -616,7 +622,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(0, 123, 255, 0.05);
+            background: rgba(37, 99, 235, 0.05);
             color: #6c757d;
         }
         
@@ -673,7 +679,7 @@
         
         .gallery-card-actions {
             padding: 1rem 1.5rem;
-            background: rgba(0, 123, 255, 0.02);
+            background: rgba(37, 99, 235, 0.02);
             border-top: 1px solid #e9ecef;
         }
         
@@ -697,7 +703,7 @@
         
         .form-control:focus {
             border-color: var(--admin-accent);
-            box-shadow: 0 0 0 0.2rem rgba(15, 52, 96, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.25);
         }
         
         /* Modal Improvements */
@@ -708,7 +714,7 @@
         }
         
         .modal-header {
-            background: linear-gradient(135deg, var(--admin-primary), var(--admin-accent));
+            background: var(--elunora-primary);
             color: white;
             border-radius: 15px 15px 0 0;
             padding: 1.5rem 2rem;
@@ -852,7 +858,7 @@
         }
         
         .sidebar-brand h4 {
-            color: var(--admin-primary);
+            color: #1e3a8a;
             margin: 0;
             font-weight: 700;
         }
@@ -905,7 +911,7 @@
         }
 
         .modern-stats-card.primary .stats-icon {
-            background: rgba(0, 123, 255, 0.1);
+            background: rgba(37, 99, 235, 0.1);
             color: var(--admin-primary);
         }
 
@@ -920,8 +926,8 @@
         }
 
         .modern-stats-card.warning .stats-icon {
-            background: rgba(0, 123, 255, 0.1);
-            color: var(--admin-primary);
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--admin-warning);
         }
 
         .stats-info {
@@ -968,9 +974,9 @@
             justify-content: space-between;
             align-items: center;
             padding: 1rem;
-            background: rgba(0, 123, 255, 0.02);
+            background: rgba(37, 99, 235, 0.02);
             border-radius: 10px;
-            border: 1px solid rgba(0, 123, 255, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.1);
         }
 
         .info-label {
@@ -1007,8 +1013,8 @@
         }
 
         .quick-action-btn.primary {
-            background: rgba(0, 123, 255, 0.05);
-            border-color: rgba(0, 123, 255, 0.1);
+            background: rgba(37, 99, 235, 0.05);
+            border-color: rgba(37, 99, 235, 0.1);
             color: var(--admin-primary);
         }
 
@@ -1108,10 +1114,15 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="sidebar-brand">
-                    <h4><i class="fas fa-cog me-2"></i>Admin Panel</h4>
-                    <small>Elunora School</small>
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse elunora-admin-sidebar">
+                <div class="sidebar-brand elunora-admin-brand" style="padding: 1.5rem 1rem; text-align: center; border-bottom: 1px solid #e3e6f0;">
+                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
+                        <img src="{{ asset('img/logo.png') }}" alt="Elunora School" style="height: 50px; width: auto; margin-right: 8px;">
+                        <div style="text-align: left;">
+                            <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1a365d; line-height: 1.2;">Elunora School</h4>
+                            <small style="color: #4a5568; font-size: 0.75rem; font-weight: 500;">Admin Panel</small>
+                        </div>
+                    </div>
                 </div>
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
@@ -1137,7 +1148,7 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.profil.*') ? 'active' : '' }}" href="{{ route('admin.profil.index') }}">
-                                <i class="fas fa-school me-2"></i> Profil Sekolah
+                                <i class="fas fa-school me-2"></i> Profile Sekolah
                             </a>
                         </li>
                         <li class="nav-item">
@@ -1148,6 +1159,19 @@
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.guru.*') ? 'active' : '' }}" href="{{ route('admin.guru.index') }}">
                                 <i class="fas fa-chalkboard-teacher me-2"></i> Guru & Staff
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.agenda.*') ? 'active' : '' }}" href="{{ route('admin.agenda.index') }}">
+                                <i class="fas fa-calendar-alt me-2"></i> Agenda
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.contact.*') ? 'active' : '' }}" href="{{ route('admin.contact.index') }}">
+                                <i class="fas fa-envelope me-2"></i> Pesan Kontak
+                                @if(\App\Models\Contact::where('status', 0)->count() > 0)
+                                    <span class="badge bg-danger ms-2">{{ \App\Models\Contact::where('status', 0)->count() }}</span>
+                                @endif
                             </a>
                         </li>
                         <li class="nav-item mt-5">

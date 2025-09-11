@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Edit Profil Sekolah')
+@section('title', 'Edit Profile Sekolah')
 
 @section('content')
 <div class="fade-in">
     <div class="page-header-modern mb-4">
         <div class="page-title-section">
             <h4 class="page-title">
-                <i class="fas fa-edit me-3"></i>Edit Profil Sekolah
+                <i class="fas fa-edit me-3"></i>Edit Profile Sekolah
             </h4>
-            <p class="page-subtitle">Edit informasi profil sekolah</p>
+            <p class="page-subtitle">Edit informasi profile sekolah</p>
         </div>
     </div>
 
@@ -73,7 +73,7 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label for="foto" class="form-label">Foto Profil Sekolah</label>
+                    <label for="foto" class="form-label">Foto Profile Sekolah</label>
                     <input type="file" class="form-control @error('foto') is-invalid @enderror" 
                            id="foto" name="foto" accept="image/*">
                     @if($profile->foto)

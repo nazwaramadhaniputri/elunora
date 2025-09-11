@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('galeris', function (Blueprint $table) {
-            //
+            $table->dropForeign(['post_id']);
+            $table->unsignedBigInteger('post_id')->nullable()->change();
+            $table->foreign('post_id')->references('id')->on('posts')->onDelete('set null');
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('galeris', function (Blueprint $table) {
-            //
+            $table->dropForeign(['post_id']);
+            $table->unsignedBigInteger('post_id')->nullable(false)->change();
+            $table->foreign('post_id')->references('id')->on('posts');
         });
     }
 };

@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Models\Agenda;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -21,9 +22,33 @@ class DashboardController extends Controller
         // Hitung jumlah kategori
         $totalKategori = \App\Models\Kategori::count();
         
+        // Hitung jumlah agenda
+        $totalAgenda = Agenda::count();
+        $todayAgenda = Agenda::whereDate('tanggal', today())->count();
+        $upcomingAgenda = Agenda::where('tanggal', '>=', today())
+                               ->where('tanggal', '<=', today()->addDays(7))
+                               ->count();
+        
+        // Ambil agenda mendatang
+        $nextAgendas = Agenda::where('tanggal', '>=', today())
+                            ->orderBy('tanggal')
+                            ->orderBy('waktu_mulai')
+                            ->take(5)
+                            ->get();
+        
         // Ambil informasi sekolah
         $profilSekolah = \App\Models\Profile::first();
         
-        return view('admin.dashboard.index', compact('totalBerita', 'totalGaleri', 'totalFoto', 'totalKategori', 'profilSekolah'));
+        return view('admin.dashboard.index', compact(
+            'totalBerita', 
+            'totalGaleri', 
+            'totalFoto', 
+            'totalKategori',
+            'totalAgenda',
+            'todayAgenda',
+            'upcomingAgenda',
+            'nextAgendas',
+            'profilSekolah'
+        ));
     }
 }

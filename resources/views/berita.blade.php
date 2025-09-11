@@ -92,20 +92,20 @@
                         <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Kategori Berita</h5>
                     </div>
                     <div class="card-body">
+                        @php
+                        $kategoris = \App\Models\Kategori::withCount(['posts' => function($query) {
+                            $query->where('status', 'published');
+                        }])->having('posts_count', '>', 0)->get();
+                        @endphp
+                        
                         <ul class="list-group list-group-flush">
-                            @php
-                            $kategoris = \App\Models\Kategori::withCount(['posts' => function($query) {
-                                $query->where('status', 'published');
-                            }])->having('posts_count', '>', 0)->get();
-                            @endphp
-                            
                             @forelse($kategoris as $kategori)
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                 {{ $kategori->nama_kategori }}
                                 <span class="badge bg-success rounded-pill">{{ $kategori->posts_count }}</span>
                             </li>
                             @empty
-                            <li class="list-group-item">Tidak ada kategori</li>
+                            <li class="list-group-item px-0">Tidak ada kategori</li>
                             @endforelse
                         </ul>
                     </div>
@@ -144,7 +144,7 @@
                                 </a>
                             </li>
                             @empty
-                            <li class="list-group-item">Belum ada berita</li>
+                            <li class="list-group-item px-0">Belum ada berita</li>
                             @endforelse
                         </ul>
                     </div>
@@ -218,7 +218,7 @@
 }
 
 .news-content {
-    padding: 2rem;
+    padding: 1.5rem;
 }
 
 .news-title {
@@ -235,6 +235,41 @@
 .news-meta .badge {
     font-size: 0.75rem;
     padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.news-actions {
+    margin-top: auto;
+}
+
+.card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 15px 15px 0 0 !important;
+    padding: 1.25rem 1.5rem;
+}
+
+.card-title {
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    line-height: 1.4;
+}
+
+.card-text {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 1rem;
 }
 
 .sidebar-card {
@@ -250,6 +285,32 @@
     color: white;
     padding: 1.25rem;
     font-weight: 600;
+}
+
+.list-group-item {
+    padding: 1rem 0;
+    border-radius: 0;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+.list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.list-group-item:last-child {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.flex-shrink-0 {
+    margin-right: 1rem;
+}
+
+.flex-grow-1 h6 {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
 }
 
 .empty-state {

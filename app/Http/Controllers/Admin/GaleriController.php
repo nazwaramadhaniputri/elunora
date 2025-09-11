@@ -26,16 +26,18 @@ class GaleriController extends Controller
     {
         $request->validate([
             'post_id' => 'nullable|exists:posts,id',
+            'judul' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
             'position' => 'required|integer|min:0',
-            'status' => 'required|in:draft,published',
+            'status' => 'required|in:0,1',
         ]);
 
         $galeri = Galeri::create([
             'post_id' => $request->post_id,
-            'judul' => $request->post_id ? Post::find($request->post_id)->judul : 'Galeri Tanpa Judul',
-            'deskripsi' => $request->post_id ? Post::find($request->post_id)->isi : 'Deskripsi galeri',
+            'judul' => $request->judul,
+            'deskripsi' => $request->deskripsi ?? 'Deskripsi galeri',
             'position' => $request->position,
-            'status' => $request->status == 'published' ? 1 : 0,
+            'status' => $request->status,
         ]);
 
         if ($request->expectsJson()) {
@@ -65,10 +67,10 @@ class GaleriController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'post_id' => 'required|exists:posts,id',
+            'post_id' => 'nullable|exists:posts,id',
             'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'position' => 'required|integer|min:1',
+            'deskripsi' => 'nullable|string',
+            'position' => 'required|integer|min:0',
             'status' => 'required|in:0,1',
         ]);
 
@@ -76,7 +78,7 @@ class GaleriController extends Controller
         $galeri->update([
             'post_id' => $request->post_id,
             'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
+            'deskripsi' => $request->deskripsi ?? 'Deskripsi galeri',
             'position' => $request->position,
             'status' => $request->status,
         ]);
@@ -110,8 +112,8 @@ class GaleriController extends Controller
     public function storePhoto(Request $request, $id)
     {
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'judul' => 'nullable|string|max:255',
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:5120',
         ]);
 
         $galeri = Galeri::findOrFail($id);
@@ -129,7 +131,7 @@ class GaleriController extends Controller
 
             Foto::create([
                 'galery_id' => $galeri->id,
-                'judul' => $request->judul,
+                'judul' => $request->judul ?? 'Foto Galeri',
                 'file' => 'uploads/galeri/' . $fileName,
             ]);
 
@@ -137,6 +139,20 @@ class GaleriController extends Controller
         }
 
         return back()->with('error', 'Gagal mengunggah foto.');
+    }
+
+    public function updatePhoto(Request $request, $id)
+    {
+        $request->validate([
+            'judul' => 'nullable|string|max:255',
+        ]);
+
+        $foto = Foto::findOrFail($id);
+        $foto->update([
+            'judul' => $request->judul ?? 'Foto Galeri',
+        ]);
+
+        return redirect()->route('admin.galeri.show', $foto->galery_id)->with('success', 'Judul foto berhasil diperbarui.');
     }
 
     public function deletePhoto($id)

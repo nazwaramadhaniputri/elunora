@@ -3,17 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class Petugas extends Authenticatable
 {
-    protected $fillable = ['username', 'password', 'email'];
+    use Notifiable;
     
-    public $timestamps = false;
+    protected $table = 'petugas';
+    
+    protected $fillable = [
+        'username', 
+        'password', 
+        'email',
+        'nama_lengkap',
+        'level'
+    ];
     
     protected $hidden = [
         'password',
+        'remember_token',
     ];
+    
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+    
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
     
     public function posts()
     {

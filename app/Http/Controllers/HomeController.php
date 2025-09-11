@@ -12,11 +12,19 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $posts = Post::where('status', 'published')->latest()->take(6)->get();
-        $galeris = Galeri::where('status', 1)->latest()->take(6)->get();
+        $posts = Post::where('status', 'published')->orderBy('updated_at', 'desc')->take(3)->get();
+        $galeris = Galeri::where('status', 1)->latest()->take(3)->get();
         $profile = Profile::first();
         
-        return view('home', compact('posts', 'galeris', 'profile'));
+        // Get upcoming agendas (next 3 upcoming events)
+        $upcomingAgendas = \App\Models\Agenda::where('status', 'published')
+            ->where('tanggal', '>=', now()->format('Y-m-d'))
+            ->orderBy('tanggal', 'asc')
+            ->orderBy('waktu_mulai', 'asc')
+            ->take(3)
+            ->get();
+        
+        return view('home', compact('posts', 'galeris', 'profile', 'upcomingAgendas'));
     }
     
     public function berita()
@@ -89,5 +97,23 @@ class HomeController extends Controller
         ]);
         
         return back()->with('success', 'Pesan Anda telah terkirim. Terima kasih!');
+    }
+
+    public function fasilitasAll()
+    {
+        $fasilitas = \App\Models\Fasilitas::where('status', 1)
+                                         ->orderBy('urutan', 'asc')
+                                         ->paginate(12);
+        
+        return view('fasilitas-all', compact('fasilitas'));
+    }
+
+    public function guruAll()
+    {
+        $gurus = \App\Models\Guru::where('status', 1)
+                                ->orderBy('nama', 'asc')
+                                ->paginate(12);
+        
+        return view('guru-all', compact('gurus'));
     }
 }

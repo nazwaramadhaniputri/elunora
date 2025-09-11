@@ -1,15 +1,15 @@
 @extends('layouts.admin')
 
-@section('title', 'Tambah Profil Sekolah')
+@section('title', 'Tambah Profile Sekolah')
 
 @section('content')
 <div class="fade-in">
     <div class="page-header-modern mb-4">
         <div class="page-title-section">
             <h4 class="page-title">
-                <i class="fas fa-plus me-3"></i>Tambah Profil Sekolah
+                <i class="fas fa-plus me-3"></i>Tambah Profile Sekolah
             </h4>
-            <p class="page-subtitle">Tambahkan informasi profil sekolah baru</p>
+            <p class="page-subtitle">Tambahkan informasi profile sekolah baru</p>
         </div>
     </div>
 
