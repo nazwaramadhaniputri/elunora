@@ -35,17 +35,16 @@
     <div class="container">
         @if($todayAgenda->count() > 0)
         <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold text-primary mb-3">
-                <i class="fas fa-star me-3"></i>Agenda Hari Ini
+            <h2 class="display-5 fw-bold mb-0" style="color: var(--elunora-primary-dark);">
+                <i class="fas fa-star me-3" style="color: var(--elunora-primary-dark);"></i>Agenda Hari Ini
             </h2>
-            <div class="divider mx-auto bg-primary mb-4"></div>
         </div>
         
         <div class="row g-4">
             @foreach($todayAgenda as $agenda)
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title mb-0">{{ $agenda->judul }}</h5>
                             @if($agenda->kategori)
@@ -72,7 +71,7 @@
                         <p class="card-text">{{ Str::limit($agenda->deskripsi, 150) }}</p>
                         @endif
                         
-                        <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
                             <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-primary btn-sm">
                                 Detail <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -88,10 +87,9 @@
         @endif
         
         <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3" style="color: #1e3a8a;">
-                <i class="fas fa-calendar-alt me-3"></i>Agenda Mendatang
+            <h2 class="display-5 fw-bold mb-0" style="color: var(--elunora-primary-dark);">
+                <i class="fas fa-calendar-alt me-3" style="color: var(--elunora-primary-dark);"></i>Agenda Mendatang
             </h2>
-            <div class="divider mx-auto bg-primary mb-4"></div>
         </div>
         
         @if($upcomingAgenda->count() > 0)
@@ -99,7 +97,7 @@
             @foreach($upcomingAgenda as $agenda)
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title mb-0">{{ $agenda->judul }}</h5>
                             @if($agenda->kategori)
@@ -126,7 +124,7 @@
                         <p class="card-text">{{ Str::limit($agenda->deskripsi, 120) }}</p>
                         @endif
                         
-                        <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
                             <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-primary btn-sm">
                                 Detail <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -153,17 +151,16 @@
         @if(isset($ongoingAgenda) && $ongoingAgenda->count() > 0)
         <hr class="my-5">
         <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3" style="color: #1e3a8a;">
-                <i class="fas fa-play-circle me-3"></i>Agenda Sedang Berlangsung
+            <h2 class="display-5 fw-bold mb-0" style="color: var(--elunora-primary-dark);">
+                <i class="fas fa-play-circle me-3" style="color: var(--elunora-primary-dark);"></i>Agenda Sedang Berlangsung
             </h2>
-            <div class="divider mx-auto bg-warning mb-4"></div>
         </div>
         
         <div class="row g-4">
             @foreach($ongoingAgenda as $agenda)
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 border-0 shadow-sm border-warning">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title mb-0">{{ $agenda->judul }}</h5>
                             <span class="badge bg-warning text-dark">
@@ -190,7 +187,7 @@
                         <p class="card-text">{{ Str::limit($agenda->deskripsi, 120) }}</p>
                         @endif
                         
-                        <div class="d-flex justify-content-between align-items-center mt-3">
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
                             <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-warning btn-sm">
                                 Detail <i class="fas fa-arrow-right ms-1"></i>
                             </a>
@@ -207,10 +204,9 @@
         @if(isset($pastAgenda) && $pastAgenda->count() > 0)
         <hr class="my-5">
         <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3" style="color: #1e3a8a;">
-                <i class="fas fa-check-circle me-3"></i>Agenda Terlaksana
+            <h2 class="display-5 fw-bold mb-0" style="color: var(--elunora-primary-dark);">
+                <i class="fas fa-check-circle me-3" style="color: var(--elunora-primary-dark);"></i>Agenda Terlaksana
             </h2>
-            <div class="divider mx-auto bg-success mb-4"></div>
         </div>
         
         <div class="row g-4">
@@ -244,8 +240,8 @@
                         <p class="card-text">{{ Str::limit($agenda->deskripsi, 120) }}</p>
                         @endif
                         
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-success btn-sm">
+                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
+                            <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-primary btn-sm">
                                 Detail <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                             <small class="text-muted">{{ $agenda->created_at->diffForHumans() }}</small>

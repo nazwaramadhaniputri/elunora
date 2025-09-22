@@ -13,11 +13,14 @@ use App\Http\Controllers\Admin\
     AgendaController as AdminAgendaController
 };
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FotoInteractionController;
 
 // Rute untuk halaman utama (guest)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
 Route::get('/berita/{id}', [HomeController::class, 'beritaDetail'])->name('berita.detail');
+Route::post('/berita/{post}/komentar', [CommentController::class, 'store'])->name('berita.comment.store');
 Route::get('/galeri', [HomeController::class, 'galeri'])->name('galeri');
 Route::get('/galeri/{id}', [HomeController::class, 'galeriDetail'])->name('galeri.detail');
 Route::get('/profil', [HomeController::class, 'profil'])->name('profil');
@@ -28,6 +31,15 @@ Route::post('/kontak', [HomeController::class, 'kirimPesan'])->name('kontak.kiri
 Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
 Route::get('/agenda/{id}', [AgendaController::class, 'show'])->name('agenda.show');
 Route::get('/fasilitas', [HomeController::class, 'fasilitasAll'])->name('fasilitas');
+
+// AJAX endpoints for Foto interactions (guest)
+Route::prefix('ajax')->group(function () {
+    Route::get('/fotos/counts', [FotoInteractionController::class, 'getCounts'])->name('ajax.fotos.counts');
+    Route::post('/fotos/{foto}/like', [FotoInteractionController::class, 'incrementLike'])->name('ajax.fotos.like');
+    Route::post('/fotos/{foto}/unlike', [FotoInteractionController::class, 'decrementLike'])->name('ajax.fotos.unlike');
+    Route::get('/fotos/{foto}/comments', [FotoInteractionController::class, 'listComments'])->name('ajax.fotos.comments');
+    Route::post('/fotos/{foto}/comments', [FotoInteractionController::class, 'addComment'])->name('ajax.fotos.comments.add');
+});
 
 // Rute untuk autentikasi admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');

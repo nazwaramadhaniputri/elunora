@@ -43,7 +43,7 @@
         <!-- Back Button -->
         <div class="row mb-4">
             <div class="col-12">
-                <a href="{{ route('galeri') }}" class="btn btn-outline-success">
+                <a href="{{ route('galeri') }}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-2"></i>Kembali ke Galeri
                 </a>
             </div>
@@ -52,8 +52,8 @@
         <!-- Gallery Photos -->
         <div class="gallery-section">
             <div class="section-header mb-4">
-                <h3 class="section-title">
-                    <i class="fas fa-images me-2"></i>Koleksi Foto
+                <h3 class="section-title" style="color: var(--elunora-primary-dark);">
+                    <i class="fas fa-images me-2" style="color: var(--elunora-primary-dark);"></i>Koleksi Foto
                 </h3>
                 <p class="section-subtitle fs-5 fw-semibold">{{ $galeri->fotos->count() }} foto dalam galeri ini</p>
             </div>
@@ -74,7 +74,7 @@
                                        class="btn-modern light">
                                         <i class="fas fa-expand me-1"></i>Lihat
                                     </a>
-                                    <button class="btn-modern success" onclick="downloadImage('{{ asset($foto->file) }}', '{{ $foto->judul }}')">
+                                    <button class="btn-modern primary" onclick="downloadImage('{{ asset($foto->file) }}', '{{ $foto->judul }}')">
                                         <i class="fas fa-download me-1"></i>Unduh
                                     </button>
                                 </div>
@@ -85,6 +85,31 @@
                             <small class="text-muted" style="font-size: 0.75rem;">
                                 <i class="fas fa-camera me-1"></i>Foto {{ $loop->iteration }} dari {{ $galeri->fotos->count() }}
                             </small>
+                        </div>
+                        <!-- Photo Actions like Instagram -->
+                        <div class="photo-actions-bar px-3 pb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <button class="action-icon like-btn" data-foto-id="{{ $foto->id }}" aria-label="Suka" type="button" role="button">
+                                    <i class="fa-regular fa-heart"></i>
+                                    <span class="count ms-1">0</span>
+                                </button>
+                                <button class="action-icon comment-btn" data-foto-id="{{ $foto->id }}" aria-label="Komentar" type="button" role="button">
+                                    <i class="fa-regular fa-comment"></i>
+                                    <span class="count ms-1">0</span>
+                                </button>
+                                <button class="action-icon share-btn ms-auto" data-foto-id="{{ $foto->id }}" data-share-url="{{ asset($foto->file) }}" aria-label="Bagikan" type="button" role="button">
+                                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                </button>
+                            </div>
+                            <div class="comments-panel mt-2 d-none" id="comments-panel-{{ $foto->id }}">
+                                <div class="comments-list small mb-2" id="comments-list-{{ $foto->id }}">
+                                    <!-- filled by JS -->
+                                </div>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" placeholder="Tulis komentar..." id="comment-input-{{ $foto->id }}">
+                                    <button class="btn btn-primary" type="button" onclick="addComment({{ $foto->id }})">Kirim</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -104,7 +129,7 @@
         <div class="row mt-5">
             <div class="col-md-12 mb-4">
                 <div class="section-header">
-                    <h3><i class="fas fa-images me-2 text-success"></i>Galeri Lainnya</h3>
+                    <h3 style="color: var(--elunora-primary-dark);"><i class="fas fa-images me-2" style="color: var(--elunora-primary-dark);"></i>Galeri Lainnya</h3>
                     <p class="text-muted">Jelajahi galeri foto lainnya yang menarik</p>
                 </div>
             </div>
@@ -131,12 +156,12 @@
                         <img src="{{ asset('img/no-image.jpg') }}" class="related-image" alt="No Image">
                         @endif
                         <div class="related-overlay">
-                            <a href="{{ route('galeri.detail', $item->id) }}" class="btn btn-light">
+                            <a href="{{ route('galeri.detail', $item->id) }}" class="btn btn-primary">
                                 <i class="fas fa-eye me-1"></i>Lihat Galeri
                             </a>
                         </div>
                         <div class="related-badge">
-                            <span class="badge bg-success">{{ $item->fotos->count() }} foto</span>
+                            <span class="badge bg-primary">{{ $item->fotos->count() }} foto</span>
                         </div>
                     </div>
                     <div class="related-content">
@@ -144,7 +169,7 @@
                         <p class="related-date text-muted">
                             <i class="fas fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}
                         </p>
-                        <a href="{{ route('galeri.detail', $item->id) }}" class="btn btn-success btn-sm w-100">
+                        <a href="{{ route('galeri.detail', $item->id) }}" class="btn btn-primary btn-sm w-100">
                             <i class="fas fa-arrow-right me-1"></i>Lihat Galeri
                         </a>
                     </div>
@@ -160,38 +185,28 @@
             @endforelse
         </div>
         
-        <!-- Share Buttons -->
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="share-card">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <h5 class="mb-0"><i class="fas fa-share-alt me-2 text-success"></i>Bagikan Galeri Ini</h5>
-                                <p class="text-muted mb-0">Sebarkan keindahan momen ini</p>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('galeri.detail', $galeri->id)) }}" target="_blank" class="btn btn-facebook">
-                                        <i class="fab fa-facebook-f"></i>
-                                    </a>
-                                    <a href="https://twitter.com/intent/tweet?url={{ urlencode(route('galeri.detail', $galeri->id)) }}&text={{ urlencode($galeri->judul ?? ($galeri->post->judul ?? 'Galeri')) }}" target="_blank" class="btn btn-twitter">
-                                        <i class="fab fa-twitter"></i>
-                                    </a>
-                                    <a href="https://wa.me/?text={{ urlencode(($galeri->judul ?? ($galeri->post->judul ?? 'Galeri')) . ' ' . route('galeri.detail', $galeri->id)) }}" target="_blank" class="btn btn-whatsapp">
-                                        <i class="fab fa-whatsapp"></i>
-                                    </a>
-                                    <button class="btn btn-secondary" onclick="copyToClipboard('{{ route('galeri.detail', $galeri->id) }}')">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+    </div>
+
+    <!-- Global Share Modal -->
+    <div class="modal fade" id="global-share-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fa-solid fa-share-nodes me-2"></i>Bagikan Foto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="list-group">
+                        <a class="list-group-item list-group-item-action d-flex align-items-center" target="_blank" data-share-wa href="#"><i class="fab fa-whatsapp me-2 text-success"></i>WhatsApp</a>
+                        <a class="list-group-item list-group-item-action d-flex align-items-center" target="_blank" data-share-fb href="#"><i class="fab fa-facebook me-2 text-primary"></i>Facebook</a>
+                        <a class="list-group-item list-group-item-action d-flex align-items-center" target="_blank" data-share-tw href="#"><i class="fab fa-x-twitter me-2"></i>Twitter/X</a>
+                        <button class="list-group-item list-group-item-action d-flex align-items-center" type="button" data-copy-link><i class="fas fa-link me-2"></i>Salin Link</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
 </section>
 @endsection
 
@@ -539,6 +554,51 @@
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* Photo actions bar (like Instagram) */
+.photo-actions-bar {
+    border-top: 1px solid #eef2f7;
+}
+
+.action-icon {
+    background: transparent;
+    border: none;
+    color: var(--elunora-dark);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.1s ease;
+    cursor: pointer;
+}
+
+.action-icon:hover {
+    background: #f1f5f9;
+}
+
+.action-icon.liked i {
+    color: #ef4444; /* red heart when liked */
+}
+
+.action-icon .count {
+    font-weight: 700;
+}
+
+.comments-panel {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.comments-list .comment-item {
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+}
+
 @media (max-width: 768px) {
     .photo-container {
         height: 180px;
@@ -589,19 +649,342 @@
     
     function copyToClipboard(text) {
         navigator.clipboard.writeText(text).then(function() {
-            // Show success message
-            const btn = event.target.closest('button');
-            const originalIcon = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-check"></i>';
-            btn.classList.add('btn-success');
-            btn.classList.remove('btn-secondary');
-            
-            setTimeout(() => {
-                btn.innerHTML = originalIcon;
-                btn.classList.remove('btn-success');
-                btn.classList.add('btn-secondary');
-            }, 2000);
+            // If triggered by a button click, give visual feedback
+            try {
+                if (typeof event !== 'undefined' && event.target) {
+                    const btn = event.target.closest('button');
+                    if (btn) {
+                        const originalIcon = btn.innerHTML;
+                        btn.innerHTML = '<i class="fas fa-check"></i>';
+                        btn.classList.add('btn-success');
+                        btn.classList.remove('btn-secondary');
+                        setTimeout(() => {
+                            btn.innerHTML = originalIcon;
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-secondary');
+                        }, 2000);
+                        return;
+                    }
+                }
+            } catch (e) { /* no-op */ }
+            // Fallback: simple console message
+            console.log('Tautan disalin ke clipboard');
         });
     }
+
+    // --- Server-backed per photo like, comment, share ---
+    function formatCountID(n) {
+        if (typeof n !== 'number') n = parseInt(n || 0, 10);
+        if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.', ',') + 'jt';
+        if (n >= 1000) return (n / 1000).toFixed(1).replace('.', ',') + 'rb';
+        return new Intl.NumberFormat('id-ID').format(n);
+    }
+
+    function getBaseline(id) {
+        const key = 'foto_like_baseline_' + id;
+        let v = localStorage.getItem(key);
+        if (v === null) {
+            v = Math.floor(Math.random() * 23) + 3; // 3..25
+            localStorage.setItem(key, String(v));
+        }
+        return parseInt(v, 10) || 0;
+    }
+
+    function updateLikeUI(fotoId, liked, likesCount) {
+        const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
+        if (!likeBtn) return;
+        likeBtn.querySelector('.count').textContent = formatCountID(likesCount);
+        likeBtn.classList.toggle('liked', !!liked);
+        likeBtn.dataset.liked = liked ? '1' : '0';
+        const icon = likeBtn.querySelector('i');
+        if (icon) {
+            // Support FA5 (far/fas) and FA6 (fa-regular/fa-solid)
+            icon.classList.toggle('far', !liked);
+            icon.classList.toggle('fas', !!liked);
+            icon.classList.toggle('fa-regular', !liked);
+            icon.classList.toggle('fa-solid', !!liked);
+        }
+    }
+
+    function getLiked(fotoId) {
+        return localStorage.getItem('foto_liked_' + fotoId) === '1';
+    }
+    function setLiked(fotoId, val) {
+        if (val) localStorage.setItem('foto_liked_' + fotoId, '1');
+        else localStorage.removeItem('foto_liked_' + fotoId);
+    }
+
+    function updateCommentsCountUI(fotoId, count) {
+        const commentBtn = document.querySelector('.comment-btn[data-foto-id="' + fotoId + '"]');
+        if (commentBtn) {
+            commentBtn.querySelector('.count').textContent = formatCountID(count);
+        }
+    }
+
+    async function fetchCounts(ids) {
+        const qs = encodeURI(ids.join(','));
+        if (!qs) return {};
+        const res = await fetch(`/ajax/fotos/counts?ids=${qs}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            credentials: 'same-origin'
+        });
+        const data = await res.json();
+        return data.data || {};
+    }
+
+    async function likeFoto(fotoId) {
+        try {
+            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
+            if (likeBtn) {
+                likeBtn.disabled = true;
+                // Optimistic increment on UI
+                const current = likeBtn.querySelector('.count').textContent.replace(/\./g, '').replace(/,rb|,jt|rb|jt/g, '');
+                let currNum = parseInt(current || '0', 10);
+                if (isNaN(currNum)) currNum = 0;
+                updateLikeUI(fotoId, true, currNum + 1);
+            }
+            const res = await fetch(`/ajax/fotos/${fotoId}/like`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            });
+            if (!res.ok) {
+                let msg = 'Failed to like';
+                try {
+                    const j = await res.json();
+                    if (j && (j.message || j.hint)) {
+                        msg = `${j.message || ''}${j.hint ? `\n${j.hint}` : ''}`.trim();
+                    }
+                } catch (_) {}
+                throw new Error(msg);
+            }
+            await res.json();
+            // Keep optimistic UI count; just ensure liked state is stored
+            setLiked(fotoId, true);
+            if (likeBtn) likeBtn.disabled = false;
+        } catch (e) {
+            console.error(e);
+            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
+            if (likeBtn) likeBtn.disabled = false;
+            alert(e.message || 'Gagal menyukai foto. Silakan coba lagi.');
+        }
+    }
+
+    async function unlikeFoto(fotoId) {
+        try {
+            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
+            if (likeBtn) {
+                likeBtn.disabled = true;
+                // Optimistic decrement on UI
+                const current = likeBtn.querySelector('.count').textContent.replace(/\./g, '').replace(/,rb|,jt|rb|jt/g, '');
+                let currNum = parseInt(current || '0', 10);
+                if (isNaN(currNum)) currNum = 0;
+                updateLikeUI(fotoId, false, Math.max(0, currNum - 1));
+            }
+            const res = await fetch(`/ajax/fotos/${fotoId}/unlike`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin'
+            });
+            if (!res.ok) {
+                let msg = 'Failed to unlike';
+                try {
+                    const j = await res.json();
+                    if (j && (j.message || j.hint)) {
+                        msg = `${j.message || ''}${j.hint ? `\n${j.hint}` : ''}`.trim();
+                    }
+                } catch (_) {}
+                throw new Error(msg);
+            }
+            await res.json();
+            // Keep optimistic UI count; just ensure liked state is stored
+            setLiked(fotoId, false);
+            if (likeBtn) likeBtn.disabled = false;
+        } catch (e) {
+            console.error(e);
+            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
+            if (likeBtn) likeBtn.disabled = false;
+            alert(e.message || 'Gagal membatalkan like. Silakan coba lagi.');
+        }
+    }
+
+    async function loadComments(fotoId) {
+        try {
+            const res = await fetch(`/ajax/fotos/${fotoId}/comments`);
+            const data = await res.json();
+            const list = document.getElementById('comments-list-' + fotoId);
+            if (list) {
+                list.innerHTML = (data.comments || []).map(c => `
+                    <div class="comment-item">
+                        <strong>${c.guest_name ? c.guest_name : 'Tamu'}</strong>
+                        <div>${c.content}</div>
+                        <small class="text-muted">${(new Date(c.created_at)).toLocaleString()}</small>
+                    </div>
+                `).join('');
+            }
+            updateCommentsCountUI(fotoId, (data.comments || []).length);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function addComment(fotoId) {
+        const input = document.getElementById('comment-input-' + fotoId);
+        if (!input) return;
+        const text = (input.value || '').trim();
+        if (!text) return;
+        try {
+            const res = await fetch(`/ajax/fotos/${fotoId}/comments`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ content: text }),
+                credentials: 'same-origin'
+            });
+            if (!res.ok) {
+                let msg = 'Failed to comment';
+                try {
+                    const j = await res.json();
+                    if (j && (j.message || j.hint)) {
+                        msg = `${j.message || ''}${j.hint ? `\n${j.hint}` : ''}`.trim();
+                    }
+                } catch (_) {}
+                throw new Error(msg);
+            }
+            input.value = '';
+            await loadComments(fotoId);
+        } catch (e) {
+            console.error(e);
+            alert(e.message || 'Gagal mengirim komentar. Pastikan koneksi stabil lalu coba lagi.');
+        }
+    }
+    window.addComment = addComment;
+
+    // Share helpers
+    function shareFoto(url) {
+        if (navigator.share) {
+            navigator.share({ title: 'Bagikan Foto', text: 'Lihat foto galeri Elunora School', url });
+            return;
+        }
+        openShareModal(url);
+    }
+
+    function openShareModal(url) {
+        const modal = document.getElementById('global-share-modal');
+        if (!modal) return copyToClipboard(url);
+        modal.querySelector('[data-share-wa]').href = `https://wa.me/?text=${encodeURIComponent(url)}`;
+        modal.querySelector('[data-share-fb]').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+        modal.querySelector('[data-share-tw]').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`;
+        modal.querySelector('[data-copy-link]').onclick = () => copyToClipboard(url);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', async function() {
+        // Collect all foto IDs on the page
+        const ids = Array.from(document.querySelectorAll('.like-btn')).map(btn => btn.getAttribute('data-foto-id'));
+        // Set initial baseline to avoid plain 0 while loading
+        ids.forEach(id => {
+            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + id + '"]');
+            if (likeBtn) {
+                const base = getBaseline(id);
+                if (base > 0) updateLikeUI(id, false, base);
+            }
+        });
+
+        // Fetch counts from server
+        try {
+            const counts = await fetchCounts(ids);
+            ids.forEach(id => {
+                const c = counts[id];
+                if (c) {
+                    const base = c.likes_count === 0 ? getBaseline(id) : 0;
+                    updateLikeUI(id, false, c.likes_count + base);
+                    updateCommentsCountUI(id, c.comments_count);
+                }
+            });
+        } catch (e) {
+            console.error(e);
+        }
+
+        // Apply initial liked state from localStorage without changing counts
+        ids.forEach(id => {
+            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + id + '"]');
+            if (!likeBtn) return;
+            const icon = likeBtn.querySelector('i');
+            const liked = getLiked(id);
+            likeBtn.classList.toggle('liked', liked);
+            likeBtn.dataset.liked = liked ? '1' : '0';
+            if (icon) {
+                icon.classList.toggle('far', !liked);
+                icon.classList.toggle('fas', liked);
+                icon.classList.toggle('fa-regular', !liked);
+                icon.classList.toggle('fa-solid', liked);
+            }
+        });
+
+        // Wire like buttons (decide by data-liked / UI state for robustness)
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            const id = btn.getAttribute('data-foto-id');
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isLikedNow = (btn.dataset.liked === '1') || btn.classList.contains('liked') || getLiked(id);
+                if (isLikedNow) {
+                    unlikeFoto(id);
+                } else {
+                    likeFoto(id);
+                }
+            });
+        });
+
+        // Wire comment buttons
+        document.querySelectorAll('.comment-btn').forEach(btn => {
+            const id = btn.getAttribute('data-foto-id');
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const panel = document.getElementById('comments-panel-' + id);
+                if (!panel) return;
+                const toShow = panel.classList.contains('d-none');
+                panel.classList.toggle('d-none');
+                if (toShow) {
+                    await loadComments(id);
+                    const input = document.getElementById('comment-input-' + id);
+                    if (input) {
+                        input.focus();
+                        input.addEventListener('keydown', function(ev) {
+                            if (ev.key === 'Enter') {
+                                ev.preventDefault();
+                                addComment(id);
+                            }
+                        }, { once: true });
+                    }
+                }
+            });
+        });
+
+        // Wire share buttons
+        document.querySelectorAll('.share-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = btn.getAttribute('data-share-url');
+                shareFoto(url);
+            });
+        });
+    });
 </script>
 @endsection

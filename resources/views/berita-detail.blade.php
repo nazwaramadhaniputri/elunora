@@ -106,6 +106,48 @@
                             </div>
                         </div>
                         @endif
+
+                        <!-- Comments Section -->
+                        @php
+                            // Ambil komentar jika relasi tersedia, urutkan terbaru dulu, dan sembunyikan yang kosong
+                            $comments = ($post->comments ?? collect())
+                                ->sortByDesc('created_at')
+                                ->filter(function($c){
+                                    $name = isset($c->name) ? trim($c->name) : (isset($c->nama) ? trim($c->nama) : '');
+                                    $body = '';
+                                    if (isset($c->content))  { $body = trim($c->content); }
+                                    if ($body === '' && isset($c->komentar)) { $body = trim($c->komentar); }
+                                    if ($body === '' && isset($c->isi))      { $body = trim($c->isi); }
+                                    return $name !== '' && $body !== '';
+                                });
+                        @endphp
+                        <div class="comments-section mt-5">
+                            <h4 class="comments-title"><i class="fas fa-comments me-2 text-primary"></i>Komentar</h4>
+                            @if($comments->count() > 0)
+                                <ul class="list-unstyled mt-3">
+                                    @foreach($comments as $comment)
+                                    <li class="comment-item">
+                                        <div class="d-flex">
+                                            <div class="comment-avatar me-3">
+                                                <i class="fas fa-user-circle"></i>
+                                            </div>
+                                            <div class="comment-body">
+                                                <div class="comment-meta">
+                                                    <strong>{{ $comment->name ?? $comment->nama ?? 'Pengguna' }}</strong>
+                                                    <small class="text-muted ms-2">
+                                                        {{ isset($comment->created_at) ? \Carbon\Carbon::parse($comment->created_at)->format('d M Y H:i') : '' }}
+                                                    </small>
+                                                </div>
+                                                <div class="comment-text">{!! nl2br(e($comment->content ?? $comment->komentar ?? $comment->isi ?? '')) !!}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <div class="alert alert-light border mt-3 mb-0">Belum ada komentar. Jadilah yang pertama!</div>
+                            @endif
+                        </div>
                         
                         <!-- Share Buttons -->
                         <div class="share-section mt-5" id="shareSection" style="display: none;">
@@ -138,40 +180,6 @@
             
             <!-- Sidebar -->
             <div class="col-lg-4">
-                <!-- Berita Terkait -->
-                <div class="sidebar-card mb-4">
-                    <div class="sidebar-header">
-                        <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Berita Terkait</h5>
-                    </div>
-                    <div class="card-body">
-                        @if($relatedPosts->count() > 0)
-                        <ul class="list-group list-group-flush">
-                            @foreach($relatedPosts as $item)
-                            <li class="list-group-item px-0">
-                                <a href="{{ route('berita.detail', $item->id) }}" class="text-decoration-none">
-                                    <div class="d-flex">
-                                        <div class="flex-shrink-0 me-3">
-                                            @if($item->gambar)
-                                            <img src="{{ asset($item->gambar) }}" class="rounded" width="60" height="60" alt="{{ $item->judul }}" style="object-fit: cover;" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
-                                            @else
-                                            <img src="{{ asset('img/no-image.jpg') }}" class="rounded" width="60" height="60" alt="No Image" style="object-fit: cover;">
-                                            @endif
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">{{ Str::limit($item->judul, 50) }}</h6>
-                                            <small class="text-muted">{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            @endforeach
-                        </ul>
-                        @else
-                        <p class="mb-0">Tidak ada berita terkait.</p>
-                        @endif
-                    </div>
-                </div>
-                
                 <!-- Kategori Berita -->
                 <div class="sidebar-card">
                     <div class="sidebar-header">
@@ -194,6 +202,43 @@
                             <li class="list-group-item">Tidak ada kategori</li>
                             @endforelse
                         </ul>
+                    </div>
+                </div>
+
+                <!-- Form Komentar (dipindah ke bawah Kategori Berita) -->
+                <div class="sidebar-card mt-4">
+                    <div class="sidebar-header">
+                        <h5 class="mb-0"><i class="fas fa-pen me-2"></i>Tinggalkan Komentar</h5>
+                    </div>
+                    <div class="card-body">
+                        @if(session('success'))
+                            <div class="alert alert-success">{{ session('success') }}</div>
+                        @endif
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <form method="POST" action="{{ route('berita.comment.store', $post->id) }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Nama</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Nama Anda" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="email@domain.com" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="content" class="form-label">Komentar</label>
+                                <textarea class="form-control" id="content" name="content" rows="4" placeholder="Tulis komentar Anda..." required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-2"><i class="fas fa-paper-plane me-2"></i>Kirim Komentar</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -415,6 +460,67 @@
     color: white;
     padding: 1.25rem;
     font-weight: 600;
+}
+
+/* Give extra breathing room between header and form fields */
+.sidebar-card .card-body {
+    padding: 1.25rem 1.25rem 1.5rem;
+}
+
+/* Comments */
+.comments-title {
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.comment-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e9f0ff;
+    color: #1e3a8a;
+    font-size: 1.5rem;
+}
+
+.comment-text {
+    margin-top: 0.25rem;
+    color: #334155;
+}
+
+/* Sidebar Comment Form Spacing */
+.sidebar-card .card-body .form-label {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 0.4rem;
+}
+
+.sidebar-card .card-body .form-control {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+}
+
+.sidebar-card .card-body .mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.sidebar-card .card-body .mb-3:first-of-type {
+    margin-top: 0.25rem;
+}
+
+.sidebar-card .card-body .mb-3:last-of-type {
+    margin-bottom: 1.25rem !important;
 }
 
 @media (max-width: 768px) {

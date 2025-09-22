@@ -10,8 +10,9 @@ class AgendaController extends Controller
 {
     public function index()
     {
+        // Upcoming: strictly after today to avoid duplicating today's agendas
         $upcomingAgenda = Agenda::where('status', 1)  // 1 = published
-                               ->where('tanggal', '>=', now()->format('Y-m-d'))
+                               ->whereDate('tanggal', '>', now()->format('Y-m-d'))
                                ->orderBy('tanggal', 'asc')
                                ->orderBy('waktu_mulai', 'asc')
                                ->paginate(12);
@@ -50,12 +51,7 @@ class AgendaController extends Controller
 
     public function show($id)
     {
-        $agenda = Agenda::findOrFail($id);
-        
-        // Hanya tampilkan agenda yang published (status = 1)
-        if ($agenda->status != 1) {
-            abort(404);
-        }
+        $agenda = Agenda::where('status', 1)->findOrFail($id);
 
         // Get related agendas (same category, exclude current agenda, limit to 3)
         $relatedAgendas = Agenda::where('status', 1)

@@ -38,9 +38,9 @@
             <div class="col-lg-8">
                 @forelse($posts as $berita)
                 <article class="news-card mb-4">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            <div class="news-image-container">
+                    <div class="row g-0 align-items-stretch">
+                        <div class="col-md-4 h-100">
+                            <div class="news-image-container h-100">
                                 @if($berita->gambar)
                                 <img src="{{ asset($berita->gambar) }}" class="news-image" alt="{{ $berita->judul }}">
                                 @else
@@ -52,7 +52,7 @@
                             </div>
                         </div>
                         <div class="col-md-8">
-                            <div class="news-content p-4">
+                            <div class="news-content p-4 d-flex flex-column h-100">
                                 <div class="news-meta mb-3">
                                     <span class="badge bg-primary">{{ $berita->kategori->nama_kategori }}</span>
                                     <small class="text-muted ms-2">
@@ -61,7 +61,7 @@
                                 </div>
                                 <h4 class="news-title mb-3">{{ $berita->judul }}</h4>
                                 <p class="news-excerpt mb-4">{{ Str::limit(strip_tags($berita->isi), 150) }}</p>
-                                <div class="news-actions">
+                                <div class="news-actions mt-auto">
                                     <a href="{{ route('berita.detail', $berita->id) }}" class="btn btn-primary">
                                         <i class="fas fa-arrow-right me-2"></i>Baca Selengkapnya
                                     </a>
@@ -182,8 +182,12 @@
 
 .news-image-container {
     position: relative;
-    height: 200px;
+    height: 100%;
+    min-height: 200px;
     overflow: hidden;
+    display: flex;
+    align-self: stretch;
+    width: 100%;
 }
 
 .news-image {
@@ -191,6 +195,14 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.3s ease;
+    display: block;
+    flex: 1 1 auto;
+}
+
+/* Make sure the image gets the left rounded corners only, to match the card */
+.news-card .news-image-container img {
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
 }
 
 .news-card:hover .news-image {
@@ -320,10 +332,42 @@
 @media (max-width: 768px) {
     .news-image-container {
         height: 150px;
+        min-height: 150px;
+    }
+
+    /* On mobile, round all corners since it stacks above content */
+    .news-card .news-image-container img {
+        border-top-right-radius: 15px;
+        border-bottom-left-radius: 0;
     }
     
     .news-content {
         padding: 1.5rem;
+    }
+}
+
+/* Equal height layout using Flex (more reliable with Bootstrap rows) */
+.news-card > .row.g-0.align-items-stretch {
+    display: flex;
+    align-items: stretch;
+}
+
+.news-card > .row.g-0.align-items-stretch > [class^="col-"],
+.news-card > .row.g-0.align-items-stretch > [class*=" col-"] {
+    display: flex;
+    align-items: stretch;
+}
+
+.news-card > .row.g-0.align-items-stretch .news-image-container,
+.news-card > .row.g-0.align-items-stretch .news-content {
+    height: 100%;
+    width: 100%;
+}
+
+/* Mobile: stack naturally */
+@media (max-width: 991.98px) {
+    .news-card > .row.g-0.align-items-stretch {
+        display: block;
     }
 }
 </style>

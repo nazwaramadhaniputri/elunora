@@ -17,9 +17,6 @@
                     <button type="button" class="btn btn-hero-glow" onclick="scrollToSection('berita-section')">
                         <i class="fas fa-newspaper me-2"></i>Baca Berita
                     </button>
-                    <button type="button" class="btn btn-hero-glow" onclick="scrollToSection('profil-section')">
-                        <i class="fas fa-user me-2"></i>Lihat Profile
-                    </button>
                     <button type="button" class="btn btn-hero-glow" onclick="scrollToSection('agenda-section')">
                         <i class="fas fa-calendar me-2"></i>Lihat Agenda
                     </button>
@@ -357,7 +354,6 @@
 @endif
 
 <!-- Upcoming Agendas Section -->
-@if(isset($upcomingAgendas) && $upcomingAgendas->count() > 0)
 <section id="agenda-section" class="py-5">
     <div class="container">
         <div class="text-center mb-5">
@@ -368,10 +364,10 @@
         </div>
         
         <div class="row g-4">
-            @foreach($upcomingAgendas as $agenda)
+            @forelse(($upcomingAgendas ?? collect()) as $agenda)
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title mb-0">{{ $agenda->judul }}</h5>
                             @if($agenda->kategori)
@@ -399,23 +395,26 @@
                             {{ Str::limit(strip_tags($agenda->deskripsi), 100) }}
                         </p>
                         
-                        <a href="{{ route('agenda.show', $agenda->id) }}" class="btn-modern primary btn-sm mt-2">
+                        <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-sm btn-primary mt-auto">
                             Lihat Detail <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                 </div>
             </div>
-            @endforeach
+            @empty
+            <div class="col-12 text-center">
+                <p>Belum ada agenda mendatang.</p>
+            </div>
+            @endforelse
         </div>
         
         <div class="text-center mt-5">
-            <a href="{{ route('agenda') }}" class="btn-modern primary">
+            <a href="{{ route('agenda') }}" class="btn btn-primary">
                 <i class="fas fa-calendar-alt me-2"></i>Lihat Semua Agenda
             </a>
         </div>
     </div>
 </section>
-@endif
 
 <!-- Berita Terbaru -->
 <section id="berita-section" class="py-5">

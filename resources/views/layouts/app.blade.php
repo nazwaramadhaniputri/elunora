@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title') - Elunora School</title>
     <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}">
     <!-- Bootstrap CSS -->
@@ -151,27 +152,31 @@
         }
         
         .btn-success {
-            background: var(--success-color);
-            border: 1px solid var(--success-color);
+            background: var(--elunora-success);
+            border: 1px solid var(--elunora-success);
             box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+            color: #fff;
         }
         
         .btn-info {
-            background: #0ea5e9;
-            border: 1px solid #0ea5e9;
+            background: var(--elunora-info);
+            border: 1px solid var(--elunora-info);
             box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+            color: #fff;
         }
         
         .btn-warning {
-            background: var(--warning-color);
-            border: 1px solid var(--warning-color);
+            background: var(--elunora-warning);
+            border: 1px solid var(--elunora-warning);
             box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+            color: #fff;
         }
         
         .btn-danger {
-            background: var(--accent-color);
-            border: 1px solid var(--accent-color);
+            background: var(--elunora-danger);
+            border: 1px solid var(--elunora-danger);
             box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+            color: #fff;
         }
         
         .alert {
@@ -306,6 +311,9 @@
         }
     </style>
     @yield('styles')
+    <script>
+        window.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    </script>
 </head>
 <body>
     <!-- Navigation -->

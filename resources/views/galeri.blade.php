@@ -118,7 +118,7 @@
                             @endif
                             <div class="gallery-overlay">
                                 <div class="gallery-info">
-                                    <span class="badge bg-success">
+                                    <span class="badge bg-primary">
                                         <i class="fas fa-images me-1"></i>{{ $galeri->fotos->count() }} Foto
                                     </span>
                                 </div>
@@ -134,7 +134,7 @@
                                     <i class="fas fa-calendar me-1"></i>
                                     {{ \Carbon\Carbon::parse($galeri->created_at)->format('d M Y') }}
                                 </small>
-                                <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-success btn-sm">
+                                <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-eye me-1"></i>Lihat Galeri
                                 </a>
                             </div>
@@ -214,7 +214,7 @@
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Total Galeri
-                                <span class="badge bg-success rounded-pill">{{ $totalGaleri }}</span>
+                                <span class="badge bg-primary rounded-pill">{{ $totalGaleri }}</span>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 Total Foto

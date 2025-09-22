@@ -16,8 +16,8 @@ class HomeController extends Controller
         $galeris = Galeri::where('status', 1)->latest()->take(3)->get();
         $profile = Profile::first();
         
-        // Get upcoming agendas (next 3 upcoming events)
-        $upcomingAgendas = \App\Models\Agenda::where('status', 'published')
+        // Get upcoming agendas (next 3 upcoming events) — status 1 = published
+        $upcomingAgendas = \App\Models\Agenda::where('status', 1)
             ->where('tanggal', '>=', now()->format('Y-m-d'))
             ->orderBy('tanggal', 'asc')
             ->orderBy('waktu_mulai', 'asc')
