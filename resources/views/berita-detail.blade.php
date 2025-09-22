@@ -79,7 +79,7 @@
                         
                         <!-- Back Button -->
                         <div class="mt-4 pt-3 border-top">
-                            <a href="{{ route('berita') }}" class="btn btn-outline-success">
+                            <a href="{{ route('berita') }}" class="btn btn-outline-primary">
                                 <i class="fas fa-arrow-left me-2"></i>Kembali ke Berita
                             </a>
                         </div>
@@ -304,7 +304,8 @@
 }
 
 .category-badge {
-    background: rgba(0, 123, 255, 0.9);
+    /* Use primary color with alpha (primary #1e3a8a) */
+    background: rgba(30, 58, 138, 0.9);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 20px;
@@ -375,7 +376,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 123, 255, 0.8);
+    /* Use primary color with alpha (primary #1e3a8a) */
+    background: rgba(30, 58, 138, 0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -390,10 +392,10 @@
 }
 
 .share-section {
-    background: rgba(0, 123, 255, 0.05);
+    background: rgba(30, 58, 138, 0.05);
     border-radius: 15px;
     padding: 2rem;
-    border: 1px solid rgba(0, 123, 255, 0.1);
+    border: 1px solid rgba(30, 58, 138, 0.1);
 }
 
 .share-header h5 {
@@ -456,7 +458,7 @@
 }
 
 .sidebar-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
+    background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-dark));
     color: white;
     padding: 1.25rem;
     font-weight: 600;

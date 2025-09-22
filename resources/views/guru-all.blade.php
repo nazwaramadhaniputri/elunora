@@ -119,7 +119,7 @@
 
 .teacher-image-container {
     position: relative;
-    height: 250px;
+    height: 320px; /* taller so wajah tidak terpotong */
     overflow: hidden;
     border-radius: 15px 15px 0 0;
 }
@@ -128,6 +128,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top; /* fokus ke wajah */
     transition: transform 0.3s ease;
 }
 
@@ -172,6 +173,12 @@
 
 .teacher-education {
     color: var(--elunora-warning) !important;
+}
+
+@media (max-width: 768px) {
+    .teacher-image-container {
+        height: 260px; /* responsive height */
+    }
 }
 </style>
 @endsection

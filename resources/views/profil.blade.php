@@ -920,7 +920,7 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
 
 .teacher-image-container {
     position: relative;
-    height: 250px;
+    height: 320px; /* taller so wajah tidak terpotong */
     overflow: hidden;
     background: #f8f9fa;
     display: flex;
@@ -932,6 +932,7 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center top; /* fokus ke wajah di bagian atas foto */
     transition: transform 0.4s ease;
 }
 
@@ -1065,6 +1066,11 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
     
     .facility-image-container {
         height: 200px;
+    }
+    
+    /* Responsif: tinggi kartu guru agar tetap terlihat wajah di layar kecil */
+    .teacher-image-container {
+        height: 260px;
     }
     
     .info-icon {

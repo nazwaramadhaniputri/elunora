@@ -3,40 +3,36 @@
 @section('title', $agenda->judul)
 
 @section('hero')
-<div class="hero-section">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-8">
-                <div class="breadcrumb-nav mb-3">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white-50">Beranda</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('agenda') }}" class="text-white-50">Agenda</a></li>
-                            <li class="breadcrumb-item active text-white" aria-current="page">{{ Str::limit($agenda->judul, 30) }}</li>
-                        </ol>
-                    </nav>
-                </div>
-                <h1 class="display-5 fw-bold text-white mb-3">{{ $agenda->judul }}</h1>
-                <div class="d-flex gap-3 mb-2 flex-wrap">
-                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="far fa-calendar-alt me-2"></i>{{ \Carbon\Carbon::parse($agenda->tanggal)->translatedFormat('l, d F Y') }}
-                    </span>
-                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="far fa-clock me-2"></i>{{ \Carbon\Carbon::parse($agenda->waktu_mulai)->format('H:i') }} - {{ $agenda->waktu_selesai ? \Carbon\Carbon::parse($agenda->waktu_selesai)->format('H:i') : 'Selesai' }}
-                    </span>
-                    @if($agenda->kategori)
-                    <span class="badge bg-light text-dark fs-6 px-3 py-2">
-                        <i class="fas fa-tag me-2"></i>{{ $agenda->kategori }}
-                    </span>
-                    @endif
-                </div>
-                <p class="lead mb-0">{{ Str::limit(strip_tags($agenda->deskripsi), 120) }}</p>
-            </div>
-            <div class="col-md-4 text-center">
-                <div class="hero-icon">
-                    <i class="fas fa-calendar-alt" style="font-size: 6rem; color: rgba(255, 255, 255, 0.2);"></i>
-                </div>
-            </div>
+<div class="row align-items-center">
+    <div class="col-md-8">
+        <div class="breadcrumb-nav mb-3">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}" class="text-white-50">Beranda</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('agenda') }}" class="text-white-50">Agenda</a></li>
+                    <li class="breadcrumb-item active text-white" aria-current="page">{{ Str::limit($agenda->judul, 30) }}</li>
+                </ol>
+            </nav>
+        </div>
+        <h1 class="display-5 fw-bold text-white mb-3">{{ $agenda->judul }}</h1>
+        <div class="d-flex gap-3 mb-2 flex-wrap">
+            <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                <i class="far fa-calendar-alt me-2"></i>{{ \Carbon\Carbon::parse($agenda->tanggal)->translatedFormat('l, d F Y') }}
+            </span>
+            <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                <i class="far fa-clock me-2"></i>{{ \Carbon\Carbon::parse($agenda->waktu_mulai)->format('H:i') }} - {{ $agenda->waktu_selesai ? \Carbon\Carbon::parse($agenda->waktu_selesai)->format('H:i') : 'Selesai' }}
+            </span>
+            @if($agenda->kategori)
+            <span class="badge bg-light text-dark fs-6 px-3 py-2">
+                <i class="fas fa-tag me-2"></i>{{ $agenda->kategori }}
+            </span>
+            @endif
+        </div>
+        <p class="lead mb-0">{{ Str::limit(strip_tags($agenda->deskripsi), 120) }}</p>
+    </div>
+    <div class="col-md-4 text-center">
+        <div class="hero-icon">
+            <i class="fas fa-calendar-alt" style="font-size: 6rem; color: rgba(255, 255, 255, 0.2);"></i>
         </div>
     </div>
 </div>
@@ -188,17 +184,13 @@
             </div>
         </div>
     </div>
-</div>
+</section>
+
+@endsection
 
 @section('styles')
 <style>
-/* Hero (consistent with Berita/Galeri) */
-.hero-section {
-    background: linear-gradient(135deg, var(--elunora-primary) 0%, #1e3a8a 100%);
-    padding: 4rem 0;
-    margin-bottom: 3rem;
-    color: #fff;
-}
+/* Hero icon tweaks (use layout hero styles; no override on .hero-section here) */
 .hero-icon { position: relative; z-index: 1; }
 
 /* Main detail card (match Berita detail proportions) */
@@ -226,23 +218,21 @@
 .sidebar-card .card-body { padding: 1.25rem 1.25rem 1.5rem; }
 
 /* Common controls */
-.btn { border-radius: 6px; font-weight: 500; padding: 0.5rem 1.25rem; }
+.btn { border-radius: 999px; font-weight: 600; padding: 0.5rem 1.25rem; }
 .btn-sm { padding: 0.4rem 0.9rem; font-size: 0.875rem; }
-.badge { font-weight: 500; padding: 0.4em 0.8em; border-radius: 6px; }
+.badge { font-weight: 600; padding: 0.45em 0.95em; border-radius: 999px; }
 
 /* Responsive */
 @media (max-width: 991px) {
-    .hero-section { padding: 3rem 0; }
-    .hero-section h1 { font-size: 2rem; }
+    .hero-icon i { font-size: 4rem !important; }
 }
 @media (max-width: 767px) {
-    .hero-section { text-align: center; padding: 2.5rem 0; }
-    .hero-section h1 { font-size: 1.75rem; }
     .btn { width: 100%; margin-bottom: 0.5rem; }
 }
 </style>
 @endsection
 
+@section('scripts')
 <script>
 function copyToClipboard() {
     navigator.clipboard.writeText(window.location.href).then(function() {
