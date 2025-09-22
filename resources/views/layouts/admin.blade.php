@@ -261,7 +261,7 @@
             padding: 0.6rem 1.5rem;
             font-weight: 500;
             transition: all 0.3s ease;
-            border: none;
+            border: 1px solid transparent; /* keep borders for outline variants */
             margin: 0.2rem;
         }
         
@@ -288,29 +288,115 @@
             box-shadow: 0 4px 8px rgba(30, 58, 138, 0.4) !important;
             color: white !important;
         }
+        .btn-primary:focus,
+        .btn-primary:active,
+        .btn-primary.active { background: var(--admin-primary) !important; border-color: var(--admin-primary) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(30,58,138,0.35) !important; }
         
         .btn-success {
             background: var(--admin-success);
             border: 1px solid var(--admin-success);
             box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
         }
+        .btn-success:hover { background: #2ea44f !important; border-color: #2ea44f !important; color:#fff !important; box-shadow: 0 4px 10px rgba(40,167,69,0.35) !important; }
+        .btn-success:focus,
+        .btn-success:active,
+        .btn-success.active { background: var(--admin-success) !important; border-color: var(--admin-success) !important; color:#fff !important; box-shadow: 0 4px 10px rgba(40,167,69,0.35) !important; }
         
         .btn-warning {
             background: var(--admin-warning);
             border: 1px solid var(--admin-warning);
             box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
         }
+        .btn-warning:hover { background: #d97706 !important; border-color: #d97706 !important; color:#fff !important; box-shadow: 0 4px 10px rgba(255,193,7,0.35) !important; }
+        .btn-warning:focus,
+        .btn-warning:active,
+        .btn-warning.active { background: var(--admin-warning) !important; border-color: var(--admin-warning) !important; color:#fff !important; box-shadow: 0 4px 10px rgba(255,193,7,0.35) !important; }
         
         .btn-danger {
             background: var(--admin-danger);
             border: 1px solid var(--admin-danger);
             box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
         }
+        .btn-danger:hover { background: #c82333 !important; border-color: #c82333 !important; color:#fff !important; box-shadow: 0 4px 10px rgba(220,53,69,0.35) !important; }
+        .btn-danger:focus,
+        .btn-danger:active,
+        .btn-danger.active { background: var(--admin-danger) !important; border-color: var(--admin-danger) !important; color:#fff !important; box-shadow: 0 4px 10px rgba(220,53,69,0.35) !important; }
         
         .btn-info {
             background: #17a2b8;
             border: 1px solid #17a2b8;
             box-shadow: 0 2px 4px rgba(23, 162, 184, 0.3);
+        }
+        .btn-info:hover { background: #138496 !important; border-color: #138496 !important; color:#fff !important; box-shadow: 0 4px 10px rgba(23,162,184,0.35) !important; }
+        .btn-info:focus,
+        .btn-info:active,
+        .btn-info.active { background: #17a2b8 !important; border-color: #17a2b8 !important; color:#fff !important; box-shadow: 0 4px 10px rgba(23,162,184,0.35) !important; }
+
+        /* Outline variants: never flip to white */
+        .btn-outline-primary {
+            color: var(--admin-primary) !important;
+            background-color: transparent !important;
+            border-color: var(--admin-primary) !important;
+        }
+        .btn-outline-primary:hover,
+        .btn-outline-primary:focus,
+        .btn-outline-primary:active,
+        .btn-outline-primary.active {
+            color: #fff !important;
+            background-color: var(--admin-primary) !important;
+            border-color: var(--admin-primary) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-outline-info {
+            color: var(--admin-info) !important;
+            background-color: transparent !important;
+            border-color: var(--admin-info) !important;
+        }
+        .btn-outline-info:hover,
+        .btn-outline-info:focus,
+        .btn-outline-info:active,
+        .btn-outline-info.active {
+            color: #fff !important;
+            background-color: var(--admin-info) !important;
+            border-color: var(--admin-info) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-outline-danger {
+            color: var(--admin-danger) !important;
+            background-color: transparent !important;
+            border-color: var(--admin-danger) !important;
+        }
+        .btn-outline-danger:hover,
+        .btn-outline-danger:focus,
+        .btn-outline-danger:active,
+        .btn-outline-danger.active {
+            color: #fff !important;
+            background-color: var(--admin-danger) !important;
+            border-color: var(--admin-danger) !important;
+            box-shadow: none !important;
+        }
+
+        .btn-outline-success {
+            color: var(--admin-success) !important;
+            background-color: transparent !important;
+            border-color: var(--admin-success) !important;
+        }
+        .btn-outline-success:hover,
+        .btn-outline-success:focus,
+        .btn-outline-success:active,
+        .btn-outline-success.active {
+            color: #fff !important;
+            background-color: var(--admin-success) !important;
+            border-color: var(--admin-success) !important;
+            box-shadow: none !important;
+        }
+
+        /* Default anchor buttons with .btn should not flash white on active */
+        .btn:active,
+        .btn:focus {
+            box-shadow: none !important;
         }
         
         .alert {
@@ -379,7 +465,8 @@
             border-radius: 10px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s ease;
+            /* Limit transition to avoid color flash */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             border: none;
             cursor: pointer;
         }
@@ -395,6 +482,13 @@
             box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
             color: white;
         }
+        .btn-modern.primary:focus,
+        .btn-modern.primary:active,
+        .btn-modern.primary.active {
+            background: var(--admin-primary) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.3) !important;
+        }
         
         .btn-modern.secondary {
             background: #6c757d;
@@ -407,7 +501,67 @@
             box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
             color: white;
         }
+        .btn-modern.secondary:focus,
+        .btn-modern.secondary:active,
+        .btn-modern.secondary.active {
+            background: #6c757d !important;
+            color: #fff !important;
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3) !important;
+        }
+
+        /* Add missing modern button variants used in admin pages */
+        .btn-modern.success { background: var(--admin-success); color: #fff; }
+        .btn-modern.success:hover { background: #2ea44f; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(40,167,69,0.3); color: #fff; }
+        .btn-modern.success:focus,
+        .btn-modern.success:active,
+        .btn-modern.success.active { background: var(--admin-success) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(40,167,69,0.3) !important; }
+
+        .btn-modern.warning { background: var(--admin-warning); color: #fff; }
+        .btn-modern.warning:hover { background: #d97706; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(245,158,11,0.3); color: #fff; }
+        .btn-modern.warning:focus,
+        .btn-modern.warning:active,
+        .btn-modern.warning.active { background: var(--admin-warning) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(245,158,11,0.3) !important; }
+
+        .btn-modern.info { background: var(--admin-info); color: #fff; }
+        .btn-modern.info:hover { background: #138496; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(23,162,184,0.3); color: #fff; }
+        .btn-modern.info:focus,
+        .btn-modern.info:active,
+        .btn-modern.info.active { background: var(--admin-info) !important; color: #fff !important; box-shadow: 0 4px 10px rgba(23,162,184,0.3) !important; }
         
+        /* Pin common Admin Berita buttons to solid colors on all states (prevent white blink) */
+        .page-actions .btn-modern.primary,
+        .page-actions .btn-modern.primary:hover,
+        .page-actions .btn-modern.primary:focus,
+        .page-actions .btn-modern.primary:active,
+        .page-actions .btn-modern.primary.active {
+            background: var(--admin-primary) !important;
+            color: #fff !important;
+            border-color: var(--admin-primary) !important;
+        }
+        .card .btn-modern.primary,
+        .card .btn-modern.primary:hover,
+        .card .btn-modern.primary:focus,
+        .card .btn-modern.primary:active,
+        .card .btn-modern.primary.active,
+        form .btn-modern.primary,
+        form .btn-modern.primary:hover,
+        form .btn-modern.primary:focus,
+        form .btn-modern.primary:active,
+        form .btn-modern.primary.active {
+            background: var(--admin-primary) !important; /* Simpan */
+            color: #fff !important;
+            border-color: var(--admin-primary) !important;
+        }
+        .page-actions .btn-modern.secondary,
+        .page-actions .btn-modern.secondary:hover,
+        .page-actions .btn-modern.secondary:focus,
+        .page-actions .btn-modern.secondary:active,
+        .page-actions .btn-modern.secondary.active {
+            background: #6c757d !important; /* Kembali solid, no gradient */
+            color: #fff !important;
+            border-color: #6c757d !important;
+        }
+
         .modern-table-card {
             background: white;
             border-radius: 20px;
@@ -486,7 +640,8 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            transition: all 0.3s ease;
+            /* Limit transition to avoid background/color flicker */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             border: none;
             cursor: pointer;
             font-size: 0.875rem;
@@ -512,19 +667,91 @@
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
         
+        /* Lihat (info) — keep same tinted bg and brand color on hover/focus/active */
         .action-btn.info:hover {
-            background: var(--admin-info);
-            color: white;
+            background: rgba(23, 162, 184, 0.1) !important;
+            color: var(--admin-info) !important;
+        }
+        /* Ensure Lihat (info) never flips color */
+        .action-buttons .action-btn.info:hover,
+        .action-buttons .action-btn.info:focus,
+        .action-buttons .action-btn.info:active,
+        .action-buttons .action-btn.info.active,
+        .action-buttons-agenda .action-btn.info:hover,
+        .action-buttons-agenda .action-btn.info:focus,
+        .action-buttons-agenda .action-btn.info:active,
+        .action-buttons-agenda .action-btn.info.active,
+        .action-buttons-gallery .action-btn.info:hover,
+        .action-buttons-gallery .action-btn.info:focus,
+        .action-buttons-gallery .action-btn.info:active,
+        .action-buttons-gallery .action-btn.info.active {
+            background: rgba(23, 162, 184, 0.1) !important;
+            color: var(--admin-info) !important;
+            box-shadow: 0 3px 10px rgba(23, 162, 184, 0.25) !important;
         }
         
-        .action-btn.primary:hover {
+        /* Edit (primary/neutral) — keep same neutral bg */
+        .action-btn.primary:hover,
+        .action-buttons .action-btn.primary:hover,
+        .action-buttons-agenda .action-btn.primary:hover,
+        .action-buttons-gallery .action-btn.primary:hover {
+            background: #e9ecef !important;
+            color: #6c757d !important;
+        }
+        
+        /* Hapus (danger) — keep same tinted bg and brand color on hover/focus/active */
+        .action-btn.danger:hover {
+            background: rgba(220, 53, 69, 0.1) !important;
+            color: var(--admin-danger) !important;
+        }
+        /* Ensure Hapus (danger) never flips color */
+        .action-buttons .action-btn.danger:hover,
+        .action-buttons .action-btn.danger:focus,
+        .action-buttons .action-btn.danger:active,
+        .action-buttons .action-btn.danger.active,
+        .action-buttons-agenda .action-btn.danger:hover,
+        .action-buttons-agenda .action-btn.danger:focus,
+        .action-buttons-agenda .action-btn.danger:active,
+        .action-buttons-agenda .action-btn.danger.active,
+        .action-buttons-gallery .action-btn.danger:hover,
+        .action-buttons-gallery .action-btn.danger:focus,
+        .action-buttons-gallery .action-btn.danger:active,
+        .action-buttons-gallery .action-btn.danger.active {
+            background: rgba(220, 53, 69, 0.1) !important;
+            color: var(--admin-danger) !important;
+            box-shadow: 0 3px 10px rgba(220, 53, 69, 0.25) !important;
+        }
+
+        /* Prevent buttons from turning white on click/active */
+        .action-btn:focus,
+        .action-btn:active {
+            outline: none;
+            box-shadow: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .action-btn.info:focus,
+        .action-btn.info:active {
+            background: var(--admin-info) !important;
+            color: #fff !important;
+        }
+        .action-btn.danger:focus,
+        .action-btn.danger:active {
+            background: var(--admin-danger) !important;
+            color: #fff !important;
+        }
+        .action-btn.primary:focus,
+        .action-btn.primary:active {
             background: #dee2e6 !important;
             color: #495057 !important;
         }
-        
-        .action-btn.danger:hover {
-            background: var(--admin-danger);
-            color: white;
+
+        /* Remove tap highlight globally within admin to avoid white blink */
+        .container-fluid a,
+        .container-fluid button,
+        .container-fluid .btn,
+        .container-fluid .action-btn,
+        .container-fluid .btn-modern {
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
         }
         
         .empty-state {
