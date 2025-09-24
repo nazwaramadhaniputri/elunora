@@ -5,15 +5,15 @@
 @section('content')
 <div class="container-fluid">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header-modern d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">
+            <h1 class="page-title mb-0">
                 <i class="fas fa-calendar-alt me-2"></i>Detail Agenda
             </h1>
-            <p class="mb-0 text-muted">Informasi lengkap tentang agenda kegiatan</p>
+            <p class="page-subtitle mb-0">Informasi lengkap tentang agenda kegiatan</p>
         </div>
         <div>
-            <a href="{{ route('admin.agenda.edit', $agenda->id) }}" class="btn-modern warning">
+            <a href="{{ route('admin.agenda.edit', $agenda->id) }}" class="btn-modern primary">
                 <i class="fas fa-edit me-2"></i>Edit
             </a>
             <a href="{{ route('admin.agenda.index') }}" class="btn-modern secondary">
@@ -65,54 +65,52 @@
                         <div class="col-lg-4">
                             <div class="card border-0 shadow-sm mb-4">
                                 <div class="card-header bg-light py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Detail Agenda</h6>
+                                <h6 class="m-0 fw-bold text-primary">Detail Agenda</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
-                                    <h6 class="font-weight-bold text-gray-700">Tanggal</h6>
+                                    <h6 class="fw-bold text-secondary">Tanggal</h6>
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-calendar-day text-primary mr-2"></i>
+                                        <i class="fas fa-calendar-day text-primary me-2"></i>
                                         <span>{{ $agenda->tanggal_formatted }}</span>
-                                        @if($agenda->is_today)
-                                            <span class="badge badge-warning ml-2">Hari ini</span>
-                                        @elseif($agenda->is_past)
-                                            <span class="badge badge-secondary ml-2">Selesai</span>
+                                        @if($agenda->is_past)
+                                            <span class="badge bg-secondary ms-2">Selesai</span>
                                         @endif
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <h6 class="font-weight-bold text-gray-700">Waktu</h6>
+                                    <h6 class="fw-bold text-secondary">Waktu</h6>
                                     <div class="d-flex align-items-center">
-                                        <i class="far fa-clock text-primary mr-2"></i>
+                                        <i class="far fa-clock text-primary me-2"></i>
                                         <span>
-                                            {{ $agenda->waktu_mulai_formatted }}
+                                            {{ $agenda->waktu_mulai_formatted ?? (\Carbon\Carbon::parse($agenda->waktu_mulai)->format('H:i')) }}
                                             @if($agenda->waktu_selesai)
-                                                - {{ $agenda->waktu_selesai_formatted }}
+                                                - {{ $agenda->waktu_selesai_formatted ?? (\Carbon\Carbon::parse($agenda->waktu_selesai)->format('H:i')) }}
                                             @endif
                                         </span>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <h6 class="font-weight-bold text-gray-700">Lokasi</h6>
+                                    <h6 class="fw-bold text-secondary">Lokasi</h6>
                                     <div class="d-flex align-items-center">
-                                        <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
                                         <span>{{ $agenda->lokasi }}</span>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <h6 class="font-weight-bold text-gray-700">Kategori</h6>
-                                    <span class="badge badge-primary">{{ $agenda->kategori ?? '-' }}</span>
+                                    <h6 class="fw-bold text-secondary">Kategori</h6>
+                                    <span class="badge bg-primary">{{ $agenda->kategori ?? '-' }}</span>
                                 </div>
 
                                 <div class="mb-3">
-                                    <h6 class="font-weight-bold text-gray-700">Status</h6>
-                                    @if($agenda->status == 'published')
-                                        <span class="badge badge-success">Published</span>
+                                    <h6 class="fw-bold text-secondary">Status</h6>
+                                    @if((string)$agenda->status === '1')
+                                        <span class="badge bg-success">Published</span>
                                     @else
-                                        <span class="badge badge-secondary">Draft</span>
+                                        <span class="badge bg-secondary">Draft</span>
                                     @endif
                                 </div>
 
@@ -131,14 +129,7 @@
                             </div>
                         </div>
 
-                        <div class="text-center mt-3">
-                            <a href="{{ route('admin.agenda.edit', $agenda) }}" class="btn-modern warning btn-icon-split">
-                                <span class="icon text-white-50">
-                                    <i class="fas fa-edit"></i>
-                                </span>
-                                <span class="text">Edit Agenda</span>
-                            </a>
-                        </div>
+                        
                     </div>
                 </div>
                 </div>
@@ -148,7 +139,7 @@
 </div>
 @endsection
 
-@push('styles')
+@section('styles')
 <style>
     .card {
         border-radius: 0.5rem;
@@ -167,4 +158,4 @@
         margin-right: 1rem;
     }
 </style>
-@endpush
+@endsection

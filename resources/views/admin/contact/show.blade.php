@@ -16,14 +16,7 @@
                 <a href="{{ route('admin.contact.index') }}" class="btn-modern secondary me-2">
                     <i class="fas fa-arrow-left me-2"></i>Kembali
                 </a>
-                <form id="toggleReadForm" action="{{ $contact->status == 0 ? route('admin.contact.read', $contact->id) : route('admin.contact.unread', $contact->id) }}" method="POST" class="d-inline me-2">
-                    @csrf
-                    @method('PATCH')
-                    <button type="submit" id="toggleReadBtn" class="btn-modern {{ $contact->status == 0 ? 'success' : 'warning' }}">
-                        <i id="toggleReadIcon" class="fas {{ $contact->status == 0 ? 'fa-check' : 'fa-undo' }} me-2"></i>
-                        <span id="toggleReadText">{{ $contact->status == 0 ? 'Tandai Sudah Dibaca' : 'Tandai Belum Dibaca' }}</span>
-                    </button>
-                </form>
+                
                 <form action="{{ route('admin.contact.destroy', $contact->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pesan ini?')">
                     @csrf
                     @method('DELETE')
@@ -51,17 +44,7 @@
                         <h5 class="mt-3 mb-1">{{ $contact->nama }}</h5>
                         <p class="text-muted">{{ $contact->email }}</p>
                         
-                        <div class="contact-status mt-3">
-                            @if($contact->status == 0)
-                                <span class="status-badge draft">
-                                    <i class="fas fa-envelope me-1"></i>Belum Dibaca
-                                </span>
-                            @else
-                                <span class="status-badge published">
-                                    <i class="fas fa-envelope-open me-1"></i>Sudah Dibaca
-                                </span>
-                            @endif
-                        </div>
+                        
                     </div>
                     
                     <div class="contact-details">
@@ -207,6 +190,66 @@
     border-top: 2px solid #e9ecef;
     padding-top: 1.5rem;
 }
+
+/* Button color overrides (solid colors, no gradients) scoped to Contact Detail */
+.page-actions .btn-modern.primary,
+.page-actions .btn-modern.primary:hover,
+.page-actions .btn-modern.primary:focus,
+.page-actions .btn-modern.primary:active,
+.message-actions .btn-modern.primary,
+.message-actions .btn-modern.primary:hover,
+.message-actions .btn-modern.primary:focus,
+.message-actions .btn-modern.primary:active {
+    background: var(--elunora-primary) !important;
+    border-color: var(--elunora-primary) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(30,58,138,0.25) !important;
+}
+
+.page-actions .btn-modern.secondary,
+.page-actions .btn-modern.secondary:hover,
+.page-actions .btn-modern.secondary:focus,
+.page-actions .btn-modern.secondary:active,
+.message-actions .btn-modern.secondary,
+.message-actions .btn-modern.secondary:hover,
+.message-actions .btn-modern.secondary:focus,
+.message-actions .btn-modern.secondary:active {
+    background: var(--elunora-secondary) !important;
+    border-color: var(--elunora-secondary) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(108,117,125,0.25) !important;
+}
+
+/* Success/Warning/Danger in page-actions: keep solid colors (no gradient) */
+.page-actions .btn-modern.success,
+.page-actions .btn-modern.success:hover,
+.page-actions .btn-modern.success:focus,
+.page-actions .btn-modern.success:active {
+    background: var(--elunora-success) !important;
+    border-color: var(--elunora-success) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(5,150,105,0.25) !important;
+}
+
+.page-actions .btn-modern.warning,
+.page-actions .btn-modern.warning:hover,
+.page-actions .btn-modern.warning:focus,
+.page-actions .btn-modern.warning:active {
+    background: var(--elunora-warning) !important;
+    border-color: var(--elunora-warning) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(217,119,6,0.25) !important;
+}
+
+.page-actions .btn-modern.danger,
+.page-actions .btn-modern.danger:hover,
+.page-actions .btn-modern.danger:focus,
+.page-actions .btn-modern.danger:active {
+    background: var(--elunora-danger) !important;
+    border-color: var(--elunora-danger) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 10px rgba(220,38,38,0.25) !important;
+}
 </style>
 @endsection
 
@@ -227,80 +270,6 @@ function copyToClipboard(text) {
     });
 }
 
-// Handle toggle read/unread with AJAX
-$(document).ready(function() {
-    $('#toggleReadForm').on('submit', function(e) {
-        e.preventDefault();
-        
-        const form = $(this);
-        const btn = $('#toggleReadBtn');
-        const icon = $('#toggleReadIcon');
-        const text = $('#toggleReadText');
-        const currentStatus = {{ $contact->status }};
-        
-        // Disable button during request
-        btn.prop('disabled', true);
-        
-        $.ajax({
-            url: form.attr('action'),
-            method: 'POST',
-            data: form.serialize(),
-            success: function(response) {
-                // Toggle the button state
-                if (currentStatus == 0) {
-                    // Was unread, now read
-                    btn.removeClass('success').addClass('warning');
-                    icon.removeClass('fa-check').addClass('fa-undo');
-                    text.text('Tandai Belum Dibaca');
-                    form.attr('action', '{{ route('admin.contact.unread', $contact->id) }}');
-                    
-                    // Update status badge
-                    $('.status-badge').removeClass('draft').addClass('published')
-                        .html('<i class="fas fa-envelope-open me-1"></i>Sudah Dibaca');
-                } else {
-                    // Was read, now unread
-                    btn.removeClass('warning').addClass('success');
-                    icon.removeClass('fa-undo').addClass('fa-check');
-                    text.text('Tandai Sudah Dibaca');
-                    form.attr('action', '{{ route('admin.contact.read', $contact->id) }}');
-                    
-                    // Update status badge
-                    $('.status-badge').removeClass('published').addClass('draft')
-                        .html('<i class="fas fa-envelope me-1"></i>Belum Dibaca');
-                }
-                
-                // Update current status for next toggle
-                window.currentContactStatus = currentStatus == 0 ? 1 : 0;
-                
-                // Show success message
-                const toast = document.createElement('div');
-                toast.className = 'alert alert-success position-fixed';
-                toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-                toast.innerHTML = '<i class="fas fa-check me-2"></i>Status berhasil diubah!';
-                document.body.appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
-            },
-            error: function() {
-                // Show error message
-                const toast = document.createElement('div');
-                toast.className = 'alert alert-danger position-fixed';
-                toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 250px;';
-                toast.innerHTML = '<i class="fas fa-times me-2"></i>Terjadi kesalahan!';
-                document.body.appendChild(toast);
-                
-                setTimeout(() => {
-                    toast.remove();
-                }, 3000);
-            },
-            complete: function() {
-                // Re-enable button
-                btn.prop('disabled', false);
-            }
-        });
-    });
-});
+// (Toggle read/unread removed as requested)
 </script>
 @endsection

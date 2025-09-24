@@ -42,17 +42,7 @@
                     <h4 class="teacher-name">{{ $guru->nama }}</h4>
                     <p class="teacher-position text-primary">{{ $guru->jabatan }}</p>
                     
-                    <div class="teacher-status mb-3">
-                        @if($guru->status)
-                            <span class="status-badge published">
-                                <i class="fas fa-check-circle me-1"></i>Aktif
-                            </span>
-                        @else
-                            <span class="status-badge draft">
-                                <i class="fas fa-pause-circle me-1"></i>Tidak Aktif
-                            </span>
-                        @endif
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -101,18 +91,6 @@
                             </div>
                         </div>
                         
-                        <div class="col-md-6 mb-3">
-                            <div class="info-item">
-                                <label class="info-label">Status</label>
-                                <div class="info-value">
-                                    @if($guru->status)
-                                        <span class="badge bg-success">Aktif</span>
-                                    @else
-                                        <span class="badge bg-danger">Tidak Aktif</span>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
                         
                         <div class="col-12 mb-3">
                             <div class="info-item">
@@ -148,6 +126,7 @@
     width: 200px;
     height: 200px;
     object-fit: cover;
+    object-position: center top;
     border: 4px solid var(--elunora-primary);
     box-shadow: 0 10px 30px rgba(0, 123, 255, 0.3);
 }

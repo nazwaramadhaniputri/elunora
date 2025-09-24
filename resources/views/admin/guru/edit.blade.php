@@ -116,7 +116,7 @@
                         </div>
 
                         <div class="d-flex gap-2">
-                            <button type="submit" class="btn-modern success">
+                            <button type="submit" class="btn-modern primary">
                                 <i class="fas fa-save me-2"></i>Update
                             </button>
                             <a href="{{ route('admin.guru.index') }}" class="btn-modern secondary">

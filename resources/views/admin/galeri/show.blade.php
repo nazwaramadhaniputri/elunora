@@ -38,11 +38,45 @@
         gap: 5px;
     }
     .foto-actions .btn {
-        opacity: 0.7;
-        transition: opacity 0.3s;
+        opacity: 1; /* always fully visible */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    .foto-item:hover .foto-actions .btn {
-        opacity: 1;
+    .foto-item:hover .foto-actions .btn { opacity: 1; }
+    /* Improve overlay action button visibility over images (keep global colors) */
+    .foto-actions .action-btn {
+        width: 40px;
+        height: 40px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    /* Make delete button (hapus) look like the screenshot: soft pink tile + solid red icon */
+    .foto-actions .action-btn.danger {
+        background: #fde7ea !important; /* soft pink tile */
+        color: var(--admin-danger) !important; /* solid red icon */
+        border-radius: 12px !important; /* rounded square */
+        border: none !important;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.18) !important; /* soft red shadow */
+        outline: none !important;
+    }
+    .foto-actions .action-btn.danger:hover,
+    .foto-actions .action-btn.danger:focus,
+    .foto-actions .action-btn.danger:active {
+        background: #fde7ea !important; /* keep same color */
+        color: var(--admin-danger) !important;
+        border: none !important;
+        box-shadow: 0 3px 10px rgba(220, 53, 69, 0.22) !important; /* slightly stronger */
+        transform: translateY(-1px);
+        outline: none !important;
+    }
+
+    /* Ensure the trash icon is clearly visible and centered */
+    .foto-actions .action-btn.danger i {
+        color: var(--admin-danger) !important;
+        font-size: 16px;
+        line-height: 1;
     }
 </style>
 @endsection
@@ -58,7 +92,7 @@
                 <p class="page-subtitle">Kelola foto dan informasi galeri</p>
             </div>
             <div class="page-actions">
-                <a href="{{ route('admin.galeri.edit', $galeri->id) }}" class="btn-modern success me-2">
+                <a href="{{ route('admin.galeri.edit', $galeri->id) }}" class="btn-modern primary me-2">
                     <i class="fas fa-edit me-2"></i>Edit Galeri
                 </a>
                 <a href="{{ route('admin.galeri.index') }}" class="btn-modern secondary">
@@ -164,7 +198,7 @@
                             @enderror
                         </div>
                         
-                        <button type="submit" class="btn-modern primary">
+                        <button type="submit" class="btn-modern primary mt-3">
                             <i class="fas fa-plus me-2"></i>Upload Foto
                         </button>
                     </form>

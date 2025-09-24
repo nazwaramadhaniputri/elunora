@@ -29,6 +29,16 @@
             --light: var(--elunora-light);
             --dark: var(--elunora-dark);
             --gradient: var(--elunora-gradient-primary);
+
+            /* ADMIN-scoped variables (missing before) */
+            --admin-primary: var(--elunora-primary);
+            --admin-accent: var(--elunora-accent);
+            --admin-success: var(--elunora-success);
+            --admin-warning: var(--elunora-warning);
+            --admin-danger: var(--elunora-danger);
+            --admin-info: var(--elunora-info);
+            --admin-light: var(--elunora-light);
+            --admin-dark: var(--elunora-dark);
         }
         
         body {
@@ -332,6 +342,23 @@
         .btn-info:active,
         .btn-info.active { background: #17a2b8 !important; border-color: #17a2b8 !important; color:#fff !important; box-shadow: 0 4px 10px rgba(23,162,184,0.35) !important; }
 
+        /* Ensure Bootstrap .btn-secondary (if used for Kembali) is locked to solid gray */
+        .btn-secondary {
+            background: var(--elunora-secondary) !important;
+            border-color: var(--elunora-secondary) !important;
+            color: #fff !important;
+        }
+        .btn-secondary:hover,
+        .btn-secondary:focus,
+        .btn-secondary:active,
+        .btn-secondary.active {
+            background: var(--elunora-secondary) !important;
+            border-color: var(--elunora-secondary) !important;
+            color: #fff !important;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3) !important;
+            transform: translateY(-2px) !important;
+        }
+
         /* Outline variants: never flip to white */
         .btn-outline-primary {
             color: var(--admin-primary) !important;
@@ -462,7 +489,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            border-radius: 25px; /* unified: lonjong */
             font-weight: 600;
             text-decoration: none;
             /* Limit transition to avoid color flash */
@@ -491,22 +518,23 @@
         }
         
         .btn-modern.secondary {
-            background: #6c757d;
+            background: var(--elunora-secondary);
             color: white;
         }
         
         .btn-modern.secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
-            color: white;
+            background: var(--elunora-secondary) !important; /* keep solid gray */
+            color: #fff !important;
+            transform: translateY(-2px) !important; /* subtle lift */
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3) !important; /* subtle shadow */
         }
         .btn-modern.secondary:focus,
         .btn-modern.secondary:active,
         .btn-modern.secondary.active {
-            background: #6c757d !important;
+            background: var(--elunora-secondary) !important; /* keep solid gray */
             color: #fff !important;
-            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3) !important;
+            transform: translateY(-1px) !important; /* slight press */
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.28) !important;
         }
 
         /* Add missing modern button variants used in admin pages */
@@ -557,9 +585,54 @@
         .page-actions .btn-modern.secondary:focus,
         .page-actions .btn-modern.secondary:active,
         .page-actions .btn-modern.secondary.active {
-            background: #6c757d !important; /* Kembali solid, no gradient */
+            background: var(--elunora-secondary) !important; /* Kembali solid, no gradient */
             color: #fff !important;
-            border-color: #6c757d !important;
+            border-color: var(--elunora-secondary) !important;
+        }
+
+        /* Ensure create/edit/show forms keep consistent primary/secondary on hover/focus/active */
+        form .btn-modern.primary,
+        form .btn-modern.primary:hover,
+        form .btn-modern.primary:focus,
+        form .btn-modern.primary:active,
+        form .btn-modern.primary.active,
+        .card .btn-modern.primary,
+        .card .btn-modern.primary:hover,
+        .card .btn-modern.primary:focus,
+        .card .btn-modern.primary:active,
+        .card .btn-modern.primary.active {
+            background: var(--admin-primary) !important;
+            color: #fff !important;
+            border-color: var(--admin-primary) !important;
+        }
+
+        form .btn-modern.secondary,
+        form .btn-modern.secondary:hover,
+        form .btn-modern.secondary:focus,
+        form .btn-modern.secondary:active,
+        form .btn-modern.secondary.active,
+        .card .btn-modern.secondary,
+        .card .btn-modern.secondary:hover,
+        .card .btn-modern.secondary:focus,
+        .card .btn-modern.secondary:active,
+        .card .btn-modern.secondary.active {
+            background: var(--elunora-secondary) !important;
+            color: #fff !important;
+            border-color: var(--elunora-secondary) !important;
+        }
+
+        /* Add subtle lift/shadow for secondary buttons in forms and cards */
+        form .btn-modern.secondary:hover,
+        .card .btn-modern.secondary:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3) !important;
+        }
+        form .btn-modern.secondary:focus,
+        form .btn-modern.secondary:active,
+        .card .btn-modern.secondary:focus,
+        .card .btn-modern.secondary:active {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 10px rgba(108, 117, 125, 0.28) !important;
         }
 
         .modern-table-card {
@@ -635,7 +708,7 @@
         .action-btn {
             width: 35px;
             height: 35px;
-            border-radius: 8px;
+            border-radius: 8px; /* reverted: small rounded */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -653,7 +726,7 @@
         }
         
         .action-btn.primary {
-            background: #e9ecef !important;
+            background: #e9ecef !important; /* reverted neutral */
             color: #6c757d !important;
         }
         

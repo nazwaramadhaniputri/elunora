@@ -50,7 +50,7 @@
                                     <td>
                                         @if($guru->foto)
                                             <img src="{{ asset($guru->foto) }}" alt="{{ $guru->nama }}" 
-                                                 class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                                 class="rounded-circle" width="50" height="50" style="object-fit: cover; object-position: center top;">
                                         @else
                                             <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" 
                                                  style="width: 50px; height: 50px;">

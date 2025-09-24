@@ -92,7 +92,7 @@
                                         <form action="{{ route('admin.contact.read', $contact->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="action-btn success" title="Tandai Sudah Dibaca">
+                                            <button type="submit" class="action-btn primary" title="Tandai Sudah Dibaca">
                                                 <i class="fas fa-check"></i>
                                             </button>
                                         </form>
@@ -100,7 +100,7 @@
                                         <form action="{{ route('admin.contact.unread', $contact->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="action-btn warning" title="Tandai Belum Dibaca">
+                                            <button type="submit" class="action-btn primary" title="Tandai Belum Dibaca">
                                                 <i class="fas fa-undo"></i>
                                             </button>
                                         </form>

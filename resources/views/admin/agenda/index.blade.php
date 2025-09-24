@@ -5,14 +5,14 @@
 @section('content')
 <div class="container-fluid">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header-modern d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">
+            <h1 class="page-title mb-0">
                 <i class="fas fa-calendar-alt me-2"></i>Manajemen Agenda
             </h1>
-            <p class="mb-0 text-muted">Kelola jadwal kegiatan dan acara sekolah</p>
+            <p class="page-subtitle mb-0">Kelola jadwal kegiatan dan acara sekolah</p>
         </div>
-        <div>
+        <div class="page-actions">
             <a href="{{ route('admin.agenda.create') }}" class="btn-modern primary">
                 <i class="fas fa-plus me-2"></i>Tambah Agenda
             </a>
@@ -22,8 +22,6 @@
     <!-- Content Row -->
     <div class="row">
         <div class="col-12">
-            <div class="modern-table-card">
-                <div class="table-card-body">
                     @if(session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
@@ -36,18 +34,12 @@
                         <div class="col-lg-4 col-md-6 mb-4">
                             <div class="modern-agenda-card">
                                 <div class="agenda-image-container">
-                                    <div class="agenda-overlay">
-                                        <div class="overlay-content">
-                                            <i class="fas fa-calendar-alt fa-2x"></i>
-                                            <p class="mt-2">Lihat Agenda</p>
-                                        </div>
-                                    </div>
-                                    
+
                                     <div class="agenda-date-display">
                                         <div class="date-number">{{ \Carbon\Carbon::parse($item->tanggal)->format('d') }}</div>
                                         <div class="date-month">{{ \Carbon\Carbon::parse($item->tanggal)->format('M') }}</div>
                                     </div>
-                                    
+
                                     <div class="agenda-status-badge">
                                         @if(\Carbon\Carbon::parse($item->tanggal)->isToday())
                                             <span class="status-badge today">
@@ -122,8 +114,6 @@
                     <div class="d-flex justify-content-center mt-4">
                         {{ $agenda->links('pagination::bootstrap-5') }}
                     </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -131,218 +121,55 @@
 
 @section('styles')
 <style>
-/* Modern Agenda Card Styles - Similar to Galeri */
+/* Agenda Card Styles aligned with theme */
 .modern-agenda-card {
-    background: white;
+    background: #ffffff;
     border-radius: 20px;
-    overflow: hidden;
     box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    transition: all 0.4s ease;
-    border: none;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
-
-.modern-agenda-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
-}
+.modern-agenda-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px rgba(0,0,0,0.15); }
 
 .agenda-image-container {
     position: relative;
     height: 180px;
-    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
+    background: var(--elunora-gradient-primary);
 }
+/* Removed hover overlay content for cleaner banner */
 
-.agenda-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(30, 58, 138, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all 0.3s ease;
-    color: white;
-}
+/* Date and status on top of banner */
+.agenda-date-display { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); text-align: center; color: #fff; z-index: 2; }
+.agenda-date-display .date-number { font-size: 3rem; font-weight: 800; line-height: 1; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+.agenda-date-display .date-month { font-size: 0.9rem; letter-spacing: 1px; font-weight: 700; opacity: 0.95; text-transform: uppercase; }
+.agenda-status-badge { position: absolute; top: 15px; right: 15px; z-index: 3; }
+.status-badge { padding: 0.35rem 0.75rem; border-radius: 25px; font-size: 0.75rem; font-weight: 700; }
+.status-badge.today { background: rgba(255,193,7,0.9); color: #212529; }
+.status-badge.completed { background: rgba(108,117,125,0.9); color: #fff; }
+.status-badge.upcoming { background: rgba(40,167,69,0.9); color: #fff; }
 
-.modern-agenda-card:hover .agenda-overlay {
-    opacity: 1;
-}
+.agenda-card-body { padding: 1.25rem 1.5rem; flex: 1 1 auto; }
+.agenda-title { color: #2c3e50; font-weight: 700; margin: 0 0 0.25rem; font-size: 1.05rem; }
+.agenda-category { color: var(--admin-primary); font-weight: 600; margin-bottom: 0.75rem; font-size: 0.85rem; }
+.agenda-meta { margin-bottom: 0.75rem; }
+.agenda-meta .meta-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6c757d; }
+.agenda-meta .meta-item i { width: 16px; color: var(--admin-primary); }
+.agenda-description { color: #6c757d; margin: 0; line-height: 1.6; font-size: 0.9rem; }
 
-.overlay-content {
-    text-align: center;
-    color: white;
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-}
+.agenda-card-actions { padding: 0.75rem 1.5rem 1.25rem; border-top: 1px solid #f1f5f9; background: rgba(37, 99, 235, 0.02); margin-top: auto; }
 
-.modern-agenda-card:hover .overlay-content {
-    transform: translateY(0);
-}
+/* Footer pills (if needed later) */
+.agenda-meta-footer { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; }
+.agenda-meta-footer .meta-left,
+.agenda-meta-footer .meta-right { display: inline-flex; align-items: center; gap: 0.4rem; background: #f1f5f9; color: #475569; padding: 0.25rem 0.6rem; border-radius: 9999px; font-size: 0.85rem; font-weight: 600; }
+.agenda-meta-footer i { color: var(--admin-primary); width: 16px; text-align: center; }
 
-.agenda-date-display {
-    text-align: center;
-    color: white;
-    z-index: 2;
-    position: relative;
-}
-
-.date-number {
-    font-size: 3rem;
-    font-weight: bold;
-    line-height: 1;
-    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-.date-month {
-    font-size: 1rem;
-    text-transform: uppercase;
-    opacity: 0.9;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
-
-.agenda-status-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    z-index: 3;
-}
-
-.status-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 25px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-badge.today {
-    background: rgba(255, 193, 7, 0.9);
-    color: #212529;
-}
-
-.status-badge.completed {
-    background: rgba(108, 117, 125, 0.9);
-    color: white;
-}
-
-.status-badge.upcoming {
-    background: rgba(40, 167, 69, 0.9);
-    color: white;
-}
-
-.agenda-card-body {
-    padding: 2rem;
-}
-
-.agenda-title {
-    color: #2c3e50;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    font-size: 1.2rem;
-}
-
-.agenda-category {
-    color: #1e3a8a;
-    font-weight: 600;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-}
-
-.agenda-meta {
-    margin-bottom: 1rem;
-}
-
-.meta-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    color: #6c757d;
-}
-
-.meta-item i {
-    width: 16px;
-    margin-right: 0.5rem;
-    color: #1e3a8a;
-}
-
-.agenda-description {
-    color: #6c757d;
-    margin-bottom: 0;
-    line-height: 1.6;
-    font-size: 0.9rem;
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
-}
-
-.agenda-card-actions {
-    padding: 1rem 2rem 2rem;
-    border-top: 1px solid #f8f9fa;
-}
-
-.action-buttons-agenda {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: space-between;
-}
-
-.action-buttons-agenda .action-btn {
-    flex: 1;
-    text-align: center;
-    padding: 0.75rem;
-    border-radius: 12px;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    border: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.action-buttons-agenda .action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* Legacy styles for backward compatibility */
-.agenda-date-badge {
-    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-    color: white;
-    padding: 0.75rem;
-    border-radius: 12px;
-    text-align: center;
-    min-width: 60px;
-}
-
-.agenda-details .detail-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-}
-
-.agenda-details .detail-item:last-child {
-    margin-bottom: 0;
-}
-
-.card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background: #f8f9fa;
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
-}
+/* Action buttons: inline and centered; keep theme-consistent colors */
+.action-buttons-agenda { display: flex; gap: 0.5rem; align-items: center; justify-content: center; flex-wrap: nowrap; }
 </style>
 @endsection
 

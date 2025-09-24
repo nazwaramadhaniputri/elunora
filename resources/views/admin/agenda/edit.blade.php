@@ -5,12 +5,12 @@
 @section('content')
 <div class="container-fluid">
     <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="page-header-modern d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-0">
+            <h1 class="page-title mb-0">
                 <i class="fas fa-edit me-2"></i>Edit Agenda
             </h1>
-            <p class="mb-0 text-muted">Perbarui informasi agenda: {{ $agenda->judul }}</p>
+            <p class="page-subtitle mb-0">Perbarui informasi agenda: {{ $agenda->judul }}</p>
         </div>
         <div>
             <a href="{{ route('admin.agenda.index') }}" class="btn-modern secondary">
@@ -172,18 +172,16 @@
 
                     <div class="row mt-4">
                         <div class="col-12">
-                            <div class="d-flex justify-content-between border-top pt-4">
+                            <div class="d-flex justify-content-center align-items-center gap-2 border-top pt-4 flex-wrap">
                                 <button type="reset" class="btn-modern light">
                                     <i class="fas fa-undo me-2"></i>Reset Perubahan
                                 </button>
-                                <div>
-                                    <a href="{{ route('admin.agenda.index') }}" class="btn-modern secondary me-2">
-                                        <i class="fas fa-times me-2"></i>Batal
-                                    </a>
-                                    <button type="submit" class="btn-modern primary">
-                                        <i class="fas fa-save me-2"></i>Perbarui Agenda
-                                    </button>
-                                </div>
+                                <a href="{{ route('admin.agenda.index') }}" class="btn-modern secondary">
+                                    <i class="fas fa-times me-2"></i>Batal
+                                </a>
+                                <button type="submit" class="btn-modern primary">
+                                    <i class="fas fa-save me-2"></i>Perbarui Agenda
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -194,22 +192,36 @@
 </div>
 @endsection
 
-@push('styles')
+@section('styles')
 <style>
     .form-label {
         font-weight: 500;
         margin-bottom: 0.5rem;
     }
     .form-control, .form-select, .form-check-input {
+        width: 100% !important; /* same width */
         border-radius: 0.375rem;
+        padding: 0.625rem 0.75rem; /* consistent height for inputs/selects */
+        box-shadow: none !important; /* avoid duplicated box look */
+        background-image: none !important; /* prevent extra background */
     }
+    .form-control.form-control-lg { width: 100% !important; }
     .card {
         border-radius: 0.5rem;
     }
     .input-group-text {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
+        border-right: 0; /* merge with input visually */
+        height: 44px;
     }
+    .input-group .form-control { 
+        border-left: 0; /* merge with input-group-text */
+        height: 44px;
+    }
+    /* Add top breathing space so focus ring is not cut */
+    .form-group, .mb-4 { scroll-margin-top: 80px; }
+    .form-group .form-control, .mb-4 .form-control, .mb-4 .form-select { margin-top: 2px; }
     .btn {
         border-radius: 0.375rem;
         padding: 0.5rem 1.25rem;
@@ -219,9 +231,9 @@
         border-color: #1e3a8a;
     }
 </style>
-@endpush
+@endsection
 
-@push('scripts')
+@section('scripts')
 <script>
     // Validasi form
     (function () {
@@ -243,5 +255,13 @@
                 }, false)
             })
     })()
+
+    // Remove any unintended tooltips that may show (e.g., on labels/icons)
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.querySelector('form.needs-validation');
+      if (form) {
+        form.querySelectorAll('[title]').forEach(function(el){ el.removeAttribute('title'); });
+      }
+    });
 </script>
-@endpush
+@endsection

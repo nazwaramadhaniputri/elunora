@@ -163,6 +163,28 @@
     text-decoration: none !important;
 }
 
+/* Matching secondary variant for consistent "Kembali" buttons */
+.elunora-btn-secondary {
+    background: var(--elunora-secondary) !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: var(--elunora-border-radius) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    box-shadow: 0 2px 4px rgba(74, 85, 104, 0.3) !important;
+}
+
+.elunora-btn-secondary:hover {
+    background: #3b4454 !important; /* slightly darker slate */
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 8px rgba(74, 85, 104, 0.45) !important;
+    color: white !important;
+    text-decoration: none !important;
+}
+
 /* Unified Card Styles */
 .elunora-card {
     background: #ffffff;
@@ -243,17 +265,48 @@
 }
 
 .page-actions .btn-modern {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: inherit;
+    border: none;
     padding: 0.5rem 1rem;
     border-radius: 25px;
     transition: all 0.3s ease;
 }
 
 .page-actions .btn-modern:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.05);
     transform: translateY(-2px);
+}
+
+/* IMPORTANT: Keep variant buttons solid and visible inside page headers */
+.page-actions .btn-modern.primary {
+    background: var(--elunora-primary) !important;
+    border-color: var(--elunora-primary) !important;
+    color: #fff !important;
+}
+
+.page-actions .btn-modern.secondary {
+    background: var(--elunora-secondary) !important;
+    border-color: var(--elunora-secondary) !important;
+    color: #fff !important;
+}
+
+.page-actions .btn-modern.success {
+    background: var(--elunora-success) !important;
+    border-color: var(--elunora-success) !important;
+    color: #fff !important;
+}
+
+.page-actions .btn-modern.info {
+    background: var(--elunora-info) !important;
+    border-color: var(--elunora-info) !important;
+    color: #fff !important;
+}
+
+.page-actions .btn-modern.danger {
+    background: var(--elunora-danger) !important;
+    border-color: var(--elunora-danger) !important;
+    color: #fff !important;
 }
 
 /* Login Form Styles */
@@ -374,27 +427,59 @@
 
 .btn-modern.secondary:hover {
     color: white !important;
-    background: var(--elunora-secondary) !important;
+    background: var(--elunora-secondary) !important; /* lock solid gray */
     border-color: var(--elunora-secondary) !important;
-    filter: brightness(1.1);
+    filter: none !important; /* no brighten */
 }
 
-/* Disable ALL hover effects for back buttons */
+/* Exhaustive lock for secondary buttons across element types and states */
+a.btn-modern.secondary,
+button.btn-modern.secondary,
+input[type="submit"].btn-modern.secondary {
+    background: var(--elunora-secondary) !important;
+    border-color: var(--elunora-secondary) !important;
+    color: #fff !important;
+}
+
+a.btn-modern.secondary:hover,
+a.btn-modern.secondary:focus,
+a.btn-modern.secondary:active,
+a.btn-modern.secondary.active,
+a.btn-modern.secondary:visited,
+button.btn-modern.secondary:hover,
+button.btn-modern.secondary:focus,
+button.btn-modern.secondary:active,
+button.btn-modern.secondary.active,
+input[type="submit"].btn-modern.secondary:hover,
+input[type="submit"].btn-modern.secondary:focus,
+input[type="submit"].btn-modern.secondary:active,
+input[type="submit"].btn-modern.secondary.active {
+    background: var(--elunora-secondary) !important;
+    border-color: var(--elunora-secondary) !important;
+    color: #fff !important;
+    filter: none !important;
+}
+
+/* Enable subtle animation for back buttons in page headers */
 .page-actions .btn-modern.secondary,
 .page-actions a.btn-modern.secondary {
-    transition: none !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .page-actions .btn-modern.secondary:hover,
 .page-actions a.btn-modern.secondary:hover,
 .page-actions .btn-modern.secondary:focus,
 .page-actions a.btn-modern.secondary:focus {
-    background: var(--elunora-gradient-secondary) !important;
+    background: var(--elunora-secondary) !important; /* solid gray, no gradient */
     color: white !important;
     border-color: var(--elunora-secondary) !important;
-    transform: none !important;
-    box-shadow: none !important;
-    opacity: 1 !important;
+    transform: translateY(-2px) !important; /* subtle lift */
+    box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3) !important; /* subtle shadow */
+}
+
+.page-actions .btn-modern.secondary:focus,
+.page-actions a.btn-modern.secondary:focus {
+    transform: translateY(1px) !important; /* slight press */
 }
 
 .btn-modern.success:hover {
@@ -434,7 +519,7 @@ input[type="submit"].btn-modern:hover {
 }
 
 .page-actions .btn-modern.secondary:hover {
-    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%) !important;
+    background: var(--elunora-secondary) !important; /* solid gray */
     color: white !important;
     text-shadow: none !important;
 }

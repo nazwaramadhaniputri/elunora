@@ -12,7 +12,7 @@
                         <i class="fas fa-eye me-2"></i>Detail Profile Sekolah
                     </h3>
                     <div>
-                        <a href="{{ route('admin.profil.edit', $profile->id) }}" class="btn-modern warning">
+                        <a href="{{ route('admin.profil.edit', $profile->id) }}" class="btn-modern primary">
                             <i class="fas fa-edit me-2"></i>Edit
                         </a>
                         <a href="{{ route('admin.profil.index') }}" class="btn-modern secondary">
