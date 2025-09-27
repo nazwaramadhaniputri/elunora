@@ -213,7 +213,7 @@
             @foreach($pastAgenda as $agenda)
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <h5 class="card-title mb-0">{{ $agenda->judul }}</h5>
                             <span class="badge bg-success">

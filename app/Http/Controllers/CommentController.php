@@ -11,9 +11,10 @@ class CommentController extends Controller
 {
     public function store(Request $request, Post $post)
     {
+        $user = $request->user();
+        abort_unless($user, 403);
+
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'email' => ['required', 'email', 'max:150'],
             'content' => ['required', 'string', 'max:2000'],
         ]);
 
@@ -21,13 +22,17 @@ class CommentController extends Controller
         // and legacy (nama/isi) schemas depending on existing columns
         $attrs = [
             'post_id' => $post->id,
-            'name'    => $validated['name'],
-            'email'   => $validated['email'],
+            'name'    => $user->name ?? 'Pengguna',
+            'email'   => $user->email ?? null,
             'content' => $validated['content'],
         ];
 
+        if (Schema::hasColumn('comments', 'user_id')) {
+            $attrs['user_id'] = $user->id ?? null;
+        }
+
         if (Schema::hasColumn('comments', 'nama')) {
-            $attrs['nama'] = $validated['name'];
+            $attrs['nama'] = $user->name ?? 'Pengguna';
         }
         if (Schema::hasColumn('comments', 'isi')) {
             $attrs['isi'] = $validated['content'];

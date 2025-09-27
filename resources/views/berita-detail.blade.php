@@ -205,7 +205,7 @@
                     </div>
                 </div>
 
-                <!-- Form Komentar (dipindah ke bawah Kategori Berita) -->
+                <!-- Form Komentar (Login required) -->
                 <div class="sidebar-card mt-4">
                     <div class="sidebar-header">
                         <h5 class="mb-0"><i class="fas fa-pen me-2"></i>Tinggalkan Komentar</h5>
@@ -215,30 +215,36 @@
                             <div class="alert alert-success">{{ session('success') }}</div>
                         @endif
                         @if($errors->any())
-                            <div class="alert alert-danger">
-                                <ul class="mb-0">
-                                    @foreach($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
+                            <div class="alert alert-danger">{{ $errors->first() }}</div>
                         @endif
-                        <form method="POST" action="{{ route('berita.comment.store', $post->id) }}">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Nama</label>
-                                <input type="text" class="form-control" id="name" name="name" placeholder="Nama Anda" required>
+
+                        @auth
+                            <div class="mb-3 small text-muted">
+                                Masuk sebagai <strong>{{ auth()->user()->name }}</strong>
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" placeholder="email@domain.com" required>
+                            <form method="POST" action="{{ route('berita.comment.store', $post->id) }}">
+                                @csrf
+                                <div class="mb-3">
+                                    <label for="content" class="form-label">Komentar</label>
+                                    <textarea class="form-control" id="content" name="content" rows="4" placeholder="Tulis komentar Anda..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 mt-2">
+                                    <i class="fas fa-paper-plane me-2"></i>Kirim Komentar
+                                </button>
+                            </form>
+                        @else
+                            <div class="alert alert-light border">
+                                Anda harus <strong>masuk</strong> untuk menulis komentar.
                             </div>
-                            <div class="mb-3">
-                                <label for="content" class="form-label">Komentar</label>
-                                <textarea class="form-control" id="content" name="content" rows="4" placeholder="Tulis komentar Anda..." required></textarea>
+                            <div class="d-grid gap-2">
+                                <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn btn-primary">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Masuk
+                                </a>
+                                <a href="{{ route('register') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-user-plus me-2"></i>Daftar
+                                </a>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100 mt-2"><i class="fas fa-paper-plane me-2"></i>Kirim Komentar</button>
-                        </form>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -458,7 +464,8 @@
 }
 
 .sidebar-header {
-    background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-dark));
+    /* Match other sidebars' blue gradient */
+    background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
     padding: 1.25rem;
     font-weight: 600;

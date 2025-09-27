@@ -15,12 +15,16 @@ use App\Http\Controllers\Admin\
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FotoInteractionController;
+use App\Http\Controllers\Auth\GuestAuthController;
+use App\Http\Controllers\AIChatController;
 
 // Rute untuk halaman utama (guest)
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/berita', [HomeController::class, 'berita'])->name('berita');
 Route::get('/berita/{id}', [HomeController::class, 'beritaDetail'])->name('berita.detail');
-Route::post('/berita/{post}/komentar', [CommentController::class, 'store'])->name('berita.comment.store');
+Route::post('/berita/{post}/komentar', [CommentController::class, 'store'])
+    ->middleware('auth')
+    ->name('berita.comment.store');
 Route::get('/galeri', [HomeController::class, 'galeri'])->name('galeri');
 Route::get('/galeri/{id}', [HomeController::class, 'galeriDetail'])->name('galeri.detail');
 Route::get('/profil', [HomeController::class, 'profil'])->name('profil');
@@ -35,11 +39,26 @@ Route::get('/fasilitas', [HomeController::class, 'fasilitasAll'])->name('fasilit
 // AJAX endpoints for Foto interactions (guest)
 Route::prefix('ajax')->group(function () {
     Route::get('/fotos/counts', [FotoInteractionController::class, 'getCounts'])->name('ajax.fotos.counts');
-    Route::post('/fotos/{foto}/like', [FotoInteractionController::class, 'incrementLike'])->name('ajax.fotos.like');
-    Route::post('/fotos/{foto}/unlike', [FotoInteractionController::class, 'decrementLike'])->name('ajax.fotos.unlike');
+    Route::post('/fotos/{foto}/like', [FotoInteractionController::class, 'incrementLike'])->middleware('auth')->name('ajax.fotos.like');
+    Route::post('/fotos/{foto}/unlike', [FotoInteractionController::class, 'decrementLike'])->middleware('auth')->name('ajax.fotos.unlike');
     Route::get('/fotos/{foto}/comments', [FotoInteractionController::class, 'listComments'])->name('ajax.fotos.comments');
     Route::post('/fotos/{foto}/comments', [FotoInteractionController::class, 'addComment'])->name('ajax.fotos.comments.add');
 });
+
+// AI Assistant routes
+Route::get('/ai', [AIChatController::class, 'index'])->name('ai');
+Route::post('/ai/ask', [AIChatController::class, 'ask'])->name('ai.ask');
+Route::post('/ai/stream', [AIChatController::class, 'stream'])->name('ai.stream');
+
+// Guest Authentication routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [GuestAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [GuestAuthController::class, 'login'])->name('login.submit');
+    Route::get('/register', [GuestAuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register', [GuestAuthController::class, 'register'])->name('register.submit');
+});
+
+Route::post('/logout', [GuestAuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 // Rute untuk autentikasi admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');

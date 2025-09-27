@@ -318,7 +318,7 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top elunora-navbar">
-        <div class="container">
+        <div class="container-fluid px-3 px-lg-4">
             <a class="navbar-brand" href="{{ route('home') }}">
                 <img src="{{ asset('img/logo.png') }}" alt="Elunora School"> Elunora School
             </a>
@@ -326,7 +326,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Beranda</a>
                     </li>
@@ -345,6 +345,37 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}" href="{{ route('kontak') }}">Kontak</a>
                     </li>
+                    @guest
+                        <li class="nav-item ms-lg-2">
+                            <a class="btn btn-light btn-sm" href="{{ route('login', ['redirect' => request()->fullUrl()]) }}">
+                                <i class="fas fa-sign-in-alt me-1"></i> Masuk
+                            </a>
+                        </li>
+                        <li class="nav-item ms-1 mt-2 mt-lg-0">
+                            <a class="btn btn-light btn-sm" href="{{ route('register', ['redirect' => request()->fullUrl()]) }}">
+                                <i class="fas fa-user-plus me-1"></i> Daftar
+                            </a>
+                        </li>
+                    @else
+                        <li class="nav-item dropdown ms-lg-3">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <span class="avatar rounded-circle bg-light text-primary d-inline-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="fas fa-user"></i></span>
+                                <span class="text-white">{{ auth()->user()->name }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li class="dropdown-header small text-muted px-3">Masuk sebagai<br><strong>{{ auth()->user()->email }}</strong></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}" class="px-3 py-1">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+                                            <i class="fas fa-sign-out-alt me-1"></i> Keluar
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @endguest
                 </ul>
             </div>
         </div>
@@ -451,5 +482,34 @@
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @yield('scripts')
+
+    @if(!request()->routeIs('ai'))
+    <!-- Floating AI Button -->
+    <a href="{{ route('ai') }}" class="ai-fab" title="Tanya Asisten AI" aria-label="Tanya Asisten AI">
+        <i class="fas fa-robot"></i>
+    </a>
+    <style>
+        .ai-fab {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-primary-dark));
+            color: #fff !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            z-index: 1050;
+            transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
+            text-decoration: none;
+        }
+        .ai-fab i { font-size: 1.25rem; }
+        .ai-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.3); }
+        @media (max-width: 576px) { .ai-fab { right: 14px; bottom: 14px; width: 52px; height: 52px; } }
+    </style>
+    @endif
 </body>
 </html>

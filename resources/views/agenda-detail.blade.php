@@ -28,7 +28,6 @@
             </span>
             @endif
         </div>
-        <p class="lead mb-0">{{ Str::limit(strip_tags($agenda->deskripsi), 120) }}</p>
     </div>
     <div class="col-md-4 text-center">
         <div class="hero-icon">
@@ -163,24 +162,6 @@
                 </div>
                 
                 <!-- Removed 'Agenda Lainnya' blocks as requested -->
-
-                <!-- Quick Links -->
-                <div class="sidebar-card">
-                    <div class="sidebar-header">
-                        <h5 class="mb-0"><i class="fas fa-link me-2"></i>Tautan Cepat</h5>
-                    </div>
-                    <div class="list-group list-group-flush">
-                        <a href="{{ route('home') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-home me-2"></i>Beranda
-                        </a>
-                        <a href="{{ route('agenda') }}" class="list-group-item list-group-item-action">
-                            <i class="fas fa-calendar-alt me-2"></i>Semua Agenda
-                        </a>
-                        <a href="#" class="list-group-item list-group-item-action" data-bs-toggle="modal" data-bs-target="#contactModal">
-                            <i class="fas fa-envelope me-2"></i>Hubungi Kami
-                        </a>
-                    </div>
-                </div>
             </div>
         </div>
     </div>

@@ -155,11 +155,6 @@
                         @else
                         <img src="{{ asset('img/no-image.jpg') }}" class="related-image" alt="No Image">
                         @endif
-                        <div class="related-overlay">
-                            <a href="{{ route('galeri.detail', $item->id) }}" class="btn btn-primary">
-                                <i class="fas fa-eye me-1"></i>Lihat Galeri
-                            </a>
-                        </div>
                         <div class="related-badge">
                             <span class="badge bg-primary">{{ $item->fotos->count() }} foto</span>
                         </div>
@@ -638,6 +633,9 @@
         'positionFromTop': 50
     });
     
+    // Current user context for per-user like state in localStorage
+    const CURRENT_USER_ID = {!! json_encode(auth()->id()) !!};
+
     function downloadImage(url, filename) {
         const link = document.createElement('a');
         link.href = url;
@@ -707,11 +705,17 @@
     }
 
     function getLiked(fotoId) {
-        return localStorage.getItem('foto_liked_' + fotoId) === '1';
+        return localStorage.getItem(storageKey(fotoId)) === '1';
     }
+    function storageKey(fotoId) {
+        const uid = (typeof CURRENT_USER_ID !== 'undefined' && CURRENT_USER_ID !== null) ? CURRENT_USER_ID : 'guest';
+        return 'foto_liked_' + uid + '_' + fotoId;
+    }
+
     function setLiked(fotoId, val) {
-        if (val) localStorage.setItem('foto_liked_' + fotoId, '1');
-        else localStorage.removeItem('foto_liked_' + fotoId);
+        const key = storageKey(fotoId);
+        if (val) localStorage.setItem(key, '1');
+        else localStorage.removeItem(key);
     }
 
     function updateCommentsCountUI(fotoId, count) {
@@ -735,14 +739,7 @@
     async function likeFoto(fotoId) {
         try {
             const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
-            if (likeBtn) {
-                likeBtn.disabled = true;
-                // Optimistic increment on UI
-                const current = likeBtn.querySelector('.count').textContent.replace(/\./g, '').replace(/,rb|,jt|rb|jt/g, '');
-                let currNum = parseInt(current || '0', 10);
-                if (isNaN(currNum)) currNum = 0;
-                updateLikeUI(fotoId, true, currNum + 1);
-            }
+            if (likeBtn) likeBtn.disabled = true;
             const res = await fetch(`/ajax/fotos/${fotoId}/like`, {
                 method: 'POST',
                 headers: {
@@ -752,6 +749,11 @@
                 },
                 credentials: 'same-origin'
             });
+            if (res.status === 401) {
+                // redirect to login
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
             if (!res.ok) {
                 let msg = 'Failed to like';
                 try {
@@ -762,8 +764,9 @@
                 } catch (_) {}
                 throw new Error(msg);
             }
-            await res.json();
-            // Keep optimistic UI count; just ensure liked state is stored
+            const data = await res.json();
+            const count = data && data.likes_count != null ? data.likes_count : undefined;
+            if (typeof count === 'number') updateLikeUI(fotoId, true, count);
             setLiked(fotoId, true);
             if (likeBtn) likeBtn.disabled = false;
         } catch (e) {
@@ -777,14 +780,7 @@
     async function unlikeFoto(fotoId) {
         try {
             const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
-            if (likeBtn) {
-                likeBtn.disabled = true;
-                // Optimistic decrement on UI
-                const current = likeBtn.querySelector('.count').textContent.replace(/\./g, '').replace(/,rb|,jt|rb|jt/g, '');
-                let currNum = parseInt(current || '0', 10);
-                if (isNaN(currNum)) currNum = 0;
-                updateLikeUI(fotoId, false, Math.max(0, currNum - 1));
-            }
+            if (likeBtn) likeBtn.disabled = true;
             const res = await fetch(`/ajax/fotos/${fotoId}/unlike`, {
                 method: 'POST',
                 headers: {
@@ -794,6 +790,10 @@
                 },
                 credentials: 'same-origin'
             });
+            if (res.status === 401) {
+                window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                return;
+            }
             if (!res.ok) {
                 let msg = 'Failed to unlike';
                 try {
@@ -804,8 +804,9 @@
                 } catch (_) {}
                 throw new Error(msg);
             }
-            await res.json();
-            // Keep optimistic UI count; just ensure liked state is stored
+            const data = await res.json();
+            const count = data && data.likes_count != null ? data.likes_count : undefined;
+            if (typeof count === 'number') updateLikeUI(fotoId, false, count);
             setLiked(fotoId, false);
             if (likeBtn) likeBtn.disabled = false;
         } catch (e) {
@@ -928,24 +929,23 @@
             likeBtn.classList.toggle('liked', liked);
             likeBtn.dataset.liked = liked ? '1' : '0';
             if (icon) {
+                // Mirror classes for FA5/FA6
                 icon.classList.toggle('far', !liked);
-                icon.classList.toggle('fas', liked);
+                icon.classList.toggle('fas', !!liked);
                 icon.classList.toggle('fa-regular', !liked);
-                icon.classList.toggle('fa-solid', liked);
+                icon.classList.toggle('fa-solid', !!liked);
             }
         });
 
-        // Wire like buttons (decide by data-liked / UI state for robustness)
+        // Toggle like/unlike on click
         document.querySelectorAll('.like-btn').forEach(btn => {
-            const id = btn.getAttribute('data-foto-id');
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const isLikedNow = (btn.dataset.liked === '1') || btn.classList.contains('liked') || getLiked(id);
-                if (isLikedNow) {
-                    unlikeFoto(id);
+            btn.addEventListener('click', function(ev) {
+                const fid = this.getAttribute('data-foto-id');
+                const liked = this.dataset.liked === '1';
+                if (liked) {
+                    unlikeFoto(fid);
                 } else {
-                    likeFoto(id);
+                    likeFoto(fid);
                 }
             });
         });

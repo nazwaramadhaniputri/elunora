@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Foto;
 use App\Models\FotoComment;
+use App\Models\FotoLike;
 use Illuminate\Http\Request;
 
 class FotoInteractionController extends Controller
@@ -11,18 +12,23 @@ class FotoInteractionController extends Controller
     public function incrementLike(Foto $foto)
     {
         try {
-            // Atomic increment
-            $foto->increment('likes_count');
-            $foto->refresh();
+            $user = request()->user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
+            }
+            // Create per-user like (idempotent)
+            FotoLike::firstOrCreate([
+                'foto_id' => $foto->id,
+                'user_id' => $user->id,
+            ]);
+            $likesCount = FotoLike::where('foto_id', $foto->id)->count();
             return response()->json([
                 'success' => true,
                 'foto_id' => $foto->id,
-                'likes_count' => (int) $foto->likes_count,
+                'likes_count' => (int) $likesCount,
             ]);
         } catch (\Throwable $e) {
-            $hint = str_contains($e->getMessage(), 'likes_count')
-                ? 'Kolom likes_count belum ada. Jalankan: php artisan migrate'
-                : null;
+            $hint = str_contains($e->getMessage(), 'foto_likes') ? 'Tabel foto_likes belum ada. Jalankan: php artisan migrate' : null;
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal menyukai foto',
@@ -36,20 +42,19 @@ class FotoInteractionController extends Controller
     public function decrementLike(Foto $foto)
     {
         try {
-            $current = (int) ($foto->likes_count ?? 0);
-            if ($current > 0) {
-                $foto->decrement('likes_count');
+            $user = request()->user();
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'Unauthenticated'], 401);
             }
-            $foto->refresh();
+            FotoLike::where('foto_id', $foto->id)->where('user_id', $user->id)->delete();
+            $likesCount = FotoLike::where('foto_id', $foto->id)->count();
             return response()->json([
                 'success' => true,
                 'foto_id' => $foto->id,
-                'likes_count' => (int) $foto->likes_count,
+                'likes_count' => (int) $likesCount,
             ]);
         } catch (\Throwable $e) {
-            $hint = str_contains($e->getMessage(), 'likes_count')
-                ? 'Kolom likes_count belum ada. Jalankan: php artisan migrate'
-                : null;
+            $hint = str_contains($e->getMessage(), 'foto_likes') ? 'Tabel foto_likes belum ada. Jalankan: php artisan migrate' : null;
             return response()->json([
                 'success' => false,
                 'message' => 'Gagal mengurangi like',
@@ -66,18 +71,22 @@ class FotoInteractionController extends Controller
             if (empty($ids)) {
                 return response()->json(['data' => []]);
             }
-            $fotos = Foto::whereIn('id', $ids)->withCount('comments')->get(['id', 'likes_count']);
+            $fotos = Foto::whereIn('id', $ids)->withCount('comments')->get(['id']);
+            $likesByFoto = FotoLike::whereIn('foto_id', $ids)
+                ->selectRaw('foto_id, COUNT(*) as c')
+                ->groupBy('foto_id')
+                ->pluck('c', 'foto_id');
             $data = [];
             foreach ($fotos as $f) {
                 $data[$f->id] = [
-                    'likes_count' => (int) ($f->likes_count ?? 0),
+                    'likes_count' => (int) ($likesByFoto[$f->id] ?? 0),
                     'comments_count' => (int) ($f->comments_count ?? 0),
                 ];
             }
             return response()->json(['data' => $data]);
         } catch (\Throwable $e) {
             $hint = str_contains($e->getMessage(), 'foto_comments') || str_contains($e->getMessage(), 'comments')
-                ? 'Tabel foto_comments belum ada. Jalankan: php artisan migrate'
+                ? 'Tabel foto_comments/foto_likes belum ada. Jalankan: php artisan migrate'
                 : null;
             return response()->json([
                 'success' => false,
@@ -116,10 +125,14 @@ class FotoInteractionController extends Controller
                 'content' => 'required|string|max:1000',
                 'guest_name' => 'nullable|string|max:100',
             ]);
+            $user = $request->user();
             $comment = new FotoComment();
             $comment->foto_id = $foto->id;
             $comment->content = $validated['content'];
-            $comment->guest_name = $validated['guest_name'] ?? null;
+            // If user is logged in, use their name; otherwise use provided guest_name or default to 'Tamu'
+            $comment->guest_name = $user && $user->name
+                ? $user->name
+                : ($validated['guest_name'] ?? 'Tamu');
             $comment->guest_ip = $request->ip();
             $comment->save();
 
