@@ -16,7 +16,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\FotoInteractionController;
 use App\Http\Controllers\Auth\GuestAuthController;
-use App\Http\Controllers\AIChatController;
+use App\Http\Controllers\Admin\AdminProfileController;
 
 // Rute untuk halaman utama (guest)
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -43,12 +43,9 @@ Route::prefix('ajax')->group(function () {
     Route::post('/fotos/{foto}/unlike', [FotoInteractionController::class, 'decrementLike'])->middleware('auth')->name('ajax.fotos.unlike');
     Route::get('/fotos/{foto}/comments', [FotoInteractionController::class, 'listComments'])->name('ajax.fotos.comments');
     Route::post('/fotos/{foto}/comments', [FotoInteractionController::class, 'addComment'])->name('ajax.fotos.comments.add');
+    Route::get('/fotos/{foto}/likes', [FotoInteractionController::class, 'listLikes'])->name('ajax.fotos.likes');
 });
 
-// AI Assistant routes
-Route::get('/ai', [AIChatController::class, 'index'])->name('ai');
-Route::post('/ai/ask', [AIChatController::class, 'ask'])->name('ai.ask');
-Route::post('/ai/stream', [AIChatController::class, 'stream'])->name('ai.stream');
 
 // Guest Authentication routes
 Route::middleware('guest')->group(function () {
@@ -56,11 +53,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [GuestAuthController::class, 'login'])->name('login.submit');
     Route::get('/register', [GuestAuthController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [GuestAuthController::class, 'register'])->name('register.submit');
+
+    // Guest Forgot Password: render guest view; POST uses Admin AuthController for handling
+    Route::get('/forgot-password', function () { return view('auth.forgot-password'); })->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.email');
 });
 
 Route::post('/logout', [GuestAuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-// Rute untuk autentikasi admin
 Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
 Route::get('/admin/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('admin.password.request');
@@ -72,7 +72,10 @@ Route::post('/admin/reset-password', [AuthController::class, 'resetPassword'])->
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    
+    // Admin account profile
+    Route::get('/account/profile', [AdminProfileController::class, 'edit'])->name('account.profile');
+    Route::put('/account/profile', [AdminProfileController::class, 'update'])->name('account.profile.update');
+
     // Admin Galeri routes
     Route::resource('galeri', GaleriController::class);
     Route::get('galeri/{id}/add-photo', [GaleriController::class, 'addPhoto'])->name('galeri.add-photo');
@@ -110,4 +113,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Admin Agenda routes
     Route::resource('agenda', AdminAgendaController::class);
     Route::patch('agenda/{agenda}/toggle-status', [AdminAgendaController::class, 'toggleStatus'])->name('agenda.toggle-status');
+    // Moderasi komentar foto (admin)
+    Route::delete('galeri/comment/{comment}', [GaleriController::class, 'deleteComment'])->name('galeri.delete-comment');
+    // Moderasi komentar berita (admin)
+    Route::delete('berita/comment/{comment}', [BeritaController::class, 'deleteComment'])->name('berita.delete-comment');
 });

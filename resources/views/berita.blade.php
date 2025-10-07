@@ -32,10 +32,13 @@
 
 @section('content')
 <section class="py-5">
-    <div class="container">
+    <div class="container" data-search-scope>
         <div class="row">
             <!-- Daftar Berita -->
             <div class="col-lg-8">
+                <div class="mb-3">
+                    <input type="text" class="form-control js-page-search" placeholder="Cari berita..." aria-label="Cari berita" data-target="article.news-card">
+                </div>
                 @forelse($posts as $berita)
                 <article class="news-card mb-4">
                     <div class="row g-0 align-items-stretch">

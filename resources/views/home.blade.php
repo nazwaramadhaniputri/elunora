@@ -6,10 +6,11 @@
 <!-- Modern Hero Section -->
 <div class="hero-section position-relative">
     <div class="container">
-        <div class="row justify-content-center text-center">
-            <div class="col-lg-8">
+        <div class="row align-items-center">
+            <!-- Left: text -->
+            <div class="col-lg-6" data-reveal>
                 <h1 class="hero-title mb-4">Selamat Datang di Elunora School</h1>
-                <p class="hero-subtitle mb-5">School of Art yang melahirkan lulusan kreatif, berbakat, dan siap bersaing di dunia seni nasional maupun internasional.</p>
+                <p class="hero-subtitle mb-4">School of Art yang melahirkan lulusan kreatif, berbakat, dan siap bersaing di dunia seni nasional maupun internasional.</p>
                 <div class="hero-actions d-flex justify-content-center flex-wrap gap-3">
                     <button type="button" class="btn btn-hero-glow" onclick="scrollToSection('galeri-section')">
                         <i class="fas fa-images me-2"></i>Lihat Galeri
@@ -20,6 +21,12 @@
                     <button type="button" class="btn btn-hero-glow" onclick="scrollToSection('agenda-section')">
                         <i class="fas fa-calendar me-2"></i>Lihat Agenda
                     </button>
+                </div>
+            </div>
+            <!-- Right: image -->
+            <div class="col-lg-6 d-none d-lg-block" data-reveal>
+                <div class="hero-image-wrap ms-lg-4">
+                    <img src="{{ isset($profile) && ($profile->foto ?? null) ? asset($profile->foto) : asset('img/hero-school.jpg') }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'" alt="Elunora School" class="img-fluid rounded-4 shadow-lg hero-image">
                 </div>
             </div>
         </div>
@@ -41,6 +48,10 @@
     padding-top: 120px;
 }
 
+/* Hero image */
+.hero-image-wrap { position: relative; }
+.hero-image { width: 100%; height: auto; object-fit: cover; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+
 .hero-overlay {
     position: absolute;
     top: 0;
@@ -57,7 +68,7 @@
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3.2rem;
     font-weight: 700;
     color: white;
     line-height: 1.2;
@@ -69,8 +80,8 @@
     font-size: 1.25rem;
     color: rgba(255, 255, 255, 0.9);
     line-height: 1.6;
-    max-width: 600px;
-    margin: 0 auto;
+    max-width: 620px;
+    margin: 0;
 }
 
 /* Profil Sekolah Section */
@@ -120,26 +131,28 @@
         min-height: auto;
     }
     
-    .hero-content h1 {
+    .hero-content h1, .hero-title {
         font-size: 2.5rem;
+        margin-right: 2rem;
     }
     
-    .hero-content .lead {
+    .hero-content .lead, .hero-subtitle {
         font-size: 1.1rem;
+        margin-right: 2rem;
     }
     
-    .play-button {
-        width: 60px;
-        height: 60px;
+    .hero-image-wrap {
+        animation: float 3s ease-in-out infinite;
     }
     
-    .play-button i {
-        font-size: 1.5rem;
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
     }
 }
 
 @media (max-width: 767.98px) {
-    .hero-content h1 {
+    .hero-content h1, .hero-title {
         font-size: 2rem;
     }
     
@@ -165,12 +178,15 @@
 .shadow {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
+/* Grain overlay for hero background */
+.hero-section::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain2" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain2)"/></svg>') repeat;
 }
 
 .hero-badge {

@@ -62,6 +62,45 @@
                             </p>
                             <p><strong>Dibuat:</strong> {{ $post->created_at ? $post->created_at->format('d M Y H:i') : '-' }}</p>
                             <p><strong>Diupdate:</strong> {{ $post->updated_at ? $post->updated_at->format('d M Y H:i') : '-' }}</p>
+                            <p><strong>Jumlah Komentar:</strong> {{ \App\Models\Comment::where('post_id', $post->id)->count() }}</p>
+                            <div class="mt-3">
+                                <a href="{{ route('berita.detail', $post->id) }}" class="btn-modern info btn-sm" target="_blank">
+                                    <i class="fas fa-external-link-alt me-1"></i> Lihat di Halaman Publik
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Komentar Masuk -->
+                    <div class="card mt-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Komentar Masuk</h5>
+                            @php($commentsCount = \App\Models\Comment::where('post_id', $post->id)->count())
+                            <span class="badge bg-primary">{{ $commentsCount }}</span>
+                        </div>
+                        <div class="card-body" style="max-height: 420px; overflow:auto;">
+                            @php($comments = \App\Models\Comment::where('post_id', $post->id)->latest()->take(100)->get())
+                            @if($comments->isEmpty())
+                                <div class="text-muted">Belum ada komentar.</div>
+                            @else
+                                @foreach($comments as $c)
+                                <div class="border rounded p-2 mb-2">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <strong><i class="fas fa-user me-1"></i>{{ $c->name ?? $c->nama ?? 'Tamu' }}</strong>
+                                            <div class="small text-muted">{{ $c->email ?? '' }}</div>
+                                        </div>
+                                        <small class="text-muted">{{ optional($c->created_at)->format('d M Y H:i') }}</small>
+                                    </div>
+                                    <div class="mt-2">{{ $c->content ?? $c->komentar ?? $c->isi }}</div>
+                                    <form method="POST" action="{{ route('admin.berita.delete-comment', $c->id) }}" class="mt-2" onsubmit="return confirm('Hapus komentar ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash me-1"></i>Hapus</button>
+                                    </form>
+                                </div>
+                                @endforeach
+                            @endif
                         </div>
                     </div>
                 </div>

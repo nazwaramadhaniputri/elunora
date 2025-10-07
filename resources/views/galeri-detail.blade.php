@@ -750,8 +750,8 @@
                 credentials: 'same-origin'
             });
             if (res.status === 401) {
-                // redirect to login
-                window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                alert('Silakan login terlebih dahulu untuk menyukai foto.');
+                window.location.href = '/login';
                 return;
             }
             if (!res.ok) {
@@ -791,7 +791,8 @@
                 credentials: 'same-origin'
             });
             if (res.status === 401) {
-                window.location.href = `/login?redirect=${encodeURIComponent(window.location.href)}`;
+                alert('Silakan login terlebih dahulu untuk membatalkan like.');
+                window.location.href = '/login';
                 return;
             }
             if (!res.ok) {
@@ -843,6 +844,12 @@
         const text = (input.value || '').trim();
         if (!text) return;
         try {
+            // If user not logged in, notify and redirect to login
+            if (!CURRENT_USER_ID) {
+                alert('Anda harus login untuk mengirim komentar.');
+                window.location.href = '/login';
+                return;
+            }
             const res = await fetch(`/ajax/fotos/${fotoId}/comments`, {
                 method: 'POST',
                 headers: {
@@ -854,6 +861,11 @@
                 body: JSON.stringify({ content: text }),
                 credentials: 'same-origin'
             });
+            if (res.status === 401) {
+                alert('Anda harus login untuk mengirim komentar.');
+                window.location.href = '/login';
+                return;
+            }
             if (!res.ok) {
                 let msg = 'Failed to comment';
                 try {

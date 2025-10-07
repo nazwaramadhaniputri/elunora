@@ -53,8 +53,26 @@ class GaleriController extends Controller
 
     public function show($id)
     {
-        $galeri = Galeri::with(['post', 'fotos'])->findOrFail($id);
-        return view('admin.galeri.show', compact('galeri'));
+        // Eager-load fotos and comment counts
+        $galeri = Galeri::with(['post', 'fotos' => function($q){
+            $q->withCount('comments');
+        }])->findOrFail($id);
+
+        // Precompute like counts per foto to avoid N+1
+        $fotoIds = $galeri->fotos->pluck('id')->all();
+        $likeCounts = [];
+        if (!empty($fotoIds)) {
+            $likeCounts = \App\Models\FotoLike::whereIn('foto_id', $fotoIds)
+                ->selectRaw('foto_id, COUNT(*) as c')
+                ->groupBy('foto_id')
+                ->pluck('c', 'foto_id')
+                ->toArray();
+        }
+
+        return view('admin.galeri.show', [
+            'galeri' => $galeri,
+            'likeCounts' => $likeCounts,
+        ]);
     }
 
     public function edit($id)
@@ -168,5 +186,16 @@ class GaleriController extends Controller
         $foto->delete();
 
         return redirect()->route('admin.galeri.show', $galeriId)->with('success', 'Foto berhasil dihapus.');
+    }
+
+    public function deleteComment(\App\Models\FotoComment $comment)
+    {
+        $foto = $comment->foto; // may be null if already detached
+        $galeriId = optional($foto)->galery_id;
+        $comment->delete();
+        if ($galeriId) {
+            return redirect()->route('admin.galeri.show', $galeriId)->with('success', 'Komentar berhasil dihapus.');
+        }
+        return back()->with('success', 'Komentar berhasil dihapus.');
     }
 }

@@ -11,12 +11,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
     <!-- Global Spacing CSS -->
     <link rel="stylesheet" href="{{ asset('css/global-spacing.css') }}">
     <!-- Elunora Theme CSS -->
     <link rel="stylesheet" href="{{ asset('css/elunora-theme.css') }}">
     <!-- Custom CSS -->
     <style>
+        /* Full-bleed layout: remove side paddings ONLY for the top-level layout container */
+        body > .container-fluid { padding-left: 0 !important; padding-right: 0 !important; }
         /* Using variables from elunora-theme.css */
         :root {
             --primary: var(--elunora-primary);
@@ -46,13 +49,20 @@
             font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #495057;
             min-height: 100vh;
+            margin: 0; /* eliminate default browser margin causing top line */
         }
         
         .sidebar {
-            background: #ffffff;
+            /* Solid theme color as requested */
+            background: var(--elunora-primary);
             min-height: 100vh;
-            box-shadow: 0 0 35px 0 rgba(154, 161, 171, 0.15);
+            box-shadow: 0 0 35px 0 rgba(2, 6, 23, 0.25);
+            color: #e2e8f0;
         }
+
+        /* Provide a minimal gutter so content cards never stick to sidebar */
+        .content { padding-left: 0.5rem; }
+        @media (min-width: 992px) { .content { padding-left: 0.75rem; } }
         
         .sidebar .nav-item {
             position: relative;
@@ -60,24 +70,24 @@
         
         .sidebar .nav-item .nav-link {
             text-align: left;
-            padding: 1rem;
+            padding: 0.9rem 1rem;
             width: 14rem;
-            color: #858796;
-            font-weight: 500;
-            border-radius: 0.35rem;
-            margin: 0.2rem 1rem;
-            transition: all 0.3s ease;
+            color: #cbd5e1;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            margin: 0.2rem 0.75rem;
+            transition: all 0.2s ease;
         }
         
         .sidebar .nav-item .nav-link:hover {
-            color: var(--admin-primary);
-            background-color: rgba(30, 58, 138, 0.1);
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
         }
         
         .sidebar .nav-item .nav-link.active {
-            color: white !important;
-            background: var(--elunora-primary) !important;
-            box-shadow: 0 3px 10px rgba(26, 54, 93, 0.3) !important;
+            color: #ffffff !important;
+            background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-accent));
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35) !important;
         }
         
         .sidebar .nav-link i {
@@ -143,6 +153,16 @@
             .main-content {
                 margin-left: 280px;
             }
+            /* Make the left sidebar sticky on desktop */
+            .elunora-admin-sidebar {
+                position: sticky;
+                top: 0;
+                height: 100vh;
+                overflow-y: auto;
+                overscroll-behavior: contain;
+            }
+            /* Remove internal top padding to align with top */
+            .elunora-admin-sidebar .position-sticky { padding-top: 0 !important; }
         }
         
         .admin-header {
@@ -462,6 +482,37 @@
             background: var(--admin-primary);
             border: 1px solid var(--admin-primary);
         }
+
+        /* Match notification bell size to profile pill */
+        #notifDropdown {
+            border-radius: 9999px !important;
+            padding: 0.4rem 0.9rem !important;
+            height: 38px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background: transparent !important; /* no textbox look */
+            border: 0 !important;
+        }
+        #notifDropdown i { color: #fff !important; font-size: 16px !important; }
+        #notifDropdown .badge { transform: translate(-2px, 2px); }
+        /* Ensure dropdown menus on dark header are readable */
+        .dropdown-menu {
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+        }
+        .dropdown-menu .dropdown-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem; /* space between text and badge */
+            padding: 0.6rem 1rem;
+        }
+        .dropdown-menu .dropdown-item .badge {
+            margin-left: 0.5rem;
+            min-width: 26px;
+            text-align: center;
+        }
         
         /* Modern Admin Components */
         .page-header-modern {
@@ -470,6 +521,110 @@
             padding: 2rem;
             box-shadow: 0 5px 20px rgba(0,0,0,0.08);
         }
+
+        /* Sticky white top header inside main content */
+        .content > .d-flex.border-bottom {
+            position: sticky;
+            top: 0;
+            background: #ffffff; /* navbar white */
+            z-index: 1050;
+            border-bottom: none !important;
+            box-shadow: none; /* remove shadow to avoid gray line */
+            border-radius: 0; /* no rounded corners */
+            margin-left: 0 !important;
+            margin-right: 0 !important; /* eliminate right gap */
+            width: 100% !important;
+            padding-left: 1.25rem; /* a bit more space from sidebar */
+            padding-right: 0.75rem; /* give a little breathing room on right */
+            padding-top: 0.5rem; /* tighter top */
+            padding-bottom: 0.5rem; /* tighter bottom */
+        }
+        .content > .d-flex.border-bottom h1,
+        .content > .d-flex.border-bottom .h2,
+        .content > .d-flex.border-bottom i {
+            color: #1f2937 !important; /* dark heading & icons */
+        }
+
+        /* Navbar page title style */
+        .navbar-page-title {
+            font-family: 'Poppins', 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif !important;
+            font-size: 1.125rem !important; /* smaller */
+            font-weight: 600 !important;
+            line-height: 1.2 !important;
+            margin-left: 0.25rem; /* not too close to sidebar */
+        }
+
+        @media (min-width: 992px) {
+            .navbar-page-title { font-size: 1.2rem !important; }
+        }
+
+        /* Header buttons: limit styles to notif/profile only to avoid affecting Logout in dropdown */
+        #notifDropdown,
+        #profileDropdown {
+            background: transparent !important;
+            border: 1px solid rgba(15,23,42,0.2) !important; /* subtle dark border */
+            color: #334155 !important; /* slate text */
+            border-radius: 999px !important;
+        }
+        #notifDropdown:hover, #notifDropdown:focus,
+        #profileDropdown:hover, #profileDropdown:focus {
+            background: #f1f5f9 !important; /* light slate */
+            border-color: rgba(15,23,42,0.35) !important;
+            color: #1f2937 !important;
+            box-shadow: none !important;
+        }
+        /* Notification icon contrast on white header */
+        #notifDropdown i { color: #334155 !important; }
+
+        /* Add spacing to content sections after the sticky header */
+        .content > .border-bottom ~ * {
+            padding-left: 1.25rem;
+            padding-right: 1.25rem;
+        }
+        @media (min-width: 992px) {
+            .content > .border-bottom ~ * { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+
+        /* Fix rows that cancel padding with negative margins (Bootstrap). Apply only to first-level rows inside content */
+        .content > .border-bottom + .row,
+        .content > .border-bottom ~ .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+        }
+        @media (min-width: 992px) {
+            .content > .border-bottom + .row,
+            .content > .border-bottom ~ .row { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+        }
+
+        /* Ensure containers right after navbar also have spacing */
+        .content > .border-bottom + .container,
+        .content > .border-bottom ~ .container,
+        .content > .border-bottom + .container-fluid,
+        .content > .border-bottom ~ .container-fluid {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+        }
+        @media (min-width: 992px) {
+            .content > .border-bottom + .container,
+            .content > .border-bottom ~ .container,
+            .content > .border-bottom + .container-fluid,
+            .content > .border-bottom ~ .container-fluid {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+            }
+        }
+
+        /* Fallback: apply spacing to ANY containers and rows inside .content (any depth) */
+        .content .container, .content .container-fluid {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 992px) {
+            .content .container, .content .container-fluid { padding-left: 1.5rem; padding-right: 1.5rem; }
+        }
+        .content .row { margin-left: 0; margin-right: 0; }
         
         .page-title {
             font-size: 1.75rem;
@@ -1151,20 +1306,21 @@
         }
         
         .sidebar-brand {
-            padding: 2rem 1.5rem;
+            padding: 1.5rem 1rem;
             text-align: center;
-            border-bottom: 1px solid #e9ecef;
-            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            margin-bottom: 0.75rem;
+            color: #e2e8f0;
         }
         
         .sidebar-brand h4 {
-            color: #1e3a8a;
+            color: #ffffff;
             margin: 0;
-            font-weight: 700;
+            font-weight: 800;
         }
         
         .sidebar-brand small {
-            color: #6c757d;
+            color: #cbd5e1;
         }
         
         .fade-in {
@@ -1412,15 +1568,15 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="row">
+        <div class="row g-0">
             <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse elunora-admin-sidebar">
-                <div class="sidebar-brand elunora-admin-brand" style="padding: 1.5rem 1rem; text-align: center; border-bottom: 1px solid #e3e6f0;">
+            <div class="col-md-3 col-lg-2 d-md-block sidebar collapse elunora-admin-sidebar p-0">
+                <div class="sidebar-brand elunora-admin-brand">
                     <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
                         <img src="{{ asset('img/logo.png') }}" alt="Elunora School" style="height: 50px; width: auto; margin-right: 8px;">
                         <div style="text-align: left;">
-                            <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: #1a365d; line-height: 1.2;">Elunora School</h4>
-                            <small style="color: #4a5568; font-size: 0.75rem; font-weight: 500;">Admin Panel</small>
+                            <h4 style="margin: 0; font-size: 1.1rem; line-height: 1.2;">Elunora School</h4>
+                            <small style="font-size: 0.75rem; font-weight: 600;">Admin Panel</small>
                         </div>
                     </div>
                 </div>
@@ -1474,22 +1630,85 @@
                                 @endif
                             </a>
                         </li>
-                        <li class="nav-item mt-5">
-                            <form action="{{ route('admin.logout') }}" method="POST">
-                                @csrf
-                                <button type="submit" class="nav-link border-0 bg-transparent">
-                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                </button>
-                            </form>
-                        </li>
+                        <!-- Logout removed from sidebar by request -->
                     </ul>
                 </div>
             </div>
 
             <!-- Main Content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">@yield('header')</h1>
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-0 content">
+                <div class="d-flex flex-wrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    @php
+                        $yieldHeader = trim($__env->yieldContent('header') ?? '');
+                        $routeName = optional(request()->route())->getName();
+                        $segmentLast = last(request()->segments()) ?? '';
+                        $autoTitle = 'Beranda';
+                        if ($routeName) {
+                            if (str_starts_with($routeName, 'admin.berita')) $autoTitle = 'Berita';
+                            elseif (str_starts_with($routeName, 'admin.galeri')) $autoTitle = 'Galeri';
+                            elseif (str_starts_with($routeName, 'admin.profil')) $autoTitle = 'Profile Sekolah';
+                            elseif (str_starts_with($routeName, 'admin.fasilitas')) $autoTitle = 'Fasilitas';
+                            elseif (str_starts_with($routeName, 'admin.guru')) $autoTitle = 'Guru & Staff';
+                            elseif (str_starts_with($routeName, 'admin.agenda')) $autoTitle = 'Agenda';
+                            elseif (str_starts_with($routeName, 'admin.contact')) $autoTitle = 'Pesan Kontak';
+                            elseif (str_starts_with($routeName, 'admin.dashboard')) $autoTitle = 'Beranda';
+                            else $autoTitle = ucwords(str_replace(['-', '.'], ' ', $routeName));
+                        } elseif ($segmentLast) {
+                            $autoTitle = ucwords(str_replace('-', ' ', $segmentLast));
+                        }
+                        $pageTitle = $yieldHeader !== '' ? $yieldHeader : $autoTitle;
+                    @endphp
+                    <h1 class="navbar-page-title flex-grow-1" style="margin:0;">{{ $pageTitle }}</h1>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Notifications -->
+                        @php
+                            $notifComments = \App\Models\Comment::whereDate('created_at', now()->toDateString())->count();
+                            $notifAgendas = \App\Models\Agenda::whereDate('tanggal', now()->toDateString())->count();
+                            $notifTotal = $notifComments + $notifAgendas;
+                        @endphp
+                        <div class="dropdown">
+                            <button class="btn btn-sm position-relative" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi" style="line-height:1.1; background: transparent; border: 1px solid rgba(15,23,42,0.2); color:#334155; border-radius:999px;">
+                                <i class="fas fa-bell" style="color:#334155;"></i>
+                                @if($notifTotal > 0)
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $notifTotal }}</span>
+                                @endif
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 260px;">
+                                <li class="dropdown-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-comments me-2 text-primary"></i>Komentar baru hari ini</span>
+                                    <span class="badge bg-primary">{{ $notifComments }}</span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="dropdown-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-calendar-day me-2 text-success"></i>Agenda hari ini</span>
+                                    <span class="badge bg-success">{{ $notifAgendas }}</span>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.berita.index') }}">Lihat Berita</a></li>
+                                <li><a class="dropdown-item" href="{{ route('admin.agenda.index') }}">Lihat Agenda</a></li>
+                            </ul>
+                        </div>
+                        <!-- Profile -->
+                        <div class="dropdown">
+                            @php($petugas = auth('petugas')->user())
+                            <button class="btn btn-sm d-flex align-items-center" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="line-height:1.1; background: transparent; border: 1px solid rgba(15,23,42,0.2); color:#334155; border-radius:999px;">
+                                <span class="me-2" style="width:28px;height:28px;border-radius:50%;background:#e2e8f0;display:inline-flex;align-items:center;justify-content:center;">
+                                    <i class="fas fa-user" style="color:#334155;"></i>
+                                </span>
+                                <span class="fw-semibold" style="font-size:0.9rem; color:#334155;">{{ optional($petugas)->nama_lengkap ?? optional($petugas)->username ?? 'Admin' }}</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                <li><button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#adminProfileModal"><i class="fas fa-user-cog me-2"></i>Profil Saya</button></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form action="{{ route('admin.logout') }}" method="POST" class="px-3 py-1">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-danger w-100"><i class="fas fa-sign-out-alt me-1"></i>Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
 
                 @if(session('success'))
@@ -1518,10 +1737,42 @@
         </div>
     </div>
 
+    <!-- Admin Profile Modal -->
+    <div class="modal fade" id="adminProfileModal" tabindex="-1" aria-labelledby="adminProfileModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="adminProfileModalLabel"><i class="fas fa-user-cog me-2"></i>Profil Admin</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="adminProfileForm">
+                        @csrf
+                        @method('PUT')
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" name="username" value="{{ optional($petugas)->username }}" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" name="email" value="{{ optional($petugas)->email }}" readonly>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Profile modal is read-only info; no actions needed.
+    </script>
     @yield('scripts')
 </body>
 </html>

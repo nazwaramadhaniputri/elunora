@@ -237,10 +237,10 @@
                                 Anda harus <strong>masuk</strong> untuk menulis komentar.
                             </div>
                             <div class="d-grid gap-2">
-                                <a href="{{ route('login') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn btn-primary">
+                                <a href="{{ route('login') }}" class="btn btn-primary">
                                     <i class="fas fa-sign-in-alt me-2"></i>Masuk
                                 </a>
-                                <a href="{{ route('register') }}?redirect={{ urlencode(request()->fullUrl()) }}" class="btn btn-outline-primary">
+                                <a href="{{ route('register') }}" class="btn btn-outline-primary">
                                     <i class="fas fa-user-plus me-2"></i>Daftar
                                 </a>
                             </div>

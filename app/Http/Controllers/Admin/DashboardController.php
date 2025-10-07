@@ -35,7 +35,14 @@ class DashboardController extends Controller
                             ->orderBy('waktu_mulai')
                             ->take(5)
                             ->get();
-        
+
+        // Konten terbaru untuk dashboard
+        $latestPosts = \App\Models\Post::orderByDesc('created_at')->take(5)->get();
+        $latestFotos = \App\Models\Foto::orderByDesc('created_at')->take(8)->get();
+        $todaysAgendaList = Agenda::whereDate('tanggal', today())
+                                  ->orderBy('waktu_mulai')
+                                  ->get();
+
         // Ambil informasi sekolah
         $profilSekolah = \App\Models\Profile::first();
         
@@ -48,7 +55,10 @@ class DashboardController extends Controller
             'todayAgenda',
             'upcomingAgenda',
             'nextAgendas',
-            'profilSekolah'
+            'profilSekolah',
+            'latestPosts',
+            'latestFotos',
+            'todaysAgendaList'
         ));
     }
 }

@@ -20,16 +20,20 @@
                 <div class="dashboard-time">
                     <div class="time-info">
                         <i class="fas fa-calendar-alt text-primary me-2"></i>
-                        <span class="fw-bold">{{ now()->format('d M Y') }}</span>
+                        <span id="dateWIB" class="fw-bold">{{ now()->format('d M Y') }}</span>
                     </div>
                     <div class="time-info mt-2">
                         <i class="fas fa-clock text-primary me-2"></i>
-                        <span class="fw-bold">{{ now()->format('H:i') }} WIB</span>
+                        <span id="timeWIB" class="fw-bold">{{ now()->format('H:i') }} WIB</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    
+
+    
 
     <!-- Statistics Cards -->
     <div class="row mb-4">
@@ -254,6 +258,128 @@
             </div>
         </div>
     </div>
+
+    <!-- Latest Content and Today's Agenda -->
+    <div class="row mt-2">
+        <!-- Latest News -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Berita Terbaru</h5>
+                    <a href="{{ route('admin.berita.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+                </div>
+                <div class="card-body">
+                    @if(isset($latestPosts) && $latestPosts->count())
+                        <ul class="list-group list-group-flush">
+                            @foreach($latestPosts as $post)
+                                <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="ms-2 me-auto">
+                                        <div class="fw-semibold">{{ $post->judul ?? 'Tanpa Judul' }}</div>
+                                        <small class="text-muted">{{ \Carbon\Carbon::parse($post->created_at)->format('d M Y H:i') }}</small>
+                                    </div>
+                                    <a href="{{ route('admin.berita.edit', $post->id) }}" class="btn btn-sm btn-outline-secondary">Kelola</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-newspaper"></i></div>
+                            <div class="empty-title">Belum ada berita</div>
+                            <div class="empty-text">Tambahkan berita pertama Anda.</div>
+                            <a href="{{ route('admin.berita.create') }}" class="btn-modern primary"><i class="fas fa-plus me-2"></i>Tambah Berita</a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Latest Photos -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Foto Terbaru</h5>
+                    <a href="{{ route('admin.galeri.index') }}" class="btn btn-sm btn-outline-primary">Kelola Galeri</a>
+                </div>
+                <div class="card-body">
+                    @if(isset($latestFotos) && $latestFotos->count())
+                        <div class="row g-3">
+                            @foreach($latestFotos as $foto)
+                                <div class="col-6 col-md-3">
+                                    <div class="ratio ratio-1x1" style="border-radius:10px; overflow:hidden; background:#f1f5f9;">
+                                        <img src="{{ asset($foto->file) }}" alt="{{ $foto->judul ?? 'Foto' }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'" style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <small class="d-block text-truncate mt-1">{{ $foto->judul ?? 'Tanpa judul' }}</small>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-camera"></i></div>
+                            <div class="empty-title">Belum ada foto</div>
+                            <div class="empty-text">Upload foto untuk galeri Anda.</div>
+                            <a href="{{ route('admin.galeri.create') }}" class="btn-modern primary"><i class="fas fa-images me-2"></i>Tambah Galeri</a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
+        <!-- Today's Agenda -->
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Agenda Hari Ini</h5>
+                    <a href="{{ route('admin.agenda.index') }}" class="btn btn-sm btn-outline-primary">Kelola Agenda</a>
+                </div>
+                <div class="card-body">
+                    @if(isset($todaysAgendaList) && $todaysAgendaList->count())
+                        <div class="table-responsive">
+                            <table class="table table-striped align-middle mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Waktu</th>
+                                        <th>Judul</th>
+                                        <th>Lokasi</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($todaysAgendaList as $ag)
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">
+                                                {{ $ag->waktu_mulai ? \Illuminate\Support\Str::of($ag->waktu_mulai)->substr(0,5) : '-' }}
+                                                @if($ag->waktu_selesai)
+                                                    - {{ \Illuminate\Support\Str::of($ag->waktu_selesai)->substr(0,5) }}
+                                                @endif
+                                            </span>
+                                        </td>
+                                        <td>{{ $ag->judul }}</td>
+                                        <td>{{ $ag->lokasi ?? '-' }}</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="{{ route('admin.agenda.show', $ag->id) }}" class="action-btn info" title="Lihat"><i class="fas fa-eye"></i></a>
+                                                <a href="{{ route('admin.agenda.edit', $ag->id) }}" class="action-btn primary" title="Edit"><i class="fas fa-edit"></i></a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon"><i class="fas fa-calendar-day"></i></div>
+                            <div class="empty-title">Tidak ada agenda hari ini</div>
+                            <div class="empty-text">Tambahkan agenda baru untuk hari ini.</div>
+                            <a href="{{ route('admin.agenda.create') }}" class="btn-modern primary"><i class="fas fa-plus me-2"></i>Tambah Agenda</a>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 @endsection
 
@@ -556,4 +682,26 @@
 
 </style>
 
+@endsection
+
+@section('scripts')
+<script>
+  (function() {
+    const dateEl = document.getElementById('dateWIB');
+    const timeEl = document.getElementById('timeWIB');
+    function updateWIB() {
+      try {
+        const now = new Date();
+        const optsDate = { timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', year: 'numeric' };
+        const optsTime = { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit', hour12: false };
+        const dateStr = now.toLocaleDateString('id-ID', optsDate);
+        const timeStr = now.toLocaleTimeString('id-ID', optsTime);
+        if (dateEl) dateEl.textContent = dateStr;
+        if (timeEl) timeEl.textContent = timeStr + ' WIB';
+      } catch (e) { /* ignore */ }
+    }
+    updateWIB();
+    setInterval(updateWIB, 1000);
+  })();
+</script>
 @endsection

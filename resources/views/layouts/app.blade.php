@@ -85,7 +85,7 @@
             background: var(--elunora-primary);
             color: white;
             padding: 6rem 0 4rem;
-            text-align: center;
+            text-align: center; /* center by default */
             position: relative;
             overflow: hidden;
             margin-top: -76px;
@@ -309,6 +309,18 @@
         .gallery-photos img:hover {
             transform: scale(1.05);
         }
+
+        /* Global reveal-on-scroll animation (slower & smoother) */
+        [data-reveal] { opacity: 0; transform: translateY(26px); transition: opacity 1.1s cubic-bezier(.22,.61,.36,1), transform 1.1s cubic-bezier(.22,.61,.36,1); will-change: opacity, transform; }
+        [data-reveal].is-visible { opacity: 1; transform: none; }
+
+        /* Hero specific slide-in animations */
+        .slide-in-left-start { opacity: 0; transform: translateX(-48px); }
+        .slide-in-left-animate { opacity: 1 !important; transform: translateX(0) !important; transition: all 1.2s cubic-bezier(.22,.61,.36,1); will-change: opacity, transform; }
+        .slide-in-right-start { opacity: 0; transform: translateX(48px); }
+        .slide-in-right-animate { opacity: 1 !important; transform: translateX(0) !important; transition: all 1.2s cubic-bezier(.22,.61,.36,1); will-change: opacity, transform; }
+        /* Blue shadow glow under images in hero */
+        .hero-img-shadow { filter: drop-shadow(0 14px 24px rgba(30,58,138,0.35)); }
     </style>
     @yield('styles')
     <script>
@@ -478,38 +490,47 @@
                     }
                 });
             });
+
+            // Global reveal on scroll: auto-tag common blocks
+            const candidates = document.querySelectorAll('.card, .news-card, .modern-card, section, .gallery-item, .content-box, .text-box');
+            candidates.forEach(el => { el.setAttribute('data-reveal', ''); });
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(en => {
+                    if (en.isIntersecting) { en.target.classList.add('is-visible'); io.unobserve(en.target); }
+                });
+            }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+            document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+            // Make hero content visible on first load (entrance animation)
+            const hero = document.querySelector('.hero-section');
+            if (hero) {
+                hero.setAttribute('data-reveal', '');
+                // Keep subtle image shadow only
+                const imgInHero = hero.querySelector('img');
+                if (imgInHero) imgInHero.classList.add('hero-img-shadow');
+                // Slight delay to allow paint before transition
+                setTimeout(() => hero.classList.add('is-visible'), 50);
+            }
+
+            // Global search filter: any input.js-page-search will filter items matching data-target selector
+            document.querySelectorAll('input.js-page-search').forEach(inp => {
+                const targetSel = inp.getAttribute('data-target') || '';
+                const container = inp.closest('[data-search-scope]') || document;
+                const doFilter = () => {
+                    const q = (inp.value || '').toLowerCase();
+                    const items = container.querySelectorAll(targetSel);
+                    items.forEach(it => {
+                        const text = it.textContent.toLowerCase();
+                        it.style.display = (text.indexOf(q) !== -1) ? '' : 'none';
+                    });
+                };
+                inp.addEventListener('input', doFilter);
+            });
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     @yield('scripts')
 
-    @if(!request()->routeIs('ai'))
-    <!-- Floating AI Button -->
-    <a href="{{ route('ai') }}" class="ai-fab" title="Tanya Asisten AI" aria-label="Tanya Asisten AI">
-        <i class="fas fa-robot"></i>
-    </a>
-    <style>
-        .ai-fab {
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-primary-dark));
-            color: #fff !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            z-index: 1050;
-            transition: transform .15s ease, box-shadow .2s ease, opacity .2s ease;
-            text-decoration: none;
-        }
-        .ai-fab i { font-size: 1.25rem; }
-        .ai-fab:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.3); }
-        @media (max-width: 576px) { .ai-fab { right: 14px; bottom: 14px; width: 52px; height: 52px; } }
-    </style>
-    @endif
+    
 </body>
 </html>

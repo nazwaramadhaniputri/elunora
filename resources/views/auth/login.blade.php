@@ -9,14 +9,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/elunora-theme.css') }}">
     <style>
-        body { background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)), url('{{ asset('img/login.jpg') }}') center/cover no-repeat; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: rgba(255,255,255,.95); border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,.1); width: 100%; max-width: 460px; overflow: hidden; }
-        .login-header { background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-primary-dark)); color: #fff; padding: 1.75rem; text-align: center; }
-        .login-header h1 { font-size: 1.5rem; font-weight: 800; margin: 0; display: flex; align-items: center; justify-content: center; gap: .5rem; }
+        :root {
+            --guest-primary: #1e3a8a; /* deep blue */
+            --guest-accent: #0f172a;  /* very dark blue */
+        }
+        body {
+            background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)), url('{{ asset('img/login.jpg') }}') center/cover no-repeat;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-card {
+            background: rgba(255,255,255,.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,.1);
+            width: 100%;
+            max-width: 450px; /* match admin */
+            min-height: 500px; /* match admin */
+            overflow: hidden;
+            backdrop-filter: blur(8px);
+        }
+        .login-header {
+            background: var(--guest-primary);
+            color: #fff;
+            padding: 2.5rem; /* bigger blue area */
+            text-align: center;
+        }
+        .login-header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+        }
         .login-body { padding: 1.5rem; }
-        .form-control { border-radius: 12px; padding: .9rem 1rem; }
-        .btn-login { background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-primary-dark)); border: none; border-radius: 12px; padding: .9rem 1rem; font-weight: 700; letter-spacing: .3px; }
-        .btn-login:hover { opacity: .95; }
+        .form-control {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            color: #495057;
+            transition: all .2s ease;
+        }
+        .form-control:focus {
+            border-color: var(--guest-primary);
+            box-shadow: 0 0 0 .2rem rgba(30, 58, 138, 0.25);
+        }
+        /* Make primary buttons single solid color and balanced height */
+        .btn-login {
+            background-color: var(--guest-primary);
+            border: none;
+            border-radius: 12px;
+            padding: .875rem 1.25rem; /* not too tall */
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: .3px;
+            color: #fff;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+        }
+        .btn-login:hover { filter: brightness(0.97); }
+        /* Force .btn-primary inside this page to use solid guest blue */
+        .login-card .btn-primary { background-color: var(--guest-primary) !important; border-color: var(--guest-primary) !important; }
         .small-links a { text-decoration: none; }
         .small-links a:hover { text-decoration: underline; }
     </style>
@@ -24,8 +84,7 @@
 <body>
     <div class="login-card">
         <div class="login-header">
-            <h1><img src="{{ asset('img/logo.png') }}" alt="Elunora" style="height:40px;"> Masuk</h1>
-            <div class="small mt-1">Untuk berkomentar pada artikel</div>
+            <h1><img src="{{ asset('img/logo.png') }}" alt="Elunora" style="height:55px;"> Elunora School </h1>
         </div>
         <div class="login-body">
             @if ($errors->any())
@@ -46,14 +105,17 @@
                     <input class="form-check-input" type="checkbox" name="remember" id="remember">
                     <label class="form-check-label" for="remember">Ingat saya</label>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 btn-login">Masuk</button>
+                <button type="submit" class="btn btn-primary btn-login">Masuk</button>
             </form>
+            <div class="mt-3 d-flex justify-content-start small">
+                <a href="{{ route('password.request') }}" class="text-decoration-none">Lupa Password?</a>
+            </div>
             <div class="mt-3">
                 <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                    <a href="{{ route('register', ['redirect' => request('redirect')]) }}" class="btn btn-outline-primary">
+                    <a href="{{ route('register', ['redirect' => request('redirect')]) }}" class="btn btn-primary" style="border-radius:12px; padding:.875rem 1.25rem;">
                         <i class="fas fa-user-plus me-1"></i> Daftar
                     </a>
-                    <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+                    <a href="{{ route('home') }}" class="btn btn-outline-secondary" style="border-radius:12px; padding:.875rem 1.25rem;">
                         <i class="fas fa-home me-1"></i> Kembali ke Beranda
                     </a>
                 </div>

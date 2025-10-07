@@ -15,7 +15,7 @@
         :root {
             --admin-primary: #1e3a8a;
             --admin-secondary: #64748b;
-            --admin-accent: #2563eb;
+            --admin-accent: #0f172a;
             --admin-success: #059669;
             --admin-warning: #f59e0b;
             --admin-danger: #dc2626;
@@ -49,10 +49,10 @@
         }
         
         .login-header {
-            background: linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-accent) 100%);
+            background: var(--admin-primary);
             color: white;
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem;
             margin: -2rem -2rem 2rem -2rem;
             border-radius: 15px 15px 0 0;
         }

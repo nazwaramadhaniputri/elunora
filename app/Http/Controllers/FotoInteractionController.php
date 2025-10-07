@@ -159,4 +159,34 @@ class FotoInteractionController extends Controller
             ], 422);
         }
     }
+
+    public function listLikes(Foto $foto)
+    {
+        try {
+            $likes = FotoLike::where('foto_id', $foto->id)
+                ->with(['user:id,name,email'])
+                ->latest('id')
+                ->take(100)
+                ->get()
+                ->map(function ($like) {
+                    return [
+                        'id' => $like->id,
+                        'user_id' => optional($like->user)->id,
+                        'name' => optional($like->user)->name ?? 'Pengguna',
+                        'email' => optional($like->user)->email,
+                    ];
+                });
+            return response()->json([
+                'foto_id' => $foto->id,
+                'likes' => $likes,
+                'count' => $likes->count(),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil daftar like',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+    }
 }

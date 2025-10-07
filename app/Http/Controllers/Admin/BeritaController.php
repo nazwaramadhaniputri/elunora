@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Kategori;
 use Illuminate\Support\Str;
+use App\Models\Comment;
 
 class BeritaController extends Controller
 {
@@ -122,6 +123,16 @@ class BeritaController extends Controller
         $post->delete();
 
         return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil dihapus');
+    }
+
+    public function deleteComment(Comment $comment)
+    {
+        $postId = $comment->post_id;
+        $comment->delete();
+        if ($postId) {
+            return redirect()->route('admin.berita.show', $postId)->with('success', 'Komentar berhasil dihapus.');
+        }
+        return back()->with('success', 'Komentar berhasil dihapus.');
     }
 
     // Kategori methods
