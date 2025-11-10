@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
@@ -23,13 +24,18 @@ class Post extends Model
     {
         parent::boot();
         
-        static::creating(function ($model) {
-            $model->created_at = $model->freshTimestamp();
-            $model->updated_at = $model->freshTimestamp();
-        });
-        
-        static::updating(function ($model) {
-            $model->updated_at = $model->freshTimestamp();
+        static::saving(function ($model) {
+            // Pastikan selalu ada petugas_id
+            if (empty($model->petugas_id)) {
+                $model->petugas_id = Auth::guard('petugas')->id() ?? 1;
+            }
+            
+            // Pastikan selalu ada timestamp
+            $now = now();
+            if (empty($model->created_at)) {
+                $model->created_at = $now;
+            }
+            $model->updated_at = $now;
         });
     }
     

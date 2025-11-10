@@ -183,6 +183,50 @@
 
 @section('styles')
 <style>
+    .news-image-container {
+        position: relative;
+        width: 100%;
+        height: 0;
+        padding-bottom: 100%; /* Membuat container berbentuk persegi */
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .news-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Memastikan gambar menutupi area tanpa terdistorsi */
+        transition: transform 0.3s ease;
+    }
+    
+    .news-card:hover .news-image {
+        transform: scale(1.05);
+    }
+    
+    .news-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(30, 58, 138, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        color: white;
+        font-size: 2rem;
+    }
+    
+    .news-card:hover .news-overlay {
+        opacity: 1;
+    }
+    
 .hero-icon {
     animation: float 3s ease-in-out infinite;
 }

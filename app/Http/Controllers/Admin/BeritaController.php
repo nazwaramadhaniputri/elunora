@@ -73,104 +73,63 @@ class BeritaController extends Controller
     public function update(Request $request, $id)
     {
         // Debug: Log request data
-        \Log::info('Update request data:', $request->except(['gambar'])); // Exclude file content from log
+        \Log::info('Update request data:', $request->except(['gambar']));
         \Log::info('Has file gambar: ' . ($request->hasFile('gambar') ? 'Ya' : 'Tidak'));
         
-        $post = Post::findOrFail($id);
-        
-        // Validasi input
-        $validated = $request->validate([
-            'judul' => 'required|string|max:255',
-            'isi' => 'required|string',
-            'kategori_id' => 'required|exists:kategoris,id',
-            'status' => 'required|in:draft,published',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-        
-        // Pastikan direktori upload ada
-        $uploadPath = public_path('uploads/berita');
-        if (!file_exists($uploadPath)) {
-            if (!mkdir($uploadPath, 0755, true)) {
-                \Log::error('Gagal membuat direktori upload: ' . $uploadPath);
-                return back()->with('error', 'Gagal membuat direktori upload. Silakan hubungi administrator.');
-            }
-        }
-        
-        // Handle upload gambar baru
-        if ($request->hasFile('gambar')) {
-            // Hapus gambar lama jika ada
-            if ($post->gambar && file_exists(public_path($post->gambar))) {
-                try {
-                    unlink(public_path($post->gambar));
-                    \Log::info('Gambar lama berhasil dihapus: ' . $post->gambar);
-                } catch (\Exception $e) {
-                    \Log::error('Gagal menghapus gambar lama: ' . $e->getMessage());
-                    // Lanjutkan meskipun gagal hapus gambar lama
-                }
-            }
-            
-            // Upload gambar baru
-            $gambar = $request->file('gambar');
-            $gambarName = time() . '_' . uniqid() . '.' . $gambar->getClientOriginalExtension();
-            $gambarPath = 'uploads/berita/' . $gambarName;
-            
-            try {
-                if ($gambar->move($uploadPath, $gambarName)) {
-                    $validated['gambar'] = $gambarPath;
-                    \Log::info('Gambar baru berhasil diupload ke: ' . $gambarPath);
-                } else {
-                    throw new \Exception('Gagal memindahkan file gambar');
-                }
-            } catch (\Exception $e) {
-                \Log::error('Gagal mengunggah gambar: ' . $e->getMessage());
-                return back()
-                    ->with('error', 'Gagal mengunggah gambar. Pastikan direktori upload memiliki izin yang cukup.')
-                    ->withInput();
-            }
-        } else {
-            // Jika tidak ada gambar baru, pertahankan gambar lama
-            $validated['gambar'] = $post->gambar;
-            \Log::info('Tidak ada gambar baru diupload, menggunakan gambar lama: ' . $post->gambar);
-        }
-
-        // Pastikan petugas_id tidak null
-        if (empty($post->petugas_id)) {
-            $validated['petugas_id'] = auth()->id() ?? 1;
-            \Log::info('Mengisi petugas_id dengan nilai default: ' . $validated['petugas_id']);
-        }
-
-        // Update timestamp
-        $validated['updated_at'] = now();
-        if (empty($post->created_at)) {
-            $validated['created_at'] = now();
-        }
-
         try {
-            // Debug log data yang akan diupdate
-            \Log::info('Data yang akan diupdate:', $validated);
-            
-            // Gunakan DB transaction untuk memastikan konsistensi data
+            // Mulai transaction
             \DB::beginTransaction();
             
-            // Update data berita
-            $post->judul = $validated['judul'];
-            $post->isi = $validated['isi'];
-            $post->kategori_id = $validated['kategori_id'];
-            $post->status = $validated['status'];
-            $post->gambar = $validated['gambar'];
-            $post->petugas_id = $validated['petugas_id'] ?? $post->petugas_id;
-            $post->updated_at = $validated['updated_at'];
+            // Dapatkan post yang akan diupdate
+            $post = Post::findOrFail($id);
             
-            if (isset($validated['created_at'])) {
-                $post->created_at = $validated['created_at'];
+            // Validasi input
+            $validated = $request->validate([
+                'judul' => 'required|string|max:255',
+                'isi' => 'required|string',
+                'kategori_id' => 'required|exists:kategoris,id',
+                'status' => 'required|in:draft,published',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+            
+            // Handle upload gambar baru
+            if ($request->hasFile('gambar')) {
+                // Pastikan direktori upload ada
+                $uploadPath = public_path('uploads/berita');
+                if (!file_exists($uploadPath)) {
+                    if (!mkdir($uploadPath, 0755, true)) {
+                        throw new \Exception('Gagal membuat direktori upload');
+                    }
+                }
+                
+                // Hapus gambar lama jika ada
+                if ($post->gambar && file_exists(public_path($post->gambar))) {
+                    try {
+                        unlink(public_path($post->gambar));
+                        \Log::info('Gambar lama berhasil dihapus: ' . $post->gambar);
+                    } catch (\Exception $e) {
+                        \Log::error('Gagal menghapus gambar lama: ' . $e->getMessage());
+                        // Lanjutkan meskipun gagal hapus gambar lama
+                    }
+                }
+                
+                // Upload gambar baru
+                $gambar = $request->file('gambar');
+                $gambarName = time() . '_' . uniqid() . '.' . $gambar->getClientOriginalExtension();
+                $gambarPath = 'uploads/berita/' . $gambarName;
+                
+                if (!$gambar->move($uploadPath, $gambarName)) {
+                    throw new \Exception('Gagal memindahkan file gambar');
+                }
+                
+                $validated['gambar'] = $gambarPath;
+                \Log::info('Gambar baru berhasil diupload ke: ' . $gambarPath);
             }
             
-            $saved = $post->save();
+            // Update data
+            $post->update($validated);
             
-            if (!$saved) {
-                throw new \Exception('Gagal menyimpan data ke database');
-            }
-            
+            // Commit transaction
             \DB::commit();
             
             // Clear cache
@@ -181,15 +140,21 @@ class BeritaController extends Controller
             return redirect()->route('admin.berita.index')
                 ->with('success', 'Berita berhasil diperbarui');
                 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Tangkap error validasi
+            throw $e;
+                
         } catch (\Exception $e) {
+            // Rollback transaction jika ada error
             \DB::rollBack();
-            \Log::error('Gagal memperbarui berita: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
             
             // Hapus file gambar yang baru diupload jika ada error
-            if (isset($gambarPath) && file_exists(public_path($gambarPath))) {
-                unlink(public_path($gambarPath));
+            if (isset($gambarPath) && isset($uploadPath) && file_exists($uploadPath . '/' . $gambarName)) {
+                @unlink($uploadPath . '/' . $gambarName);
             }
+            
+            \Log::error('Gagal memperbarui berita: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
             
             return back()
                 ->with('error', 'Gagal memperbarui berita: ' . $e->getMessage())

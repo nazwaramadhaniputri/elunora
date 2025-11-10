@@ -147,59 +147,6 @@
             </div>
         @endif
         
-        <!-- Agenda Sedang Berlangsung -->
-        @if(isset($ongoingAgenda) && $ongoingAgenda->count() > 0)
-        <hr class="my-5">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-0" style="color: var(--elunora-primary-dark);">
-                <i class="fas fa-play-circle me-3" style="color: var(--elunora-primary-dark);"></i>Agenda Sedang Berlangsung
-            </h2>
-        </div>
-        
-        <div class="row g-4">
-            @foreach($ongoingAgenda as $agenda)
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm border-warning">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="card-title mb-0">{{ $agenda->judul }}</h5>
-                            <span class="badge bg-warning text-dark">
-                                <i class="fas fa-play me-1"></i>Berlangsung
-                            </span>
-                        </div>
-                        
-                        <div class="agenda-date mb-3">
-                            <span class="text-muted d-block mb-1">
-                                <i class="far fa-calendar-alt me-2"></i>{{ \Carbon\Carbon::parse($agenda->tanggal)->translatedFormat('l, d F Y') }}
-                            </span>
-                            <span class="text-muted">
-                                <i class="far fa-clock me-2"></i>{{ \Carbon\Carbon::parse($agenda->waktu_mulai)->format('H:i') }} - {{ $agenda->waktu_selesai ? \Carbon\Carbon::parse($agenda->waktu_selesai)->format('H:i') : 'Selesai' }}
-                            </span>
-                        </div>
-                        
-                        @if($agenda->lokasi)
-                        <p class="text-muted mb-3">
-                            <i class="fas fa-map-marker-alt me-2"></i>{{ $agenda->lokasi }}
-                        </p>
-                        @endif
-                        
-                        @if($agenda->deskripsi)
-                        <p class="card-text">{{ Str::limit($agenda->deskripsi, 120) }}</p>
-                        @endif
-                        
-                        <div class="d-flex justify-content-between align-items-center mt-auto pt-2">
-                            <a href="{{ route('agenda.show', $agenda->id) }}" class="btn btn-warning btn-sm">
-                                Detail <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                            <small class="text-muted">{{ $agenda->created_at->diffForHumans() }}</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        @endif
-        
         <!-- Agenda Terlaksana -->
         @if(isset($pastAgenda) && $pastAgenda->count() > 0)
         <hr class="my-5">

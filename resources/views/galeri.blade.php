@@ -37,7 +37,110 @@
     }
     
     .gallery-card-body {
-        padding: 1.25rem;
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+    
+    .gallery-card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+    
+    .gallery-card .badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+    }
+    
+    .gallery-card .btn-outline-primary {
+        border-width: 1.5px;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    
+    .gallery-card .btn-outline-primary:hover {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    
+    .gallery-footer {
+        margin-top: auto;
+        padding: 1rem 0 0;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .gallery-footer .btn-outline-primary {
+        border-radius: 6px;
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        text-transform: none;
+        background: #1e40af;
+        color: #ffffff !important;
+        border: 2px solid #1e40af;
+    }
+    
+    .gallery-footer .btn-outline-primary i {
+        color: #ffffff !important;
+    }
+    
+    .gallery-footer .btn-outline-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+        color: #ffffff !important;
+    }
+    
+    .category-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 2;
+    }
+    
+    .category-badge .badge {
+        background: rgba(30, 64, 175, 0.15) !important;
+        color: #1e40af !important;
+        font-weight: 500;
+        border-radius: 20px;
+        padding: 0.4em 1.2em;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: 1px solid rgba(30, 64, 175, 0.2);
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        line-height: 1.2;
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+    }
+    
+    .category-badge .badge i {
+        margin-right: 6px;
+        font-size: 0.9em;
+        color: #1e40af;
+    }
+    
+    
+    .gallery-footer .badge {
+        font-size: 0.75rem;
+        padding: 0.35em 0.65em;
+        font-weight: 500;
+        margin-right: 0.5rem;
     }
     
     .gallery-meta {
@@ -160,6 +263,7 @@
             
             <!-- Daftar Galeri -->
             <div class="col-lg-8">
+                <!-- Search Bar -->
                 <div class="mb-3 position-relative">
                     <input type="text" class="form-control js-page-search" placeholder="Cari galeri..." aria-label="Cari galeri" data-target=".col-md-6.mb-4" style="padding-right: 40px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
                     <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="z-index: 10; color: #1e3a8a;">
@@ -173,13 +277,9 @@
                         <a href="{{ route('galeri') }}" class="btn btn-sm btn-chip {{ !request('category') ? 'active' : '' }}">
                             Semua
                         </a>
-                        @php
-                        $categories = \App\Models\GalleryCategory::where('status', 1)->get();
-                        @endphp
-                        
                         @foreach($categories as $category)
-                        <a href="{{ route('galeri', ['category' => $category->slug]) }}" 
-                           class="btn btn-sm btn-chip {{ request('category') == $category->slug ? 'active' : '' }}">
+                        <a href="{{ route('galeri', ['category' => $category->id]) }}" 
+                           class="btn btn-sm btn-chip {{ request('category') == $category->id ? 'active' : '' }}">
                             {{ $category->name }}
                         </a>
                         @endforeach
@@ -189,7 +289,15 @@
                 @forelse($galeris as $galeri)
                 <div class="col-md-6 mb-4">
                     <div class="gallery-card">
-                        <div class="gallery-img-container">
+                        <div class="gallery-img-container position-relative">
+                            @if($galeri->category)
+                                <div class="category-badge">
+                                    <span class="badge">
+                                        <i class="fas fa-tag"></i>
+                                        {{ strtoupper($galeri->category->name) }}
+                                    </span>
+                                </div>
+                            @endif
                             @if($galeri->fotos->count() > 0)
                                 <!-- Gallery Grid Preview -->
                                 <div class="gallery-preview" style="height: 280px; position: relative;">
@@ -273,22 +381,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="gallery-card-body">
-                            @if($galeri->category)
-                                <div class="mb-2">
-                                    <span class="badge bg-primary">{{ $galeri->category->name }}</span>
-                                </div>
-                            @endif
-                            <h5 class="card-title">{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri Tanpa Judul') }}</h5>
-                            <p class="card-text">{{ Str::limit($galeri->deskripsi ?? ($galeri->post ? strip_tags($galeri->post->isi) : 'Deskripsi tidak tersedia'), 100) }}</p>
-                            <div class="gallery-bottom">
-                                <div>
-                                    <small class="gallery-date"><i class="far fa-calendar-alt"></i> {{ $galeri->created_at->format('d M Y') }}</small>
+                        <div class="gallery-card-body d-flex flex-column h-100">
+                            <h5 class="card-title mb-2">{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri Tanpa Judul') }}</h5>
+                            
+                            <p class="card-text flex-grow-1">{{ Str::limit($galeri->deskripsi ?? ($galeri->post ? strip_tags($galeri->post->isi) : 'Deskripsi tidak tersedia'), 100) }}</p>
+                            
+                            <div class="gallery-footer">
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i>{{ $galeri->created_at->format('d M Y') }}
+                                    </small>
                                     @if($galeri->fotos->count() > 0)
-                                        <small class="ms-2"><i class="fas fa-images"></i> {{ $galeri->fotos->count() }} Foto</small>
+                                        <small class="text-muted ms-2">
+                                            <i class="fas fa-images me-1"></i>{{ $galeri->fotos->count() }}
+                                        </small>
                                     @endif
                                 </div>
-                                <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-sm btn-primary btn-view">Lihat <i class="fas fa-arrow-right ms-1"></i></a>
+                                <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-outline-primary">
+                                    Lihat <i class="fas fa-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

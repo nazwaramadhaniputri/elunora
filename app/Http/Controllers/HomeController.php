@@ -55,18 +55,19 @@ class HomeController extends Controller
     public function galeri()
     {
         $query = Galeri::where('status', 1)->with(['fotos', 'category']);
-        $slug = request('category');
-        if ($slug) {
-            $cat = \App\Models\GalleryCategory::where('status', 1)->where('slug', $slug)->first();
-            if ($cat) {
-                $query->where('category_id', $cat->id);
-            } else {
-                // No matching category -> show empty result page
-                $query->whereRaw('1 = 0');
-            }
+        $categoryId = request('category');
+        
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
         }
-        $galeris = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
-        return view('galeri', compact('galeris'));
+        
+        $galeris = $query->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+            
+        $categories = \App\Models\GalleryCategory::where('status', 1)->get();
+        
+        return view('galeri', compact('galeris', 'categories'));
     }
     
     public function galeriDetail($id)
