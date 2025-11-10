@@ -12,40 +12,77 @@ class GaleriController extends Controller
 {
     public function index()
     {
-        $galeris = Galeri::with(['post', 'fotos'])->latest()->paginate(10);
+        $galeris = Galeri::with(['post', 'fotos', 'category'])->latest()->paginate(10);
         return view('admin.galeri.index', compact('galeris'));
     }
 
     public function create()
     {
         $posts = Post::where('status', 'published')->get();
-        return view('admin.galeri.create', compact('posts'));
+        $categories = \App\Models\GalleryCategory::where('status', true)->get();
+        return view('admin.galeri.create', compact('posts', 'categories'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'post_id' => 'nullable|exists:posts,id',
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-            'position' => 'required|integer|min:0',
-            'status' => 'required|in:0,1',
-        ]);
-
-        $galeri = Galeri::create([
-            'post_id' => $request->post_id,
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi ?? 'Deskripsi galeri',
-            'position' => $request->position,
-            'status' => $request->status,
-        ]);
-
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Galeri berhasil dibuat',
-                'galeri' => $galeri
+        try {
+            $validated = $request->validate([
+                'judul' => 'required|string|max:255',
+                'deskripsi' => 'nullable|string',
+                'category_id' => 'required|exists:gallery_categories,id',
+                'position' => 'required|integer|min:0',
+                'status' => 'required|in:0,1',
+                'post_id' => 'nullable|exists:posts,id',
+            ], [
+                'judul.required' => 'Judul galeri harus diisi',
+                'category_id.required' => 'Kategori galeri harus dipilih',
+                'category_id.exists' => 'Kategori yang dipilih tidak valid',
+                'position.required' => 'Posisi harus diisi',
+                'status.required' => 'Status harus dipilih',
+                'post_id.exists' => 'Berita yang dipilih tidak valid',
             ]);
+
+            $galeri = Galeri::create([
+                'judul' => $validated['judul'],
+                'deskripsi' => $validated['deskripsi'] ?? null,
+                'category_id' => $validated['category_id'],
+                'position' => $validated['position'],
+                'status' => $validated['status'],
+                'post_id' => $validated['post_id'] ?? null,
+            ]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Galeri berhasil dibuat',
+                    'redirect' => route('admin.galeri.index')
+                ]);
+            }
+
+            return redirect()->route('admin.galeri.index')
+                ->with('success', 'Galeri berhasil dibuat');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                    'message' => 'Validasi gagal'
+                ], 422);
+            }
+            return back()->withErrors($e->errors())->withInput();
+                
+        } catch (\Exception $e) {
+            \Log::error('Error creating gallery: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return back()->withInput()->with('error', 'Gagal membuat galeri. Silakan coba lagi.');
         }
 
         return redirect()->route('admin.galeri.index')->with('success', 'Galeri berhasil ditambahkan');
@@ -79,29 +116,62 @@ class GaleriController extends Controller
     {
         $galeri = Galeri::findOrFail($id);
         $posts = Post::where('status', 'published')->get();
-        return view('admin.galeri.edit', compact('galeri', 'posts'));
+        $categories = \App\Models\GalleryCategory::where('status', true)->get();
+        return view('admin.galeri.edit', compact('galeri', 'posts', 'categories'));
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        $validated = $request->validate([
             'post_id' => 'nullable|exists:posts,id',
             'judul' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
+            'category_id' => 'required|exists:gallery_categories,id',
             'position' => 'required|integer|min:0',
             'status' => 'required|in:0,1',
+        ], [
+            'judul.required' => 'Judul galeri harus diisi',
+            'category_id.required' => 'Kategori galeri harus dipilih',
+            'category_id.exists' => 'Kategori yang dipilih tidak valid',
+            'position.required' => 'Posisi harus diisi',
+            'status.required' => 'Status harus dipilih',
+            'post_id.exists' => 'Berita yang dipilih tidak valid',
         ]);
 
-        $galeri = Galeri::findOrFail($id);
-        $galeri->update([
-            'post_id' => $request->post_id,
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi ?? 'Deskripsi galeri',
-            'position' => $request->position,
-            'status' => $request->status,
-        ]);
+        try {
+            $galeri = Galeri::findOrFail($id);
+            $galeri->update([
+                'post_id' => $validated['post_id'] ?? null,
+                'judul' => $validated['judul'],
+                'deskripsi' => $validated['deskripsi'] ?? null,
+                'category_id' => $validated['category_id'],
+                'position' => $validated['position'],
+                'status' => $validated['status'],
+            ]);
 
-        return redirect()->route('admin.galeri.index')->with('success', 'Galeri berhasil diperbarui');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Galeri berhasil diperbarui',
+                    'redirect' => route('admin.galeri.index')
+                ]);
+            }
+
+            return redirect()->route('admin.galeri.index')
+                ->with('success', 'Galeri berhasil diperbarui');
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating gallery: ' . $e->getMessage());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                ], 500);
+            }
+            
+            return back()->withInput()->with('error', 'Gagal memperbarui galeri. Silakan coba lagi.');
+        }
     }
 
     public function destroy($id)
@@ -151,6 +221,7 @@ class GaleriController extends Controller
                 'galery_id' => $galeri->id,
                 'judul' => $request->judul ?? 'Foto Galeri',
                 'file' => 'uploads/galeri/' . $fileName,
+                'uploader_name' => auth()->user()->name ?? 'Admin',
             ]);
 
             return redirect()->route('admin.galeri.show', $galeri->id)->with('success', 'Foto berhasil ditambahkan.');

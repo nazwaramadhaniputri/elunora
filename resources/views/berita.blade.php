@@ -36,8 +36,30 @@
         <div class="row">
             <!-- Daftar Berita -->
             <div class="col-lg-8">
-                <div class="mb-3">
-                    <input type="text" class="form-control js-page-search" placeholder="Cari berita..." aria-label="Cari berita" data-target="article.news-card">
+                <div class="mb-3 position-relative">
+                    <input type="text" class="form-control js-page-search" placeholder="Cari berita..." aria-label="Cari berita" data-target="article.news-card" style="padding-right: 40px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="z-index: 10; color: #1e3a8a;">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+                
+                <!-- Filter Kategori -->
+                <div class="mb-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ route('berita') }}" class="btn btn-sm btn-chip {{ !request('category') ? 'active' : '' }}">
+                            Semua
+                        </a>
+                        @php
+                        $categories = \App\Models\Kategori::all();
+                        @endphp
+                        
+                        @foreach($categories as $category)
+                        <a href="{{ route('berita', ['category' => $category->id]) }}" 
+                           class="btn btn-sm btn-chip {{ request('category') == $category->id ? 'active' : '' }}">
+                            {{ $category->nama_kategori }}
+                        </a>
+                        @endforeach
+                    </div>
                 </div>
                 @forelse($posts as $berita)
                 <article class="news-card mb-4">
@@ -96,15 +118,16 @@
                     </div>
                     <div class="card-body">
                         @php
-                        $kategoris = \App\Models\Kategori::withCount(['posts' => function($query) {
-                            $query->where('status', 'published');
-                        }])->having('posts_count', '>', 0)->get();
+                        $kategoris = \App\Models\Kategori::withCount('posts')
+                            ->orderBy('nama_kategori')
+                            ->get();
                         @endphp
-                        
                         <ul class="list-group list-group-flush">
                             @forelse($kategoris as $kategori)
-                            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                {{ $kategori->nama_kategori }}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{{ route('berita', ['category' => $kategori->id]) }}" class="text-decoration-none">
+                                    {{ $kategori->nama_kategori }}
+                                </a>
                                 <span class="badge bg-success rounded-pill">{{ $kategori->posts_count }}</span>
                             </li>
                             @empty
@@ -129,9 +152,9 @@
                         
                         <ul class="list-group list-group-flush">
                             @forelse($beritaTerbaru as $item)
-                            <li class="list-group-item px-0">
-                                <a href="{{ route('berita.detail', $item->id) }}" class="text-decoration-none">
-                                    <div class="d-flex">
+                            <li class="list-group-item">
+                                <a href="{{ route('berita.detail', $item->id) }}" class="text-decoration-none d-block py-2">
+                                    <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0 me-3">
                                             @if($item->gambar)
                                             <img src="{{ asset($item->gambar) }}" class="rounded" width="60" height="60" alt="{{ $item->judul }}" style="object-fit: cover;">
@@ -209,7 +232,8 @@
 }
 
 .news-card:hover .news-image {
-    transform: scale(1.05);
+    /* Menghilangkan efek zoom */
+    transform: none;
 }
 
 .news-overlay {

@@ -35,6 +35,20 @@ Route::post('/kontak', [HomeController::class, 'kirimPesan'])->name('kontak.kiri
 Route::get('/agenda', [AgendaController::class, 'index'])->name('agenda');
 Route::get('/agenda/{id}', [AgendaController::class, 'show'])->name('agenda.show');
 Route::get('/fasilitas', [HomeController::class, 'fasilitasAll'])->name('fasilitas');
+Route::get('/kategori', [App\Http\Controllers\KategoriController::class, 'index'])->name('kategori');
+Route::get('/kategori/{id}', [App\Http\Controllers\KategoriController::class, 'show'])->name('kategori.show');
+
+// Rute untuk fitur upload foto pengunjung
+Route::get('/user-photos', [App\Http\Controllers\UserPhotoController::class, 'index'])->name('user-photos.index');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/my-photos', [App\Http\Controllers\UserPhotoController::class, 'myPhotos'])->name('user-photos.my-photos');
+    Route::get('/user-photos/create', [App\Http\Controllers\UserPhotoController::class, 'create'])->name('user-photos.create');
+    Route::post('/user-photos', [App\Http\Controllers\UserPhotoController::class, 'store'])->name('user-photos.store');
+    Route::get('/user-photos/{id}/edit', [App\Http\Controllers\UserPhotoController::class, 'edit'])->name('user-photos.edit');
+    Route::put('/user-photos/{id}', [App\Http\Controllers\UserPhotoController::class, 'update'])->name('user-photos.update');
+    Route::delete('/user-photos/{id}', [App\Http\Controllers\UserPhotoController::class, 'destroy'])->name('user-photos.destroy');
+});
+Route::get('/user-photos/{id}', [App\Http\Controllers\UserPhotoController::class, 'show'])->name('user-photos.show');
 
 // AJAX endpoints for Foto interactions (guest)
 Route::prefix('ajax')->group(function () {
@@ -44,6 +58,8 @@ Route::prefix('ajax')->group(function () {
     Route::get('/fotos/{foto}/comments', [FotoInteractionController::class, 'listComments'])->name('ajax.fotos.comments');
     Route::post('/fotos/{foto}/comments', [FotoInteractionController::class, 'addComment'])->name('ajax.fotos.comments.add');
     Route::get('/fotos/{foto}/likes', [FotoInteractionController::class, 'listLikes'])->name('ajax.fotos.likes');
+    // Recent likes (for admin navbar notifications)
+    Route::get('/likes/recent', [FotoInteractionController::class, 'recentLikes'])->name('ajax.likes.recent');
 });
 
 
@@ -71,15 +87,23 @@ Route::post('/admin/reset-password', [AuthController::class, 'resetPassword'])->
 // Rute untuk admin (tanpa middleware - sesuai sistem asli)
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/latest', [DashboardController::class, 'latest'])->name('dashboard.latest');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     // Admin account profile
     Route::get('/account/profile', [AdminProfileController::class, 'edit'])->name('account.profile');
     Route::put('/account/profile', [AdminProfileController::class, 'update'])->name('account.profile.update');
 
     // Admin Galeri routes
+    Route::get('galeri/test-modal', function () { return view('admin.galeri.test-modal'); })->name('galeri.test-modal');
     Route::resource('galeri', GaleriController::class);
     Route::get('galeri/{id}/add-photo', [GaleriController::class, 'addPhoto'])->name('galeri.add-photo');
     Route::post('galeri/{id}/store-photo', [GaleriController::class, 'storePhoto'])->name('galeri.store-photo');
+    
+    // Gallery Categories routes
+    Route::resource('gallery-categories', \App\Http\Controllers\Admin\GalleryCategoryController::class)->except(['show']);
+    Route::post('gallery-categories/list', [\App\Http\Controllers\Admin\GalleryCategoryController::class, 'getCategoriesJson'])->name('gallery-categories.list');
+    
+    // Gallery Photo routes
     Route::put('galeri/photo/{id}', [GaleriController::class, 'updatePhoto'])->name('galeri.update-photo');
     Route::delete('galeri/photo/{id}', [GaleriController::class, 'deletePhoto'])->name('galeri.delete-photo');
     
@@ -117,4 +141,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::delete('galeri/comment/{comment}', [GaleriController::class, 'deleteComment'])->name('galeri.delete-comment');
     // Moderasi komentar berita (admin)
     Route::delete('berita/comment/{comment}', [BeritaController::class, 'deleteComment'])->name('berita.delete-comment');
+    
+    // User Photos management
+    Route::get('/user-photos', [App\Http\Controllers\Admin\UserPhotoController::class, 'index'])->name('user-photos.index');
+    Route::get('/user-photos/approved', [App\Http\Controllers\Admin\UserPhotoController::class, 'approved'])->name('user-photos.approved');
+    Route::get('/user-photos/rejected', [App\Http\Controllers\Admin\UserPhotoController::class, 'rejected'])->name('user-photos.rejected');
+    Route::get('/user-photos/{id}', [App\Http\Controllers\Admin\UserPhotoController::class, 'show'])->name('user-photos.show');
+    Route::post('/user-photos/{id}/approve', [App\Http\Controllers\Admin\UserPhotoController::class, 'approve'])->name('user-photos.approve');
+    Route::post('/user-photos/{id}/reject', [App\Http\Controllers\Admin\UserPhotoController::class, 'reject'])->name('user-photos.reject');
 });

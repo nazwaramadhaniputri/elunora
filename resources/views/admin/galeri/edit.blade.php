@@ -99,7 +99,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="deskripsi">Deskripsi</label>
                             <textarea class="form-control @error('deskripsi') is-invalid @enderror" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi', $galeri->deskripsi) }}</textarea>
@@ -108,19 +108,74 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="post_id">Berita Terkait</label>
-                            <select class="form-control @error('post_id') is-invalid @enderror" id="post_id" name="post_id">
-                                <option value="">-- Pilih Berita (Opsional) --</option>
-                                @foreach($posts as $post)
-                                <option value="{{ $post->id }}" {{ old('post_id', $galeri->post_id) == $post->id ? 'selected' : '' }}>{{ $post->judul }}</option>
+                            <label for="category_id">Kategori Galeri *</label>
+                            <select class="form-control @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
+                                <option value="">Pilih Kategori</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ (old('category_id', $galeri->category_id) == $category->id) ? 'selected' : '' }}>{{ $category->name }}</option>
                                 @endforeach
                             </select>
-                            <small class="form-text text-muted">Pilih berita yang terkait dengan galeri ini (opsional).</small>
+                            @error('category_id')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="post_id">Terkait Berita (Opsional)</label>
+                            <select class="form-control @error('post_id') is-invalid @enderror" id="post_id" name="post_id">
+                                <option value="">Pilih Berita</option>
+                                @foreach($posts as $post)
+                                    <option value="{{ $post->id }}" {{ (old('post_id', $galeri->post_id) == $post->id) ? 'selected' : '' }}>{{ $post->judul }}</option>
+                                @endforeach
+                            </select>
                             @error('post_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="position">Posisi</label>
+                            <input type="number" class="form-control @error('position') is-invalid @enderror" id="position" name="position" value="{{ old('position', $galeri->position) }}" min="0" required>
+                            <small class="form-text text-muted">Urutan tampilan galeri (angka lebih kecil akan ditampilkan lebih dulu).</small>
+                            @error('position')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
+                                <option value="0" {{ (old('status', $galeri->status) == '0') ? 'selected' : '' }}>Draft</option>
+                                <option value="1" {{ (old('status', $galeri->status) == '1') ? 'selected' : '' }}>Publikasikan</option>
+                            </select>
+                            @error('status')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="mb-3">
+                                <label for="post_id" class="form-label">Terkait Berita (Opsional)</label>
+                                <select class="form-control" id="post_id" name="post_id">
+                                    <option value="">Pilih Berita</option>
+                                    @foreach($posts as $post)
+                                        <option value="{{ $post->id }}" {{ old('post_id', $galeri->post_id) == $post->id ? 'selected' : '' }}>{{ $post->judul }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="category_id" class="form-label">Kategori Galeri</label>
+                                <select class="form-control" id="category_id" name="category_id" required>
+                                    <option value="">Pilih Kategori</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id', $galeri->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <small class="form-text text-muted">Pilih berita yang terkait dengan galeri ini (opsional).</small>
                         </div>
                         
                         <div class="form-group">
@@ -191,7 +246,6 @@
                         @empty
                         <div class="col-12 text-center py-4">
                             <i class="fas fa-images fa-3x text-gray-300 mb-3"></i>
-                            <p>Belum ada foto dalam galeri ini.</p>
                         </div>
                         @endforelse
                     </div>

@@ -58,7 +58,7 @@
 
                                         <div class="form-group mb-4">
                                             <label for="lokasi" class="form-label fw-bold">Lokasi <span class="text-danger">*</span></label>
-                                            <div class="input-group">
+                                            <div class="input-group merged">
                                                 <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt text-primary"></i></span>
                                                 <input type="text" class="form-control @error('lokasi') is-invalid @enderror" 
                                                        id="lokasi" name="lokasi" value="{{ old('lokasi') }}" required
@@ -86,28 +86,25 @@
 
                             <div class="col-lg-4">
                                 <div class="card border-0 shadow-sm h-100">
-                                    <div class="card-body">
-                                        <h5 class="fw-bold text-primary mb-4">
-                                            <i class="far fa-clock me-2"></i>Waktu & Kategori
-                                        </h5>
-                                        
-                                        <div class="mb-4">
-                                            <label for="tanggal" class="form-label fw-bold">Tanggal <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light"><i class="far fa-calendar text-primary"></i></span>
-                                                <input type="date" class="form-control @error('tanggal') is-invalid @enderror" 
-                                                       id="tanggal" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" required>
-                                                @error('tanggal')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <label class="form-label fw-bold">Waktu <span class="text-danger">*</span></label>
+                                        <div class="card-body">
+                                            <h5 class="fw-bold text-primary mb-4">
+                                                <i class="far fa-clock me-2"></i>Waktu & Kategori
+                                            </h5>
+                                            <div class="mb-4">
+                                            <label class="form-label fw-bold">Tanggal & Waktu <span class="text-danger">*</span></label>
                                             <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <div class="input-group">
+                                                <div class="col-12">
+                                                    <div class="input-group merged">
+                                                        <span class="input-group-text bg-light"><i class="far fa-calendar text-primary"></i></span>
+                                                        <input type="date" class="form-control @error('tanggal') is-invalid @enderror" 
+                                                               id="tanggal" name="tanggal" value="{{ old('tanggal', date('Y-m-d')) }}" required>
+                                                        @error('tanggal')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="input-group merged">
                                                         <span class="input-group-text bg-light"><i class="far fa-clock text-primary"></i></span>
                                                         <input type="time" class="form-control @error('waktu_mulai') is-invalid @enderror" 
                                                                id="waktu_mulai" name="waktu_mulai" value="{{ old('waktu_mulai', '08:00') }}" required>
@@ -115,22 +112,19 @@
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <div class="form-text text-center">Mulai</div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="input-group">
+                                                <div class="col-12">
+                                                    <div class="input-group merged">
                                                         <span class="input-group-text bg-light"><i class="far fa-clock text-primary"></i></span>
                                                         <input type="time" class="form-control @error('waktu_selesai') is-invalid @enderror" 
-                                                               id="waktu_selesai" name="waktu_selesai" value="{{ old('waktu_selesai', '10:00') }}">
+                                                               id="waktu_selesai" name="waktu_selesai" value="{{ old('waktu_selesai', '10:00') }}" required>
                                                         @error('waktu_selesai')
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <div class="form-text text-center">Selesai</div>
                                                 </div>
                                             </div>
                                         </div>
-
                                         <div class="mb-4">
                                             <label for="kategori" class="form-label fw-bold">Kategori <span class="text-danger">*</span></label>
                                             <select class="form-select @error('kategori') is-invalid @enderror" 
@@ -148,22 +142,13 @@
                                             @enderror
                                         </div>
 
-                                        <div class="mb-4">
-                                            <label for="status" class="form-label fw-bold">Status <span class="text-danger">*</span></label>
-                                            <select class="form-select @error('status') is-invalid @enderror" 
-                                                    id="status" name="status" required>
-                                                <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Published</option>
-                                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Draft</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+                                            </div>
                                         </div>
-
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="row mt-4">
                             <div class="col-12">
                                 <div class="d-flex justify-content-center align-items-center gap-2 border-top pt-4 flex-wrap">
@@ -209,12 +194,42 @@
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: 0; /* merge with input visually */
-        height: 44px;
+        height: 42px; /* equalize height */
+        display: flex;
+        align-items: center;
+        padding: 0 0.75rem;
+        min-width: 42px;
+        justify-content: center;
+        background: #fff;
+        border: 1px solid #e2e8f0; /* explicit border to match input */
+    }
+    .input-group { display: flex !important; align-items: stretch; flex-wrap: nowrap !important; gap: 0; }
+    /* Unified box by styling the group container */
+    .input-group.merged { border: 1px solid #e2e8f0 !important; border-radius: 8px !important; overflow: hidden; background:#fff; }
+    .input-group > .input-group-text { border-right: 0 !important; background:#fff !important; border:0 !important; }
+    .input-group > .input-group-text + .form-control {
+        border-left: 0 !important; /* merge with input-group-text */
     }
     .input-group .form-control {
-        border-left: 0; /* merge with input-group-text */
-        height: 44px;
+        border-left: 0 !important; /* safety */
+        height: 42px; /* prevent clipping */
+        padding: 0.5rem 0.75rem;
+        flex: 1 1 auto;
+        border: 0 !important;
+        border-top-left-radius: 0; /* visually merge with icon */
+        border-bottom-left-radius: 0;
+        background: #fff !important;
+        box-shadow: none !important;
     }
+    .input-group .form-control:focus {
+        border-color: #cbd5e1 !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+    .form-check.form-check-inline { margin-right: 1rem; }
+    .form-check-input { width: 1rem !important; height: 1rem !important; border-radius: 50% !important; aspect-ratio: 1/1; }
+    .row.g-3 > [class^="col-"], .row.g-3 > [class*=" col-"] { min-width: 0; }
+    .form-check-input { width: 1rem !important; height: 1rem !important; border-radius: 50% !important; aspect-ratio: 1 / 1; vertical-align: middle; }
     /* Add top breathing space so focus ring is not cut */
     .form-group, .mb-4 { scroll-margin-top: 80px; }
     .form-group .form-control, .mb-4 .form-control, .mb-4 .form-select { margin-top: 2px; }

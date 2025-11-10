@@ -36,7 +36,35 @@ class FotoInteractionController extends Controller
                 'hint' => $hint,
             ], 422);
         }
+    }
 
+    public function recentLikes(Request $request)
+    {
+        try {
+            $limit = (int) ($request->query('limit', 10));
+            if ($limit < 1 || $limit > 50) { $limit = 10; }
+            $likes = \App\Models\FotoLike::with(['user:id,name', 'foto:id,judul,galery_id'])
+                ->latest('id')
+                ->take($limit)
+                ->get()
+                ->map(function($like){
+                    return [
+                        'id' => $like->id,
+                        'user_name' => optional($like->user)->name ?? 'Pengguna',
+                        'foto_id' => optional($like->foto)->id,
+                        'foto_title' => optional($like->foto)->judul ?? 'Foto',
+                        'galery_id' => optional($like->foto)->galery_id,
+                        'created_at' => optional($like->created_at)->toDateTimeString(),
+                    ];
+                });
+            return response()->json(['data' => $likes]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengambil notifikasi like',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
     }
 
     public function decrementLike(Foto $foto)

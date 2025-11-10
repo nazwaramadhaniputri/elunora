@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Foto extends Model
 {
-    protected $fillable = ['galery_id', 'file', 'judul', 'likes_count'];
+    protected $fillable = ['galery_id', 'file', 'judul', 'uploader_name', 'likes_count'];
     
     public $timestamps = false;
     

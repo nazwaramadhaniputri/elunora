@@ -29,9 +29,13 @@ class HomeController extends Controller
     
     public function berita()
     {
-        $posts = Post::where('status', 'published')->with('kategori')->paginate(9);
+        $query = Post::where('status', 'published')->with('kategori');
+        $categoryId = request('category');
+        if ($categoryId) {
+            $query->where('kategori_id', $categoryId);
+        }
+        $posts = $query->orderBy('created_at', 'desc')->paginate(9)->withQueryString();
         $kategoris = Kategori::all();
-        
         return view('berita', compact('posts', 'kategoris'));
     }
     
@@ -50,16 +54,41 @@ class HomeController extends Controller
     
     public function galeri()
     {
-        $galeris = Galeri::where('status', 1)->with('fotos')->paginate(12);
-        
+        $query = Galeri::where('status', 1)->with(['fotos', 'category']);
+        $slug = request('category');
+        if ($slug) {
+            $cat = \App\Models\GalleryCategory::where('status', 1)->where('slug', $slug)->first();
+            if ($cat) {
+                $query->where('category_id', $cat->id);
+            } else {
+                // No matching category -> show empty result page
+                $query->whereRaw('1 = 0');
+            }
+        }
+        $galeris = $query->orderBy('created_at', 'desc')->paginate(12)->withQueryString();
         return view('galeri', compact('galeris'));
     }
     
     public function galeriDetail($id)
     {
-        $galeri = Galeri::where('status', 1)->with('fotos')->findOrFail($id);
+        $galeri = Galeri::where('status', 1)
+            ->with(['fotos', 'category', 'post'])
+            ->findOrFail($id);
         
-        return view('galeri-detail', compact('galeri'));
+        // Get related galleries (same category, excluding current)
+        $relatedGaleris = Galeri::where('status', 1)
+            ->where('id', '!=', $id)
+            ->where(function($query) use ($galeri) {
+                if ($galeri->category_id) {
+                    $query->where('category_id', $galeri->category_id);
+                }
+            })
+            ->with('fotos')
+            ->orderBy('created_at', 'desc')
+            ->take(4)
+            ->get();
+        
+        return view('galeri-detail', compact('galeri', 'relatedGaleris'));
     }
     
     public function profil()

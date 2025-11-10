@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="{{ asset('css/global-spacing.css') }}">
     <!-- Elunora Theme CSS -->
     <link rel="stylesheet" href="{{ asset('css/elunora-theme.css') }}">
+    <!-- Animations CSS -->
+    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
     <!-- Custom CSS -->
     <style>
         /* Full-bleed layout: remove side paddings ONLY for the top-level layout container */
@@ -50,6 +52,7 @@
             color: #495057;
             min-height: 100vh;
             margin: 0; /* eliminate default browser margin causing top line */
+            overflow-x: hidden; /* prevent horizontal scrollbars */
         }
         
         .sidebar {
@@ -61,7 +64,7 @@
         }
 
         /* Provide a minimal gutter so content cards never stick to sidebar */
-        .content { padding-left: 0.5rem; }
+        .content { padding-left: 0.5rem; padding-bottom: 2rem; }
         @media (min-width: 992px) { .content { padding-left: 0.75rem; } }
         
         .sidebar .nav-item {
@@ -94,6 +97,36 @@
             width: 20px;
             text-align: center;
         }
+        
+        /* Foto Pengunjung menu highlight */
+        .sidebar .nav-item .nav-link.active-foto-pengunjung {
+            color: #ffffff !important;
+            background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-accent));
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.35) !important;
+        }
+        
+        /* Script para añadir el enlace de Foto Pengunjung */
+        document.addEventListener('DOMContentLoaded', function() {
+            // Buscar el contenedor de navegación
+            var sidebarNav = document.querySelector('.sidebar .nav');
+            if (sidebarNav) {
+                // Crear el elemento para Foto Pengunjung
+                var fotoPengunjungItem = document.createElement('li');
+                fotoPengunjungItem.className = 'nav-item';
+                fotoPengunjungItem.innerHTML = `
+                    <a class="nav-link ${window.location.pathname.includes('/admin/user-photos') ? 'active-foto-pengunjung' : ''}" 
+                       href="{{ route('admin.user-photos.index') }}">
+                        <i class="fas fa-camera"></i>
+                        <span>Foto Pengunjung</span>
+                    </a>
+                `;
+                
+                // Insertar en la posición adecuada
+                sidebarNav.appendChild(fotoPengunjungItem);
+            }
+        });
+        
+
         
         /* Remove yellow/orange colors */
         .btn-warning {
@@ -147,6 +180,7 @@
             padding: 2rem;
             min-height: 100vh;
             background: transparent;
+            overflow-x: hidden; /* contain any wide children */
         }
         
         @media (min-width: 768px) {
@@ -277,7 +311,8 @@
         
         .table tbody tr:hover {
             background-color: var(--admin-light);
-            transform: scale(1.01);
+            /* remove scale to avoid horizontal slide/scrollbars */
+            transform: none;
         }
         
         .table tbody td {
@@ -533,12 +568,23 @@
             border-radius: 0; /* no rounded corners */
             margin-left: 0 !important;
             margin-right: 0 !important; /* eliminate right gap */
-            width: 100% !important;
+            width: 100% !important; /* avoid subpixel overflow */
             padding-left: 1.25rem; /* a bit more space from sidebar */
             padding-right: 0.75rem; /* give a little breathing room on right */
             padding-top: 0.5rem; /* tighter top */
             padding-bottom: 0.5rem; /* tighter bottom */
         }
+
+        /* Remove subtle bottom line under sidebar brand that can look like a seam */
+        .elunora-admin-brand { border-bottom: none !important; }
+
+        /* Ensure any top-level containers inside content cannot cause horizontal scroll */
+        .content, .content > *, .container-fluid, .container, .row {
+            max-width: 100%;
+        }
+
+        /* Add a little extra breathing room under page header */
+        .page-header-modern { margin-bottom: 1.5rem; }
         .content > .d-flex.border-bottom h1,
         .content > .d-flex.border-bottom .h2,
         .content > .d-flex.border-bottom i {
@@ -823,7 +869,8 @@
         
         .modern-table tbody tr:hover {
             background: rgba(37, 99, 235, 0.05);
-            transform: scale(1.01);
+            /* remove scale to avoid horizontal slide/scrollbars */
+            transform: none;
         }
         
         .modern-table tbody td {
@@ -1073,15 +1120,23 @@
         
         .empty-gallery-image {
             height: 100%;
-            display: flex;
+            display: flex !important;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(37, 99, 235, 0.05);
+            padding: 2rem;
             color: #6c757d;
+            position: relative;
         }
         
-        .empty-gallery-image p {
+        .empty-gallery-image::after {
+            display: none !important; /* Menghilangkan pseudo-element yang mungkin menampilkan teks */
+            content: '';
+        }
+        
+        .empty-gallery-image p,
+        .empty-gallery-image .empty-text {
+            display: none !important; /* Menyembunyikan teks "Belum ada foto" */
             margin: 0;
             font-weight: 500;
         }
@@ -1167,6 +1222,12 @@
             border: none;
             box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
+        /* Dialog spacing (balanced, seperti semula) */
+        .modal-dialog { margin: 1.75rem auto; }
+        .modal-dialog.modal-xl { margin: 2rem auto; }
+        /* Keep footer always visible by constraining content height */
+        .modal-dialog-scrollable .modal-content { max-height: calc(100vh - 2rem); }
+        .modal-dialog-scrollable .modal-body { overflow-y: auto; }
         
         .modal-header {
             background: var(--elunora-primary);
@@ -1184,9 +1245,22 @@
         }
         
         .modal-footer {
-            padding: 1.5rem 2rem;
+            padding: 1.5rem 2rem 2rem; /* slightly tighter bottom spacing */
             border-top: 1px solid #e9ecef;
         }
+
+        /* Fine-tune for Berita modals: no internal scroll, slightly tighter spacing */
+        #modalCreateBerita .modal-dialog,
+        #modalEditBerita .modal-dialog { margin: 2rem auto; }
+        #modalCreateBerita .modal-content,
+        #modalEditBerita .modal-content { max-height: none; }
+        #modalCreateBerita .modal-body,
+        #modalEditBerita .modal-body { overflow: visible; }
+        #modalCreateBerita .modal-footer,
+        #modalEditBerita .modal-footer { padding-bottom: 2.25rem; }
+
+        /* Lock page scroll when any Bootstrap modal is open (in case overrides disable it) */
+        body.modal-open { overflow: hidden !important; }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -1598,8 +1672,13 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.galeri.*') ? 'active' : '' }}" href="{{ route('admin.galeri.index') }}">
+                            <a class="nav-link {{ request()->routeIs('admin.galeri.*') && !request()->routeIs('admin.gallery-categories.*') ? 'active' : '' }}" href="{{ route('admin.galeri.index') }}">
                                 <i class="fas fa-images me-2"></i> Galeri
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.gallery-categories.*') ? 'active' : '' }}" href="{{ route('admin.gallery-categories.index') }}">
+                                <i class="fas fa-tags me-2"></i> Kategori Galeri
                             </a>
                         </li>
                         <li class="nav-item">
@@ -1642,16 +1721,19 @@
                         $yieldHeader = trim($__env->yieldContent('header') ?? '');
                         $routeName = optional(request()->route())->getName();
                         $segmentLast = last(request()->segments()) ?? '';
-                        $autoTitle = 'Beranda';
+                        $autoTitle = 'Dashboard';
                         if ($routeName) {
-                            if (str_starts_with($routeName, 'admin.berita')) $autoTitle = 'Berita';
+                            // Specific mappings first so they don't get shadowed by broader prefixes
+                            if (str_starts_with($routeName, 'admin.gallery-categories')) $autoTitle = 'Kategori Galeri';
+                            elseif (str_starts_with($routeName, 'admin.berita.kategori')) $autoTitle = 'Kategori Berita';
+                            elseif (str_starts_with($routeName, 'admin.berita')) $autoTitle = 'Berita';
                             elseif (str_starts_with($routeName, 'admin.galeri')) $autoTitle = 'Galeri';
                             elseif (str_starts_with($routeName, 'admin.profil')) $autoTitle = 'Profile Sekolah';
                             elseif (str_starts_with($routeName, 'admin.fasilitas')) $autoTitle = 'Fasilitas';
                             elseif (str_starts_with($routeName, 'admin.guru')) $autoTitle = 'Guru & Staff';
                             elseif (str_starts_with($routeName, 'admin.agenda')) $autoTitle = 'Agenda';
                             elseif (str_starts_with($routeName, 'admin.contact')) $autoTitle = 'Pesan Kontak';
-                            elseif (str_starts_with($routeName, 'admin.dashboard')) $autoTitle = 'Beranda';
+                            elseif (str_starts_with($routeName, 'admin.dashboard')) $autoTitle = 'Dashboard';
                             else $autoTitle = ucwords(str_replace(['-', '.'], ' ', $routeName));
                         } elseif ($segmentLast) {
                             $autoTitle = ucwords(str_replace('-', ' ', $segmentLast));
@@ -1660,11 +1742,13 @@
                     @endphp
                     <h1 class="navbar-page-title flex-grow-1" style="margin:0;">{{ $pageTitle }}</h1>
                     <div class="d-flex align-items-center gap-2">
-                        <!-- Notifications -->
+                        <!-- Notifications (counts only) -->
                         @php
                             $notifComments = \App\Models\Comment::whereDate('created_at', now()->toDateString())->count();
                             $notifAgendas = \App\Models\Agenda::whereDate('tanggal', now()->toDateString())->count();
-                            $notifTotal = $notifComments + $notifAgendas;
+                            $notifLikes   = class_exists('App\\Models\\FotoLike') ? \App\Models\FotoLike::whereDate('created_at', now()->toDateString())->count() : 0;
+                            $notifPending = class_exists('App\\Models\\UserPhoto') ? \App\Models\UserPhoto::whereIn('status', ['pending','PENDING',0,'0'])->count() : 0;
+                            $notifTotal   = $notifComments + $notifAgendas + $notifLikes + $notifPending;
                         @endphp
                         <div class="dropdown">
                             <button class="btn btn-sm position-relative" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifikasi" style="line-height:1.1; background: transparent; border: 1px solid rgba(15,23,42,0.2); color:#334155; border-radius:999px;">
@@ -1673,19 +1757,23 @@
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $notifTotal }}</span>
                                 @endif
                             </button>
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 260px;">
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notifDropdown" style="min-width: 280px;">
                                 <li class="dropdown-item d-flex justify-content-between align-items-center">
                                     <span><i class="fas fa-comments me-2 text-primary"></i>Komentar baru hari ini</span>
                                     <span class="badge bg-primary">{{ $notifComments }}</span>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
                                 <li class="dropdown-item d-flex justify-content-between align-items-center">
                                     <span><i class="fas fa-calendar-day me-2 text-success"></i>Agenda hari ini</span>
                                     <span class="badge bg-success">{{ $notifAgendas }}</span>
                                 </li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.berita.index') }}">Lihat Berita</a></li>
-                                <li><a class="dropdown-item" href="{{ route('admin.agenda.index') }}">Lihat Agenda</a></li>
+                                <li class="dropdown-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-heart me-2 text-danger"></i>Like hari ini</span>
+                                    <span class="badge bg-danger">{{ $notifLikes }}</span>
+                                </li>
+                                <li class="dropdown-item d-flex justify-content-between align-items-center">
+                                    <span><i class="fas fa-user-check me-2 text-info"></i>Permintaan persetujuan</span>
+                                    <span class="badge bg-info">{{ $notifPending }}</span>
+                                </li>
                             </ul>
                         </div>
                         <!-- Profile -->
@@ -1711,28 +1799,14 @@
                     </div>
                 </div>
 
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                @endif
+                
 
-                @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    {{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                @endif
+                
 
-                @if(session('info'))
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    {{ session('info') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                @endif
+                
 
                 @yield('content')
+                @yield('modals')
             </main>
         </div>
     </div>
@@ -1766,13 +1840,61 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery -->
+    <!-- jQuery (required for Bootstrap) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    @yield('scripts')
+
     <script>
         // Profile modal is read-only info; no actions needed.
+        (function(){
+            var dropdown = document.getElementById('notifDropdown');
+            if (!dropdown) return;
+            dropdown.addEventListener('click', function(){
+                try {
+                    var emptyEl = document.getElementById('recentLikesEmpty');
+                    var ul = document.getElementById('recentLikesList');
+                    if (emptyEl) emptyEl.textContent = 'Memuat...';
+                    if (ul) ul.innerHTML = '';
+                    fetch('{{ route('ajax.likes.recent') }}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(function(r){ return r.json(); })
+                        .then(function(data){
+                            var arr = (data && data.data) || [];
+                            if (!arr.length) { if (emptyEl) emptyEl.textContent = 'Belum ada like terbaru.'; return; }
+                            if (emptyEl) emptyEl.textContent = '';
+                            var html = arr.map(function(it){
+                                var href = it.galery_id ? ('/admin/galeri/' + it.galery_id) : '#';
+                                var time = it.created_at ? new Date(it.created_at).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+                                return '<li class="list-group-item d-flex align-items-center justify-content-between">'
+                                     + '<a href="' + href + '" class="text-decoration-none">'
+                                     + '<i class="fas fa-heart text-danger me-2"></i>'
+                                     + '<span><strong>' + (it.user_name || 'Pengguna') + '</strong> menyukai <em>' + (it.foto_title || 'Foto') + '</em></span>'
+                                     + '</a>'
+                                     + '<span class="text-muted small ms-2">' + time + '</span>'
+                                     + '</li>';
+                            }).join('');
+                            if (ul) ul.innerHTML = html;
+                        }).catch(function(){ if (emptyEl) emptyEl.textContent = 'Gagal memuat.'; });
+                } catch(_){ }
+            });
+        })();
     </script>
-    @yield('scripts')
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Initialize popovers
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        });
+    </script>
 </body>
 </html>

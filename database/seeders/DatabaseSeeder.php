@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminPetugasSeeder::class,
             PostSeeder::class,
+            GalleryCategorySeeder::class,
+            AgendaSeeder::class,
+            GuestUserSeeder::class,
+            FasilitasSeeder::class,
+            GuruSeeder::class,
         ]);
     }
 }

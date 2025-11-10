@@ -1,0 +1,19 @@
+/* Background Pattern Styles — elegant, non-boxy */
+/* Subtle mesh gradient + noise */
+body {
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(1200px 800px at 10% -10%, rgba(37, 99, 235, 0.06), transparent 60%),
+    radial-gradient(900px 600px at 110% 10%, rgba(14, 165, 233, 0.06), transparent 60%),
+    radial-gradient(1000px 700px at 50% 120%, rgba(30, 64, 175, 0.05), transparent 60%),
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="64" height="64" filter="url(%23n)" opacity="0.015"/></svg>');
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+  background-attachment: fixed;
+  background-size: cover, cover, cover, 64px 64px;
+}
+
+/* Hero section overlays removed to avoid inner rectangle/panel. 
+   The hero background is now controlled by layouts/app.blade.php. */
+.hero-section { position: relative; }
+.hero-section::before { content: none !important; }
+.hero-section .container { position: relative; z-index: 2; background: transparent !important; box-shadow: none !important; }

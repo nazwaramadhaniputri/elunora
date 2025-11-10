@@ -1,0 +1,135 @@
+/* Animaciones suaves para todas las páginas */
+.fade-in {
+    animation: fadeIn 0.7s cubic-bezier(.22,.61,.36,1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animaciones para tarjetas y elementos de contenido */
+.card, .modern-table-card, .dashboard-stat-card, .modern-gallery-card {
+    transition: all 0.3s cubic-bezier(.22,.61,.36,1);
+}
+
+.card:hover, .modern-table-card:hover, .dashboard-stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Animaciones para botones */
+.btn, .btn-modern {
+    transition: all 0.25s cubic-bezier(.22,.61,.36,1);
+}
+
+.btn:hover, .btn-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Animaciones para enlaces de navegación */
+.nav-link {
+    transition: all 0.25s cubic-bezier(.22,.61,.36,1);
+}
+
+.nav-link:hover {
+    transform: translateX(5px);
+}
+
+/* Animaciones para imágenes */
+.img-fluid, .gallery-image {
+    transition: all 0.5s cubic-bezier(.22,.61,.36,1);
+}
+
+.img-fluid:hover, .gallery-image:hover {
+    transform: scale(1.02);
+}
+
+/* Animación para página completa al cargar */
+body {
+    animation: pageLoad 0.8s cubic-bezier(.22,.61,.36,1);
+}
+
+@keyframes pageLoad {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Animaciones para formularios */
+.form-control {
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    transform: translateY(-2px);
+}
+
+/* Animaciones para alertas */
+.alert {
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animaciones para modales */
+.modal-content {
+    animation: modalFade 0.3s ease-in-out;
+}
+
+@keyframes modalFade {
+    from {
+        opacity: 0;
+        transform: translateY(-50px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Animaciones para paginación */
+.pagination .page-link {
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    transform: scale(1.1);
+}
+
+/* Animaciones para tablas */
+.table tr {
+    transition: all 0.3s ease;
+}
+
+.table tr:hover {
+    background-color: rgba(37, 99, 235, 0.05);
+}
+
+/* Animaciones para badges */
+.badge {
+    transition: all 0.3s ease;
+}
+
+.badge:hover {
+    transform: scale(1.1);
+}

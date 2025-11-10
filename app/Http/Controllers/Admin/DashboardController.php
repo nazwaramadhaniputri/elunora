@@ -5,22 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Agenda;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // Hitung jumlah berita
-        $totalBerita = \App\Models\Post::count();
+        // Hitung jumlah berita (hanya published jika ada kolom status)
+        $totalBerita = \App\Models\Post::when(Schema::hasColumn('posts', 'status'), function($q){
+                return $q->where('status', 1);
+            })->count();
         
-        // Hitung jumlah galeri
-        $totalGaleri = \App\Models\Galeri::count();
+        // Hitung jumlah galeri aktif (status=1 jika ada)
+        $totalGaleri = \App\Models\Galeri::when(Schema::hasColumn('galeris', 'status'), function($q){
+                return $q->where('status', 1);
+            })->count();
         
-        // Hitung jumlah foto
-        $totalFoto = \App\Models\Foto::count();
+        // Hitung jumlah foto pada galeri aktif (lebih relevan ke publikasi)
+        $totalFoto = \App\Models\Foto::whereHas('galeri', function($q){
+                $q->when(Schema::hasColumn('galeris', 'status'), function($qq){ $qq->where('status',1); });
+            })->count();
         
-        // Hitung jumlah kategori
-        $totalKategori = \App\Models\Kategori::count();
+        // Hitung jumlah kategori berita (status=1 jika ada)
+        $totalKategori = \App\Models\Kategori::when(Schema::hasColumn('kategoris', 'status'), function($q){
+                return $q->where('status', 1);
+            })->count();
         
         // Hitung jumlah agenda
         $totalAgenda = Agenda::count();
@@ -36,9 +45,23 @@ class DashboardController extends Controller
                             ->take(5)
                             ->get();
 
-        // Konten terbaru untuk dashboard
-        $latestPosts = \App\Models\Post::orderByDesc('created_at')->take(5)->get();
-        $latestFotos = \App\Models\Foto::orderByDesc('created_at')->take(8)->get();
+        // Konten terbaru untuk dashboard (hanya yang publish/aktif jika ada)
+        $latestPosts = \App\Models\Post::when(Schema::hasColumn('posts', 'status'), function($q){
+                                return $q->where('status', 1);
+                            })
+                            ->orderByDesc('updated_at')
+                            ->orderByDesc('created_at')
+                            ->orderByDesc('id')
+                            ->take(5)
+                            ->get();
+        $latestFotos = \App\Models\Foto::whereHas('galeri', function($q){
+                                $q->when(Schema::hasColumn('galeris', 'status'), function($qq){ $qq->where('status',1); });
+                            })
+                            ->orderByDesc('updated_at')
+                            ->orderByDesc('created_at')
+                            ->orderByDesc('id')
+                            ->take(8)
+                            ->get();
         $todaysAgendaList = Agenda::whereDate('tanggal', today())
                                   ->orderBy('waktu_mulai')
                                   ->get();
@@ -60,5 +83,45 @@ class DashboardController extends Controller
             'latestFotos',
             'todaysAgendaList'
         ));
+    }
+
+    // JSON endpoint for realtime polling by the dashboard
+    public function latest()
+    {
+        $latestPosts = \App\Models\Post::when(Schema::hasColumn('posts', 'status'), function($q){
+                                return $q->where('status', 1);
+                            })
+                            ->orderByDesc('updated_at')
+                            ->orderByDesc('created_at')
+                            ->orderByDesc('id')
+                            ->take(5)
+                            ->get(['id','judul','created_at','updated_at']);
+
+        $latestFotos = \App\Models\Foto::whereHas('galeri', function($q){
+                                $q->when(Schema::hasColumn('galeris', 'status'), function($qq){ $qq->where('status',1); });
+                            })
+                            ->orderByDesc('updated_at')
+                            ->orderByDesc('created_at')
+                            ->orderByDesc('id')
+                            ->take(8)
+                            ->get(['id','judul','file','created_at','updated_at']);
+
+        $counts = [
+            'berita' => \App\Models\Post::when(Schema::hasColumn('posts', 'status'), function($q){ return $q->where('status',1); })->count(),
+            'galeri' => \App\Models\Galeri::when(Schema::hasColumn('galeris', 'status'), function($q){ return $q->where('status',1); })->count(),
+            'foto'   => \App\Models\Foto::whereHas('galeri', function($q){ $q->when(Schema::hasColumn('galeris','status'), function($qq){ $qq->where('status',1); }); })->count(),
+            'kategori' => \App\Models\Kategori::when(Schema::hasColumn('kategoris', 'status'), function($q){ return $q->where('status',1); })->count(),
+        ];
+
+        $todaysAgenda = Agenda::whereDate('tanggal', today())
+                            ->orderBy('waktu_mulai')
+                            ->get(['id','judul','lokasi','waktu_mulai','waktu_selesai']);
+
+        return response()->json([
+            'latestPosts' => $latestPosts,
+            'latestFotos' => $latestFotos,
+            'counts' => $counts,
+            'todaysAgenda' => $todaysAgenda,
+        ]);
     }
 }

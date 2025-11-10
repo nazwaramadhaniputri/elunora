@@ -19,10 +19,16 @@
         display: block;
         margin-top: 1.4rem;
     }
+    /* Prevent cards from hugging the sidebar; add safe side gutters on this page */
+    .dashboard-safe-gutter { padding-left: 1rem; padding-right: 1rem; }
+    @media (min-width: 992px) { .dashboard-safe-gutter { padding-left: 1.5rem; padding-right: 1.5rem; } }
+    /* Give submit button some breathing room from the status select */
+    #galeriForm .btn-modern.primary { margin-top: 0.75rem; }
 </style>
 @endsection
 
 @section('content')
+<div class="dashboard-safe-gutter">
 <div class="page-header-modern mb-4">
     <div class="d-flex justify-content-between align-items-center">
         <div class="page-title-section">
@@ -56,17 +62,16 @@
         </button>
     </div>
     @endif
-
     <div class="row">
         <div class="col-lg-12">
-            <div class="modern-card">
+            <div class="modern-card mb-3">
                 <div class="card-header-modern">
                     <h5 class="card-title-modern">
                         <i class="fas fa-info-circle me-2"></i>Informasi Galeri
                     </h5>
                 </div>
                 <div class="card-body-modern">
-                    <form action="{{ route('admin.galeri.store') }}" method="POST" id="galeriForm">
+                    <form action="{{ route('admin.galeri.store') }}" method="POST" id="galeriForm" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="form-group">
@@ -87,23 +92,32 @@
                             @enderror
                         </div>
                         
-                        <div class="form-group">
-                            <label for="post_id">Berita Terkait</label>
-                            <select class="form-control @error('post_id') is-invalid @enderror" id="post_id" name="post_id">
-                                <option value="">-- Pilih Berita (Opsional) --</option>
+                        <div class="mb-3">
+                            <label for="post_id" class="form-label">Terkait Berita (Opsional)</label>
+                            <select class="form-control" id="post_id" name="post_id">
+                                <option value="">Pilih Berita</option>
                                 @foreach($posts as $post)
-                                <option value="{{ $post->id }}" {{ old('post_id') == $post->id ? 'selected' : '' }}>{{ $post->judul }}</option>
+                                    <option value="{{ $post->id }}" {{ old('post_id') == $post->id ? 'selected' : '' }}>{{ $post->judul }}</option>
                                 @endforeach
                             </select>
-                            <small class="form-text text-muted">Pilih berita yang terkait dengan galeri ini (opsional).</small>
-                            @error('post_id')
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category_id" class="form-label">Kategori Galeri *</label>
+                            <select class="form-control @error('category_id') is-invalid @enderror" id="category_id" name="category_id" required>
+                                <option value="">Pilih Kategori</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('category_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
                         
                         <div class="form-group">
                             <label for="position">Posisi</label>
-                            <input type="number" class="form-control @error('position') is-invalid @enderror" id="position" name="position" value="{{ old('position', 0) }}" min="0">
+                            <input type="number" class="form-control @error('position') is-invalid @enderror" id="position" name="position" value="{{ old('position', 0) }}" min="0" required>
                             <small class="form-text text-muted">Urutan tampilan galeri (angka lebih kecil akan ditampilkan lebih dulu).</small>
                             @error('position')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -112,7 +126,7 @@
                         
                         <div class="form-group">
                             <label for="status">Status</label>
-                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status">
+                            <select class="form-control @error('status') is-invalid @enderror" id="status" name="status" required>
                                 <option value="0" {{ old('status', '0') == '0' ? 'selected' : '' }}>Draft</option>
                                 <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Publikasikan</option>
                             </select>
@@ -121,7 +135,7 @@
                             @enderror
                         </div>
                         
-                        <button type="submit" class="btn-modern primary">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fas fa-save me-2"></i>Simpan Galeri
                         </button>
                     </form>
@@ -174,87 +188,75 @@
     Dropzone.autoDiscover = false;
     
     $(document).ready(function() {
-        // Initialize dropzone
-        var myDropzone = new Dropzone("#fotoDropzone", {
-            paramName: "file",
-            maxFilesize: 5, // MB
-            acceptedFiles: ".jpeg,.jpg,.png,.gif",
-            addRemoveLinks: true,
-            dictRemoveFile: "Hapus",
-            dictFileTooBig: "File terlalu besar. Ukuran maksimal: 5MB.",
-            dictInvalidFileType: "Format file tidak didukung.",
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
+        // Check if we have a galeri_id (edit mode)
+        var galeriId = $('#galeri_id').val();
+        
+        if (galeriId) {
+            initializeDropzone(galeriId);
+            $('#uploadSection').removeClass('d-none');
+            $('#viewGaleriBtn').attr('href', '/admin/galeri/' + galeriId).removeClass('d-none');
+        }
         
         // Handle form submission
         $('#galeriForm').on('submit', function(e) {
-            e.preventDefault();
+            // Client-side validation
+            var isValid = true;
+            var errorMessage = '';
             
-            $.ajax({
-                url: $(this).attr('action'),
-                type: 'POST',
-                data: $(this).serialize(),
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        // Show success message
-                        alert(response.message);
-                        
-                        // Update galeri_id for dropzone
-                        $('#galeri_id').val(response.galeri.id);
-                        
-                        // Update dropzone action URL
-                        myDropzone.options.url = '/admin/galeri/' + response.galeri.id + '/store-photo';
-                        
-                        // Show upload section
-                        $('#uploadSection').removeClass('d-none');
-                        
-                        // Update view galeri button
-                        $('#viewGaleriBtn').removeClass('d-none')
-                            .attr('href', '/admin/galeri/' + response.galeri.id);
-                        
-                        // Disable form fields
-                        $('#galeriForm input, #galeriForm select, #galeriForm button').attr('disabled', true);
-                    } else {
-                        alert('Terjadi kesalahan: ' + response.message);
-                    }
-                },
-                error: function(xhr) {
-                    if (xhr.status === 422) {
-                        var errors = xhr.responseJSON.errors;
-                        var errorMessage = '';
-                        
-                        $.each(errors, function(key, value) {
-                            errorMessage += value[0] + '\n';
-                        });
-                        
-                        alert('Validasi gagal:\n' + errorMessage);
-                    } else {
-                        alert('Terjadi kesalahan. Silakan coba lagi.');
-                    }
+            // Check required fields
+            $(this).find('[required]').each(function() {
+                if (!$(this).val()) {
+                    var fieldName = $(this).attr('name');
+                    var label = $('label[for="' + $(this).attr('id') + '"]').text().replace('*', '').trim();
+                    errorMessage += '- ' + label + ' harus diisi\n';
+                    isValid = false;
                 }
             });
-        });
-        
-        // Handle dropzone events
-        myDropzone.on("success", function(file, response) {
-            if (response.success) {
-                file.previewElement.classList.add("dz-success");
-            } else {
-                file.previewElement.classList.add("dz-error");
-                alert('Gagal mengunggah foto: ' + response.message);
+            
+            if (!isValid) {
+                e.preventDefault();
+                alert('Mohon lengkapi semua field yang wajib diisi:\n\n' + errorMessage);
+                return false;
             }
+            
+            // If we get here, form is valid and will submit normally
+            return true;
         });
         
-        myDropzone.on("error", function(file, errorMessage) {
-            file.previewElement.classList.add("dz-error");
-        });
-        
-        // If galeri_id is already set (edit mode), show upload section
-        if ($('#galeri_id').val() !== '') {
-            $('#uploadSection').removeClass('d-none');
+        function initializeDropzone(galeriId) {
+            // Initialize dropzone only if it hasn't been initialized yet
+            if ($('#fotoDropzone').hasClass('dz-clickable')) return;
+            
+            var myDropzone = new Dropzone("#fotoDropzone", {
+                url: '/admin/galeri/' + galeriId + '/store-photo',
+                paramName: "file",
+                maxFilesize: 5, // MB
+                acceptedFiles: ".jpeg,.jpg,.png,.gif",
+                addRemoveLinks: true,
+                dictRemoveFile: "Hapus",
+                dictFileTooBig: "File terlalu besar. Ukuran maksimal: 5MB.",
+                dictInvalidFileType: "Format file tidak didukung.",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                init: function() {
+                    this.on("success", function(file, response) {
+                        if (response.success) {
+                            file.previewElement.classList.add("dz-success");
+                            // Update the view button to point to the gallery
+                            $('#viewGaleriBtn').attr('href', '/admin/galeri/' + galeriId).removeClass('d-none');
+                        } else {
+                            file.previewElement.classList.add("dz-error");
+                            alert('Gagal mengunggah foto: ' + (response.message || 'Terjadi kesalahan'));
+                        }
+                    });
+                    
+                    this.on("error", function(file, errorMessage) {
+                        file.previewElement.classList.add("dz-error");
+                        alert('Gagal mengunggah foto: ' + (errorMessage || 'Terjadi kesalahan'));
+                    });
+                }
+            });
         }
     });
 </script>

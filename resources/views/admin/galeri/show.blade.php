@@ -3,12 +3,34 @@
 @section('title', 'Detail Galeri')
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
-<style>
+    <style>
+    /* Debug styles */
+    .gallery-image {
+        position: relative;
+    }
+    .gallery-image::after {
+        content: attr(data-original-path);
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 2px 5px;
+        font-size: 9px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: none; /* Sembunyikan debug info secara default */
+    }
+    
     /* Header action buttons: make all same size as 'Kembali' */
+    .page-actions { display:flex; align-items:center; gap:12px; }
     .page-actions .btn-modern {
         display: inline-flex;
         align-items: center;
         gap: 8px;
+        height: 40px; /* samakan tinggi */
         padding: 8px 14px; /* unify padding */
         line-height: 1.2;
         white-space: nowrap; /* avoid two-line text */
@@ -16,6 +38,18 @@
         height: auto; /* rely on padding */
     }
     .page-actions .btn-modern i { margin-right: 6px; }
+    /* Samakan tinggi tombol lonceng dan tombol lainnya */
+    .page-actions .btn-modern { height: 40px; padding: 8px 14px; display: inline-flex; align-items: center; border-radius: 22px; }
+    .page-actions .btn-modern.info {
+        position: relative; width: 40px; height: 40px;
+        padding: 0; justify-content: center; border-radius: 50%;
+        border: none !important; box-shadow: none !important;
+    }
+    .page-actions .btn-modern.info i { margin-right: 0 !important; line-height: 1; }
+    .page-actions .btn-modern.info .badge { pointer-events: none; }
+    /* Prevent badge overlapping next button */
+    .page-actions .btn-modern.info { position: relative; }
+    .page-actions .btn-modern.info .badge { pointer-events: none; }
     .foto-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr); /* 3 per row */
@@ -128,9 +162,9 @@
     .stat-pill .count { font-weight: 700; font-size: 13px; }
     /* icon size aligned with action tiles */
     .stat-pill i, .foto-footer .action-btn i { font-size: 16px; line-height: 1; }
-    /* Comments interactive; Like non-interactive per request */
+    /* Both Comments and Likes are interactive in admin */
     .stat-pill.comments { pointer-events: auto; }
-    .stat-pill.likes { pointer-events: none; cursor: default; }
+    .stat-pill.likes { pointer-events: auto; cursor: pointer; }
     .foto-footer form { display: inline-flex; margin: 0; padding: 0; }
 
     /* When any modal is open, disable interactions on overlays to avoid click-through */
@@ -139,9 +173,15 @@
         pointer-events: none !important;
     }
 
-    /* Use default Bootstrap modal styles (no transparency) on admin pages */
-    .modal { z-index: 1085 !important; }
-    .modal-backdrop { z-index: 1080 !important; }
+    /* Ensure Bootstrap modal overlays above Lightbox (which uses ~9999) */
+    .modal { z-index: 12050 !important; }
+    .modal-backdrop { z-index: 12040 !important; }
+
+    /* If Lightbox overlay is active while a modal opens, hide Lightbox layers */
+    body.modal-open #lightbox, 
+    body.modal-open .lb-overlay, 
+    body.modal-open .lb-outerContainer, 
+    body.modal-open .lb-dataContainer { display: none !important; }
 
     /* Fallback Comments Popup (custom) */
     .comments-popup-overlay {
@@ -182,6 +222,73 @@
                 <p class="page-subtitle mb-1">{{ $galeri->deskripsi ?? '' }}</p>
                 <div class="text-muted small">Dibuat: {{ \Carbon\Carbon::parse($galeri->created_at)->format('d M Y H:i') }}</div>
             </div>
+            @php
+                // Capture common variants for user-photo pending submissions
+                $pendingStatuses = ['pending','PENDING','awaiting','menunggu','waiting',0,'0',null,''];
+                $pendingQuery = \App\Models\UserPhoto::whereIn('status', $pendingStatuses);
+                $pendingList = (clone $pendingQuery)->with('user')->orderBy('created_at','desc')->take(20)->get();
+                $pendingCount = $pendingQuery->count();
+            @endphp
+
+    <!-- Modal: Pending User Photos -->
+    <div class="modal fade" id="pendingUserPhotosModal" tabindex="-1" aria-labelledby="pendingUserPhotosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pendingUserPhotosModalLabel"><i class="fas fa-bell me-2"></i>Foto Tamu Menunggu Persetujuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @if($pendingList->count())
+                    <div class="list-group">
+                        @foreach($pendingList as $p)
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                @php
+                                    $pRaw = ltrim((string)($p->image_path ?? ''), '/');
+                                    if (\Illuminate\Support\Str::startsWith($pRaw, 'storage/')) { $pRaw = substr($pRaw, 8); }
+                                    if (\Illuminate\Support\Str::startsWith($pRaw, 'public/')) { $pRaw = substr($pRaw, 7); }
+                                    $pUrl = null;
+                                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($pRaw)) { $pUrl = asset(\Illuminate\Support\Facades\Storage::url($pRaw)); }
+                                    if (empty($pUrl) && \Illuminate\Support\Facades\File::exists(public_path('storage/'.$pRaw))) { $pUrl = asset('storage/'.$pRaw); }
+                                    if (empty($pUrl) && \Illuminate\Support\Facades\File::exists(public_path($pRaw))) { $pUrl = asset($pRaw); }
+                                    if (empty($pUrl)) { $pUrl = asset('img/no-image.jpg'); }
+                                @endphp
+                                <a href="{{ $pUrl }}" data-lightbox="pending" data-title="{{ $p->title }}" class="me-3">
+                                    <img src="{{ $pUrl }}" alt="{{ $p->title }}" width="64" height="64" class="rounded" style="object-fit:cover" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
+                                </a>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold mb-1">{{ $p->title ?: 'Tanpa judul' }}</div>
+                                    <div class="small text-muted">Oleh: {{ optional($p->user)->name ?: 'Pengguna' }} • {{ optional($p->created_at)->format('d M Y H:i') }}</div>
+                                    @if($p->description)
+                                        <div class="small text-muted mt-1">{{ \Illuminate\Support\Str::limit($p->description, 120) }}</div>
+                                    @endif
+                                </div>
+                                <div class="ms-3 d-flex gap-2">
+                                    <form action="{{ route('admin.user-photos.approve', $p->id) }}" method="POST" class="pending-action-form" data-id="{{ $p->id }}" data-action="approve">
+                                        @csrf
+                                        <input type="hidden" name="galery_id" value="{{ $galeri->id }}">
+                                        <button type="submit" class="btn btn-success btn-sm"><i class="fas fa-check me-1"></i>Setuju</button>
+                                    </form>
+                                    <form action="{{ route('admin.user-photos.reject', $p->id) }}" method="POST" class="pending-action-form" data-id="{{ $p->id }}" data-action="reject" onsubmit="return confirm('Tolak foto ini?');">
+                                        @csrf
+                                        <input type="hidden" name="admin_notes" value="Ditolak dari modal galeri">
+                                        <input type="hidden" name="galery_id" value="{{ $galeri->id }}">
+                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-times me-1"></i>Tolak</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                    @else
+                    <div class="text-center text-muted py-4">Tidak ada foto menunggu persetujuan.</div>
+                    @endif
+                </div>
+                <div class="modal-footer d-none"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- Fallback Comments Popup (custom) -->
     <div class="comments-popup-overlay" id="commentsPopupOverlay" aria-hidden="true">
@@ -198,6 +305,12 @@
         </div>
     </div>
             <div class="page-actions d-flex align-items-center gap-2">
+                <button type="button" class="btn-modern info position-relative" data-bs-toggle="modal" data-bs-target="#pendingUserPhotosModal" title="Foto tamu menunggu persetujuan">
+                    <i class="fas fa-bell"></i>
+                    @if($pendingCount > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ $pendingCount }}</span>
+                    @endif
+                </button>
                 <button type="button" class="btn-modern primary" data-bs-toggle="modal" data-bs-target="#uploadFotoModal">
                     <i class="fas fa-plus me-2"></i>Tambah Foto
                 </button>
@@ -243,18 +356,14 @@
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ session('success') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
     @if(session('error'))
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         {{ session('error') }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
 
@@ -264,17 +373,100 @@
             <div class="foto-grid">
                 @foreach($galeri->fotos as $foto)
                 <div class="foto-item">
-                            <a href="{{ asset($foto->file) }}" data-lightbox="galeri" data-title="{{ $foto->judul ?: 'Foto Galeri' }}">
-                                <img src="{{ asset($foto->file) }}" alt="{{ $foto->judul }}" style="height:280px; width:100%; object-fit:cover;" onerror="this.src='{{ asset('img/no-image.jpg') }}'">
+                            @php
+                                $src = null;
+                                $raw = trim((string)($foto->file ?? ''));
+                                
+                                // Debug: Tampilkan path file asli
+                                // {{-- {{ dd('File path:', $raw) }} --}}
+                                
+                                // Jika path kosong, gunakan no-image
+                                if (empty($raw)) {
+                                    $src = asset('img/no-image.jpg');
+                                } 
+                                // Jika sudah full URL
+                                elseif (\Illuminate\Support\Str::startsWith($raw, ['http://', 'https://'])) {
+                                    $src = $raw;
+                                }
+                                // Jika path relatif
+                                else {
+                                    // Hapus awalan slash jika ada
+                                    $raw = ltrim($raw, '/');
+                                    
+                                    // Coba beberapa lokasi yang mungkin
+                                    $possiblePaths = [
+                                        $raw,  // Path asli
+                                        'storage/' . $raw,  // Jika file ada di storage public
+                                        'public/' . $raw,  // Jika file ada di folder public
+                                        'storage/app/public/' . $raw,  // Path lengkap storage
+                                        'public/storage/' . $raw  // Path symlink
+                                    ];
+                                    
+                                    // Cek setiap path yang mungkin
+                                    foreach ($possiblePaths as $path) {
+                                        // Cek di storage
+                                        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($path)) {
+                                            $src = asset('storage/' . $path);
+                                            break;
+                                        }
+                                        
+                                        // Cek di public path
+                                        $publicPath = public_path($path);
+                                        if (file_exists($publicPath)) {
+                                            $src = asset($path);
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // Jika masih belum ketemu, coba langsung akses file
+                                    if (empty($src) && file_exists(public_path($raw))) {
+                                        $src = asset($raw);
+                                    }
+                                    
+                                    // Jika masih kosong, gunakan no-image
+                                    if (empty($src)) {
+                                        $src = asset('img/no-image.jpg');
+                                        // Debug: Tampilkan path yang tidak ditemukan
+                                        // {{-- {{ 'File not found: ' . $raw }} --}}
+                                    }
+                                }
+                            @endphp
+                            <a href="{{ $src }}" data-lightbox="galeri" data-title="{{ $foto->judul ?: 'Foto Galeri' }}">
+                                <img 
+                                    src="{{ $src }}" 
+                                    alt="{{ $foto->judul }}" 
+                                    style="height:280px; width:100%; object-fit:cover;" 
+                                    onerror="this.onerror=null; this.src='{{ asset('img/no-image.jpg') }}'"
+                                    loading="lazy"
+                                    data-original-path="{{ $foto->file }}"
+                                    class="gallery-image"
+                                >
+                                @if($src === asset('img/no-image.jpg'))
+                                <div class="position-absolute top-50 start-50 translate-middle text-center">
+                                    <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                                    <p class="small text-muted mb-0">Gambar tidak ditemukan</p>
+                                </div>
+                                @endif
                             </a>
                             <!-- Photo title under the image -->
                             <div class="foto-caption">
                                 <small>{{ $foto->judul ?: 'Tanpa judul' }}</small>
+                                @php
+                                    // Prefer actual related user name if exists; otherwise fall back to stored uploader_name; otherwise Admin
+                                    $uploaderName = optional($foto->user)->name
+                                        ?? ($foto->uploader_name ?: (\Illuminate\Support\Str::startsWith((string)$foto->file, 'uploads/galeri/user/')
+                                            ? 'Pengguna'
+                                            : 'Admin'));
+                                @endphp
+                                <div class="text-muted small d-flex align-items-center gap-1">
+                                    <i class="fas fa-user-circle me-1"></i>
+                                    <span>{{ $uploaderName }}</span>
+                                </div>
                             </div>
                             <!-- Footer actions under the photo: left (like/comment), right (edit/delete) -->
                             <div class="foto-footer mt-2">
                                 <div class="left">
-                                    <button type="button" class="stat-pill likes" data-id="{{ $foto->id }}" title="Jumlah yang menyukai" data-likes-initial="{{ (int) ($likeCounts[$foto->id] ?? 0) }}">
+                                    <button type="button" class="stat-pill likes" data-id="{{ $foto->id }}" title="Jumlah yang menyukai" data-likes-initial="{{ (int) ($likeCounts[$foto->id] ?? 0) }}" data-bs-toggle="modal" data-bs-target="#likesModal">
                                         <i class="fas fa-heart"></i>
                                         <span class="count" id="likes-count-{{ $foto->id }}">{{ (int) ($likeCounts[$foto->id] ?? 0) }}</span>
                                     </button>
@@ -302,7 +494,6 @@
             @else
             <div class="text-center py-5">
                 <i class="fas fa-images fa-4x text-gray-300 mb-3"></i>
-                <h5 class="text-gray-700">Belum ada foto</h5>
                 <p class="text-gray-500">Unggah foto pertama untuk galeri ini.</p>
             </div>
             @endif
@@ -313,7 +504,7 @@
 </div>
 
 <!-- Modal Edit Foto -->
-<div class="modal fade" id="editFotoModal" tabindex="-1" role="dialog" aria-labelledby="editFotoModalLabel" aria-hidden="true">
+<div class="modal fade" id="editFotoModal" tabindex="-1" aria-labelledby="editFotoModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="editFotoForm" action="" method="POST">
@@ -373,6 +564,58 @@
 @section('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
     <script>
+        // AJAX handle for approve/reject in pending photos modal
+        (function(){
+            var __suppressLB = false;
+            // When suppression is on, cancel any click headed to lightbox anchors at capture
+            document.addEventListener('click', function(ev){
+                if (!__suppressLB) return;
+                var a = ev.target && ev.target.closest && ev.target.closest('a[data-lightbox]');
+                if (!a) return;
+                ev.preventDefault();
+                ev.stopImmediatePropagation();
+            }, true);
+            function updateBadge(delta){
+                try {
+                    var badge = document.querySelector('.page-actions .btn-modern.info .badge');
+                    if (!badge) return;
+                    var n = parseInt(badge.textContent.trim(), 10) || 0;
+                    n = Math.max(0, n + delta);
+                    badge.textContent = n;
+                    if (n === 0) { badge.remove(); }
+                } catch(_){}
+            }
+            document.addEventListener('submit', function(e){
+                var form = e.target;
+                if (!form.classList || !form.classList.contains('pending-action-form')) return;
+                e.preventDefault();
+                var url = form.getAttribute('action');
+                var fd = new FormData(form);
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: fd
+                }).then(function(resp){
+                    if (!resp.ok) return resp.text().then(function(t){ throw new Error(t || 'Request failed'); });
+                    // remove item and update badge
+                    var item = form.closest('.list-group-item');
+                    if (item) item.parentNode.removeChild(item);
+                    updateBadge(-1);
+                    // if list empty, show empty message
+                    var left = document.querySelectorAll('#pendingUserPhotosModal .list-group .list-group-item').length;
+                    if (left === 0) {
+                        var body = document.querySelector('#pendingUserPhotosModal .modal-body');
+                        if (body) body.innerHTML = '<div class="text-center text-muted py-4">Tidak ada foto menunggu persetujuan.</div>';
+                    }
+                    // refresh agar foto approved muncul di grid
+                    setTimeout(function(){ window.location.reload(); }, 200);
+                }).catch(function(err){
+                    var msg = 'Aksi gagal. Coba lagi.';
+                    try { if (err && err.message) msg = err.message; } catch(_){ }
+                    alert(msg.replace(/<[^>]+>/g,'').trim());
+                });
+            });
+        })();
         // Helper: format datetime 'dd MMM yyyy HH:mm'
         function formatDateTime(dt){
             try {
@@ -385,6 +628,88 @@
         window.closeCommentsOverlay = function(){
             try { document.getElementById('commentsPopupOverlay').classList.remove('open'); } catch(_){ }
         };
+
+        // Likes modal loader
+        (function(){
+            // Load counts for all photos on page
+            try {
+                var ids = Array.from(document.querySelectorAll('.stat-pill.likes[data-id]')).map(function(el){ return el.getAttribute('data-id'); });
+                ids = ids.filter(function(x, i, a){ return x && a.indexOf(x) === i; });
+                if (ids.length) {
+                    fetch('/ajax/fotos/counts?ids=' + encodeURIComponent(ids.join(',')), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(function(r){ return r.json(); })
+                        .then(function(data){
+                            var map = (data && data.data) || {};
+                            ids.forEach(function(id){
+                                var likeEl = document.querySelector('#likes-count-' + id);
+                                var comEl = document.querySelector('[data-id="' + id + '"] ~ .comments .count');
+                                var d = map[id] || {};
+                                if (likeEl && typeof d.likes_count === 'number') likeEl.textContent = d.likes_count;
+                                if (comEl && typeof d.comments_count === 'number') comEl.textContent = d.comments_count;
+                            });
+                        }).catch(function(){});
+                }
+            } catch(_){}
+            // Capture-phase guard: prevent any click inside footer from reaching the image anchor/Lightbox
+            ['click','mousedown','mouseup','touchstart','touchend'].forEach(function(type){
+                document.addEventListener(type, function(ev){
+                    var footer = ev.target && ev.target.closest && ev.target.closest('.foto-footer');
+                    if (!footer) return;
+                    // Allow clicks on our interactive controls so their handlers can run
+                    var allow = ev.target.closest('.stat-pill.likes, .stat-pill.comments, .action-btn, button, form');
+                    if (allow) return; // do not block; bubble handler will stop propagation later
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                }, true); // capture phase
+            });
+
+            document.addEventListener('click', function(e){
+                var btn = e.target.closest('.stat-pill.likes');
+                if (!btn) return;
+                // block Lightbox but allow Bootstrap data API to open modal
+                e.stopPropagation();
+                // Close Lightbox if somehow open
+                try { if (window.lightbox && document.getElementById('lightbox')) { lightbox.end(); } } catch(_) {}
+                // Briefly suppress Lightbox triggers
+                __suppressLB = true; setTimeout(function(){ __suppressLB = false; }, 400);
+                // set loading state now so modal shows content quickly when opened
+                var list = document.getElementById('likesList');
+                if (list) list.innerHTML = '<li class="list-group-item text-muted">Memuat...</li>';
+            });
+
+            // Load likers when the modal is about to be shown via Bootstrap Data API
+            try {
+                var likesModalEl = document.getElementById('likesModal');
+                likesModalEl && likesModalEl.addEventListener('show.bs.modal', function (event) {
+                    var trigger = event.relatedTarget; // button that opened the modal
+                    var fotoId = trigger && trigger.getAttribute('data-id');
+                    var list = document.getElementById('likesList');
+                    if (list) list.innerHTML = '<li class="list-group-item text-muted">Memuat...</li>';
+                    if (!fotoId) return;
+                    fetch('/ajax/fotos/' + fotoId + '/likes', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                        .then(function(r){ return r.json(); })
+                        .then(function(data){
+                            var items = (data && data.likes ? data.likes : []).map(function(u){
+                                var name = u.name || u.username || u.email || 'Pengguna';
+                                return '<li class="list-group-item">'
+                                    + '<i class="fas fa-user me-2 text-primary"></i>' + name
+                                    + '</li>';
+                            });
+                            if (list) list.innerHTML = items.length ? items.join('') : '<li class="list-group-item text-muted">Belum ada yang menyukai.</li>';
+                        })
+                        .catch(function(){
+                            if (list) list.innerHTML = '<li class="list-group-item text-danger">Gagal memuat data.</li>';
+                        });
+                });
+            } catch(_){}
+            // Also stop propagation for comments tile to avoid opening lightbox behind the button
+            document.addEventListener('click', function(e){
+                var btn = e.target.closest('.stat-pill.comments');
+                if (!btn) return;
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        })();
 
         window.deleteComment = function(id){
             if (!id) return;

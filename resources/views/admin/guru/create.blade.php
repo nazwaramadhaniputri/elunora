@@ -3,15 +3,19 @@
 @section('title', 'Tambah Guru')
 
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h4 class="mb-0"><i class="fas fa-plus me-2"></i>Tambah Guru & Staff</h4>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('admin.guru.store') }}" method="POST" enctype="multipart/form-data">
+<div class="fade-in">
+    <div class="page-header-modern mb-4">
+        <div class="page-title-section">
+            <h4 class="page-title">
+                <i class="fas fa-plus me-3"></i>Tambah Guru & Staff
+            </h4>
+            <p class="page-subtitle">Tambahkan guru atau staff baru</p>
+        </div>
+    </div>
+
+    <div class="modern-table-card">
+        <div class="card-body">
+            <form action="{{ route('admin.guru.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="row">
@@ -114,9 +118,7 @@
                                 <i class="fas fa-arrow-left me-2"></i>Kembali
                             </a>
                         </div>
-                    </form>
-                </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>

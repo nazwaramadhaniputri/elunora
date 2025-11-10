@@ -40,14 +40,52 @@
 <section class="py-5 fade-in">
     <div class="container">
         
-        <!-- Back Button -->
+        <!-- Back Button and Upload Button -->
         <div class="row mb-4">
-            <div class="col-12">
+            <div class="col-md-12">
                 <a href="{{ route('galeri') }}" class="btn btn-outline-primary">
                     <i class="fas fa-arrow-left me-2"></i>Kembali ke Galeri
                 </a>
             </div>
         </div>
+        
+        <!-- Upload Photo Modal -->
+        @auth
+        <div class="modal fade" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="uploadPhotoModalLabel">Upload Foto ke Galeri</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="{{ route('user-photos.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <input type="hidden" name="galeri_id" value="{{ $galeri->id }}">
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="photo" class="form-label">Pilih Foto</label>
+                                <input type="file" class="form-control" id="photo" name="image" accept="image/*" onchange="previewImage(this)" required>
+                                <div id="photoPreview" class="mt-2"></div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Judul Foto (opsional)</label>
+                                <input type="text" class="form-control" id="title" name="title">
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <small><i class="fas fa-info-circle me-1"></i> Foto Anda akan ditampilkan setelah disetujui oleh admin.</small>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Upload Foto</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @endauth
 
         <!-- Gallery Photos -->
         <div class="gallery-section">
@@ -62,19 +100,39 @@
                 <div class="col-md-6 col-lg-4 mb-2">
                     <div class="modern-card photo-card">
                         <div class="photo-container">
-                            <img src="{{ asset($foto->file) }}" 
+                            @php
+                                $raw = ltrim((string)($foto->file ?? ''), '/');
+                                if (\Illuminate\Support\Str::startsWith($raw, 'storage/')) { $raw = substr($raw, 8); }
+                                if (\Illuminate\Support\Str::startsWith($raw, 'public/')) { $raw = substr($raw, 7); }
+                                $src = null;
+                                if (\Illuminate\Support\Str::startsWith($raw, ['http://','https://'])) {
+                                    $src = $raw;
+                                } else {
+                                    if (\Illuminate\Support\Facades\Storage::disk('public')->exists($raw)) {
+                                        $src = asset(\Illuminate\Support\Facades\Storage::url($raw));
+                                    }
+                                    if (empty($src) && \Illuminate\Support\Facades\File::exists(public_path('storage/'.$raw))) {
+                                        $src = asset('storage/'.$raw);
+                                    }
+                                    if (empty($src) && \Illuminate\Support\Facades\File::exists(public_path($raw))) {
+                                        $src = asset($raw);
+                                    }
+                                    if (empty($src)) { $src = asset('img/no-image.jpg'); }
+                                }
+                            @endphp
+                            <img src="{{ $src }}" 
                                  alt="{{ $foto->judul }}" 
                                  class="img-fluid gallery-photo"
                                  onerror="this.src='{{ asset('img/no-image.jpg') }}'">
                             <div class="photo-overlay">
                                 <div class="photo-actions">
-                                    <a href="{{ asset($foto->file) }}" 
+                                    <a href="{{ $src }}" 
                                        data-lightbox="gallery" 
                                        data-title="{{ $foto->judul }}" 
                                        class="btn-modern light">
                                         <i class="fas fa-expand me-1"></i>Lihat
                                     </a>
-                                    <button class="btn-modern primary" onclick="downloadImage('{{ asset($foto->file) }}', '{{ $foto->judul }}')">
+                                    <button class="btn-modern primary" onclick="downloadImage('{{ $src }}', '{{ $foto->judul }}')">
                                         <i class="fas fa-download me-1"></i>Unduh
                                     </button>
                                 </div>
@@ -82,6 +140,14 @@
                         </div>
                         <div class="card-body-modern" style="padding: 0.5rem;">
                             <h6 class="photo-title" style="margin-bottom: 0.1rem; font-size: 0.9rem;">{{ $foto->judul }}</h6>
+                            @php 
+                                $uploader = $foto->uploader_name
+                                    ?? (\Illuminate\Support\Str::startsWith($foto->file, 'uploads/galeri/user/') ? 'Pengguna' : 'Admin');
+                            @endphp
+                            <small class="text-muted d-block d-flex align-items-center gap-1" style="font-size: 0.75rem;">
+                                <i class="fas fa-user-circle"></i>
+                                <span>{{ $uploader }}</span>
+                            </small>
                             <small class="text-muted" style="font-size: 0.75rem;">
                                 <i class="fas fa-camera me-1"></i>Foto {{ $loop->iteration }} dari {{ $galeri->fotos->count() }}
                             </small>
@@ -203,11 +269,37 @@
     </div>
 
 </section>
+@auth
+<!-- Floating Upload FAB -->
+<button type="button" class="fab-upload" data-bs-toggle="modal" data-bs-target="#uploadPhotoModal" aria-label="Tambah Foto">
+    <i class="fas fa-plus"></i>
+</button>
+@endauth
 @endsection
 
 @section('styles')
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
 <style>
+/* Floating Action Button (Upload) */
+.fab-upload {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--elunora-primary), var(--elunora-accent));
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    box-shadow: 0 12px 24px rgba(30,58,138,0.35);
+    z-index: 1040; /* di bawah modal (1055) & backdrop (1050) agar tidak menutupi input */
+    transition: transform .15s ease, box-shadow .15s ease, background .2s ease;
+}
+.fab-upload:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(30,58,138,0.4); }
+.fab-upload i { font-size: 1.25rem; }
 .info-badge {
     display: flex;
     align-items: center;
@@ -379,12 +471,13 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.7);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
     transition: opacity 0.3s ease;
+    text-align: center;
 }
 
 .photo-card:hover .photo-overlay {
@@ -405,6 +498,7 @@
     font-weight: 600;
     margin-bottom: 0.5rem;
     color: var(--dark-text);
+    text-align: center;
 }
 
 .related-gallery-card {
@@ -586,6 +680,36 @@
     padding: 10px;
 }
 
+/* Remove blue focus glow on comment input and button */
+.comments-panel .form-control:focus {
+    box-shadow: none !important;
+    outline: none !important;
+    border-color: #cbd5e1 !important; /* subtle slate */
+}
+.comments-panel .btn:focus {
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Join input and button cleanly without gap */
+.comments-panel .input-group { overflow: hidden; border-radius: 8px; border: 1px solid #cbd5e1; background:#fff; }
+.comments-panel .input-group .form-control {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-left: 0 !important;
+    border-bottom: 0 !important;
+}
+.comments-panel .input-group .btn {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    border-left: 0 !important;
+    border-top: 0 !important;
+    border-bottom: 0 !important;
+    margin-left: 0 !important;
+}
+
 .comments-list .comment-item {
     background: #fff;
     border: 1px solid #eef2f7;
@@ -678,15 +802,7 @@
         return new Intl.NumberFormat('id-ID').format(n);
     }
 
-    function getBaseline(id) {
-        const key = 'foto_like_baseline_' + id;
-        let v = localStorage.getItem(key);
-        if (v === null) {
-            v = Math.floor(Math.random() * 23) + 3; // 3..25
-            localStorage.setItem(key, String(v));
-        }
-        return parseInt(v, 10) || 0;
-    }
+    // baseline likes removed: counts should start at 0 until there are real likes
 
     function updateLikeUI(fotoId, liked, likesCount) {
         const likeBtn = document.querySelector('.like-btn[data-foto-id="' + fotoId + '"]');
@@ -906,16 +1022,22 @@
     }
 
     document.addEventListener('DOMContentLoaded', async function() {
+        // Ensure upload modal is appended to body to avoid stacking/overlay issues
+        try {
+            var up = document.getElementById('uploadPhotoModal');
+            if (up && up.parentElement !== document.body) {
+                document.body.appendChild(up);
+            }
+            // Hide FAB while modal is open so it never sits above modal
+            var fab = document.querySelector('.fab-upload');
+            if (up && typeof bootstrap !== 'undefined') {
+                up.addEventListener('show.bs.modal', function(){ if (fab) fab.classList.add('d-none'); });
+                up.addEventListener('hidden.bs.modal', function(){ if (fab) fab.classList.remove('d-none'); });
+            }
+        } catch(e) { /* no-op */ }
         // Collect all foto IDs on the page
         const ids = Array.from(document.querySelectorAll('.like-btn')).map(btn => btn.getAttribute('data-foto-id'));
-        // Set initial baseline to avoid plain 0 while loading
-        ids.forEach(id => {
-            const likeBtn = document.querySelector('.like-btn[data-foto-id="' + id + '"]');
-            if (likeBtn) {
-                const base = getBaseline(id);
-                if (base > 0) updateLikeUI(id, false, base);
-            }
-        });
+        // Initialize displayed counts to 0 (already in markup)
 
         // Fetch counts from server
         try {
@@ -923,9 +1045,8 @@
             ids.forEach(id => {
                 const c = counts[id];
                 if (c) {
-                    const base = c.likes_count === 0 ? getBaseline(id) : 0;
-                    updateLikeUI(id, false, c.likes_count + base);
-                    updateCommentsCountUI(id, c.comments_count);
+                    updateLikeUI(id, false, c.likes_count || 0);
+                    updateCommentsCountUI(id, c.comments_count || 0);
                 }
             });
         } catch (e) {

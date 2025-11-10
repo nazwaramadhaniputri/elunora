@@ -2,6 +2,128 @@
 
 @section('title', 'Galeri Foto')
 
+@section('styles')
+<link href="{{ asset('css/floating-button.css') }}" rel="stylesheet">
+<style>
+    .gallery-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+        position: relative;
+    }
+    
+    .gallery-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .gallery-img-container {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .gallery-img-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .gallery-card:hover .gallery-img-container img {
+        transform: scale(1.05);
+    }
+    
+    .gallery-card-body {
+        padding: 1.25rem;
+    }
+    
+    .gallery-meta {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    /* Align bottoms using flex (not absolute) */
+    .gallery-card { position: relative !important; min-height: 400px; display: flex; flex-direction: column; }
+    .gallery-card .gallery-img-container { flex: 0 0 auto; }
+    .gallery-card .card-body.gallery-content { flex: 1 1 auto; display: flex; flex-direction: column; padding: 1rem !important; }
+    .gallery-card .card-body .card-title { margin-bottom: .5rem !important; }
+    .gallery-card .card-body .card-text { margin-bottom: 0 !important; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .gallery-card .gallery-bottom { margin-top: auto; padding-top: .5rem; display: flex; justify-content: space-between; align-items: center; }
+    .gallery-card .gallery-date { margin: 0 !important; line-height: 1; display: inline-flex; align-items: center; gap: 6px; }
+    .gallery-card .btn-view { margin: 0 !important; display: inline-flex; align-items: center; }
+</style>
+@endsection
+
+@section('scripts')
+<script>
+    function previewImage(input) {
+        const preview = document.getElementById('photoPreview');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        } else {
+            preview.innerHTML = `<i class="fas fa-camera fa-3x text-muted"></i>`;
+        }
+    }
+</script>
+@endsection
+
+<!-- Modal Upload Foto -->
+@auth
+<div class="modal fade photo-upload-modal" id="uploadPhotoModal" tabindex="-1" aria-labelledby="uploadPhotoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadPhotoModalLabel">Tambah Foto ke Galeri</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('user-photos.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="photo-preview" id="photoPreview">
+                        <i class="fas fa-camera fa-3x text-muted"></i>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">Pilih Foto</label>
+                        <input type="file" class="form-control" id="photo" name="image" accept="image/*" required onchange="previewImage(this)">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Judul Foto</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Deskripsi</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small><i class="fas fa-info-circle me-1"></i> Foto Anda akan ditampilkan setelah disetujui oleh admin.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Upload Foto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endauth
+
 @section('hero')
 <div class="hero-section">
     <div class="container">
@@ -34,13 +156,40 @@
 <section class="py-5">
     <div class="container">
         <div class="row">
+            <!-- Tombol Floating dihapus karena sudah dipindahkan ke halaman detail -->
+            
             <!-- Daftar Galeri -->
             <div class="col-lg-8">
+                <div class="mb-3 position-relative">
+                    <input type="text" class="form-control js-page-search" placeholder="Cari galeri..." aria-label="Cari galeri" data-target=".col-md-6.mb-4" style="padding-right: 40px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <span class="position-absolute top-50 end-0 translate-middle-y me-3" style="z-index: 10; color: #1e3a8a;">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+                
+                <!-- Filter Kategori -->
+                <div class="mb-4">
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ route('galeri') }}" class="btn btn-sm btn-chip {{ !request('category') ? 'active' : '' }}">
+                            Semua
+                        </a>
+                        @php
+                        $categories = \App\Models\GalleryCategory::where('status', 1)->get();
+                        @endphp
+                        
+                        @foreach($categories as $category)
+                        <a href="{{ route('galeri', ['category' => $category->slug]) }}" 
+                           class="btn btn-sm btn-chip {{ request('category') == $category->slug ? 'active' : '' }}">
+                            {{ $category->name }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
                 <div class="row">
                 @forelse($galeris as $galeri)
                 <div class="col-md-6 mb-4">
-                    <div class="card news-card h-100 shadow-sm">
-                        <div class="gallery-image-container position-relative overflow-hidden">
+                    <div class="gallery-card">
+                        <div class="gallery-img-container">
                             @if($galeri->fotos->count() > 0)
                                 <!-- Gallery Grid Preview -->
                                 <div class="gallery-preview" style="height: 280px; position: relative;">
@@ -51,11 +200,11 @@
                                              style="object-fit: cover;">
                                     @elseif($galeri->fotos->count() == 2)
                                         <div class="row g-1 h-100">
-                                            <div class="col-6">
+                                            <div class="col-6 h-100">
                                                 <img src="{{ asset($galeri->fotos->get(0)->file) }}" 
                                                      class="w-100 h-100" style="object-fit: cover;" alt="">
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-6 h-100">
                                                 <img src="{{ asset($galeri->fotos->get(1)->file) }}" 
                                                      class="w-100 h-100" style="object-fit: cover;" alt="">
                                             </div>
@@ -124,19 +273,22 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body gallery-content d-flex flex-column" style="padding: 1rem;">
-                            <h5 class="card-title mb-2">{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri Tanpa Judul') }}</h5>
-                            <p class="card-text text-muted flex-grow-1">
-                                {{ Str::limit(strip_tags($galeri->deskripsi ?? ($galeri->post ? $galeri->post->isi : 'Deskripsi galeri')), 100) }}
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    {{ \Carbon\Carbon::parse($galeri->created_at)->format('d M Y') }}
-                                </small>
-                                <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-eye me-1"></i>Lihat Galeri
-                                </a>
+                        <div class="gallery-card-body">
+                            @if($galeri->category)
+                                <div class="mb-2">
+                                    <span class="badge bg-primary">{{ $galeri->category->name }}</span>
+                                </div>
+                            @endif
+                            <h5 class="card-title">{{ $galeri->judul ?? ($galeri->post ? $galeri->post->judul : 'Galeri Tanpa Judul') }}</h5>
+                            <p class="card-text">{{ Str::limit($galeri->deskripsi ?? ($galeri->post ? strip_tags($galeri->post->isi) : 'Deskripsi tidak tersedia'), 100) }}</p>
+                            <div class="gallery-bottom">
+                                <div>
+                                    <small class="gallery-date"><i class="far fa-calendar-alt"></i> {{ $galeri->created_at->format('d M Y') }}</small>
+                                    @if($galeri->fotos->count() > 0)
+                                        <small class="ms-2"><i class="fas fa-images"></i> {{ $galeri->fotos->count() }} Foto</small>
+                                    @endif
+                                </div>
+                                <a href="{{ route('galeri.detail', $galeri->id) }}" class="btn btn-sm btn-primary btn-view">Lihat <i class="fas fa-arrow-right ms-1"></i></a>
                             </div>
                         </div>
                     </div>
@@ -174,9 +326,9 @@
                         
                         <ul class="list-group list-group-flush">
                             @forelse($galeriTerbaru as $item)
-                            <li class="list-group-item px-0">
-                                <a href="{{ route('galeri.detail', $item->id) }}" class="text-decoration-none">
-                                    <div class="d-flex">
+                            <li class="list-group-item">
+                                <a href="{{ route('galeri.detail', $item->id) }}" class="text-decoration-none d-block py-2">
+                                    <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0 me-3">
                                             @if($item->fotos->isNotEmpty())
                                             <img src="{{ asset($item->fotos->first()->file) }}" class="rounded" width="60" height="60" alt="{{ $item->fotos->first()->judul }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'" style="object-fit: cover;">
@@ -185,7 +337,7 @@
                                             @endif
                                         </div>
                                         <div class="flex-grow-1">
-                                            <h6 class="mb-1">{{ Str::limit($item->judul ?? ($item->post ? $item->post->judul : 'Galeri Tanpa Judul'), 50) }}</h6>
+                                            <h6 class="mb-2">{{ Str::limit($item->judul ?? ($item->post ? $item->post->judul : 'Galeri Tanpa Judul'), 50) }}</h6>
                                             <small class="text-muted">{{ \Carbon\Carbon::parse($item->created_at)->format('d M Y') }}</small>
                                         </div>
                                     </div>
@@ -197,7 +349,36 @@
                         </ul>
                     </div>
                 </div>
-                
+
+                <!-- Kategori Galeri (moved below Galeri Terbaru) -->
+                <div class="sidebar-card mb-4">
+                    <div class="sidebar-header">
+                        <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Kategori Galeri</h5>
+                    </div>
+                    <div class="card-body">
+                        @php
+                        $kategoriGaleri = \App\Models\GalleryCategory::where('status', 1)
+                            ->withCount(['galleries' => function($query) {
+                                $query->where('status', 1);
+                            }])
+                            ->orderBy('name')
+                            ->get();
+                        @endphp
+                        <ul class="list-group list-group-flush">
+                            @forelse($kategoriGaleri as $kategori)
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <a href="{{ route('galeri', ['category' => $kategori->slug]) }}" class="text-decoration-none">
+                                    {{ $kategori->name }}
+                                </a>
+                                <span class="badge bg-success rounded-pill">{{ $kategori->galleries_count }}</span>
+                            </li>
+                            @empty
+                            <li class="list-group-item px-0">Tidak ada kategori</li>
+                            @endforelse
+                        </ul>
+                    </div>
+                </div>
+
                 <!-- Statistik Galeri -->
                 <div class="sidebar-card">
                     <div class="sidebar-header">
@@ -242,6 +423,12 @@
 
 .camera-animation {
     animation: cameraShutter 2s ease-in-out infinite;
+}
+
+/* Kategori button styling - selalu lonjong */
+.btn, .btn-primary, .btn-outline-primary, .page-item .page-link {
+    border-radius: 30px !important;
+    transition: all 0.3s ease;
 }
 
 @keyframes cameraShutter {
@@ -296,7 +483,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 123, 255, 0.8);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -304,6 +491,7 @@
     transition: opacity 0.3s ease;
     color: white;
     font-size: 1.5rem;
+    text-align: center;
 }
 
 .gallery-card:hover .gallery-overlay {
@@ -313,6 +501,15 @@
 .gallery-content {
     padding: 2rem;
 }
+
+/* Enforce bottom pin for date and button (final styles section) */
+.gallery-card { min-height: 420px; }
+.gallery-card { position: relative !important; }
+.gallery-card .card-body { padding: 1rem 1rem 3.5rem 1rem !important; }
+.gallery-card .btn-view { position: absolute !important; right: 16px !important; bottom: 16px !important; margin: 0 !important; display: inline-flex; align-items: center; }
+.gallery-card .gallery-date { position: absolute !important; left: 16px !important; bottom: 16px !important; margin: 0 !important; line-height: 1; display: inline-flex; align-items: center; gap: 6px; }
+/* Standardize gallery preview height regardless of inline styles */
+.gallery-preview { height: 200px !important; }
 
 .gallery-title {
     color: #2c3e50;
@@ -330,26 +527,12 @@
     padding: 0.5rem 1rem;
 }
 
-.sidebar-card {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    overflow: hidden;
-    border: none;
-}
-
-.sidebar-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    padding: 1.25rem;
-    font-weight: 600;
-}
+/* Sidebar: gunakan style global dari elunora-theme.css */
 
 .empty-state {
     padding: 3rem 0;
 }
 
-/* Global Card and Box Text Spacing */
 .card {
     border-radius: 15px;
     border: none;
@@ -383,7 +566,6 @@
 .table {
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .table th,

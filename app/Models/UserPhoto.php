@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class UserPhoto extends Model
+{
+    use HasFactory;
+    
+    protected $fillable = [
+        'user_id',
+        'title',
+        'description',
+        'image_path',
+        'status',
+        'admin_notes'
+    ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+    
+    public function isApproved()
+    {
+        return $this->status === 'approved';
+    }
+    
+    public function isRejected()
+    {
+        return $this->status === 'rejected';
+    }
+}

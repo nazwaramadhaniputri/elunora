@@ -1,0 +1,82 @@
+.floating-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  border-radius: 50%;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.floating-btn i {
+  font-size: 24px;
+}
+
+/* Modal styles */
+.photo-upload-modal .modal-content {
+  border-radius: 15px;
+  border: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.photo-upload-modal .modal-header {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  border-radius: 15px 15px 0 0;
+  border-bottom: none;
+}
+
+.photo-upload-modal .modal-footer {
+  border-top: none;
+}
+
+.photo-upload-modal .btn-primary {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  border: none;
+}
+
+.photo-upload-modal .btn-primary:hover {
+  background: linear-gradient(135deg, #1e4a9a, #4b92ff);
+}
+
+.photo-upload-modal .close {
+  color: white;
+  opacity: 1;
+}
+
+.photo-upload-modal .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+
+.photo-preview {
+  width: 100%;
+  height: 200px;
+  border-radius: 10px;
+  background-color: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.photo-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}

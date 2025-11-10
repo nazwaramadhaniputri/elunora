@@ -31,6 +31,114 @@
     --elunora-border-radius: 0.35rem;
 }
 
+/* ===== Modal Buttons Consistency (pill shape) ===== */
+.modal .btn,
+.modal .btn-primary,
+.modal .btn-secondary,
+.modal .btn-success,
+.modal .btn-danger,
+.modal .btn-info,
+.modal .btn-warning {
+  border-radius: 9999px !important;
+}
+
+/* ===== Compact semi-transparent chip buttons (category filters) ===== */
+.btn-chip,
+.btn.btn-chip,
+.btn-outline-primary.btn-chip,
+.btn-primary.btn-chip {
+  border-radius: 9999px !important; /* keep pill in all states */
+  font-size: 0.85rem !important;
+  line-height: 1.1 !important;
+  padding: 0.35rem 0.75rem !important;
+  border: 1px solid rgba(30,58,138,0.25) !important; /* navy border */
+  color: #1e3a8a !important; /* navy text */
+  background: rgba(30,58,138,0.08) !important; /* semi-transparent */
+  backdrop-filter: saturate(140%) blur(2px);
+  box-shadow: none !important;
+}
+.btn-chip:hover,
+.btn-outline-primary.btn-chip:hover,
+.btn-primary.btn-chip:hover {
+  background: rgba(30,58,138,0.14) !important;
+  color: #1e3a8a !important;
+  border-color: rgba(30,58,138,0.35) !important;
+}
+/* Active/selected state remains pill and slightly stronger */
+.btn-chip.active,
+.btn-outline-primary.btn-chip.active,
+.btn-primary.btn-chip.active,
+.btn-chip:active,
+.btn-outline-primary.btn-chip:active,
+.btn-primary.btn-chip:active {
+  background: rgba(30,58,138,0.18) !important;
+  color: #0f172a !important;
+  border-color: rgba(30,58,138,0.4) !important;
+  transform: none !important;
+}
+.btn-chip:focus { box-shadow: 0 0 0 2px rgba(30,58,138,0.15) !important; }
+
+/* ===== Elunora Global Form Refinements ===== */
+/* Seamless icon + textbox for all input-groups */
+.input-group { display: flex; flex-wrap: nowrap; align-items: stretch; }
+.input-group > .input-group-text {
+  background: #fff;
+  border-right: 0 !important;
+  min-width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.input-group > .input-group-text + .form-control {
+  border-left: 0 !important;
+}
+.input-group .form-control {
+  height: 42px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Radios always perfect circles */
+.form-check-input[type="radio"] {
+  width: 1rem !important;
+  height: 1rem !important;
+  border-radius: 50% !important;
+  aspect-ratio: 1 / 1;
+  padding: 0 !important;
+}
+
+/* ===== Guest Sidebar (match News) ===== */
+.sidebar-card {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+  border: none;
+}
+.sidebar-header {
+  background: linear-gradient(135deg, #007bff, #0056b3) !important;
+  color: #fff !important;
+  padding: 1.25rem !important;
+  font-weight: 600 !important;
+  border-top-left-radius: 15px !important;
+  border-top-right-radius: 15px !important;
+}
+.sidebar-header h5 { font-size: 1.125rem !important; margin: 0; }
+.sidebar-card .card-body { padding: 1rem 1.25rem; }
+.sidebar-card .list-group { margin-top: 0; }
+.sidebar-card .list-group-item {
+  padding: 1rem 0;
+  border-left: 0;
+  border-right: 0;
+  border-color: #e9ecef;
+}
+.sidebar-card .list-group-item:first-child { border-top: 0; }
+.sidebar-card .list-group-item .d-flex { gap: 0.75rem; }
+.sidebar-card .flex-shrink-0 img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; }
+.sidebar-card .list-group-item a { padding-left: 0.25rem; padding-right: 0.25rem; display: block; }
+
 /* Common Brand Elements */
 .elunora-brand {
     font-weight: 700;
@@ -526,9 +634,7 @@ input[type="submit"].btn-modern:hover {
 
 /* Hero Section Gradient */
 .hero-section {
-    background: var(--elunora-primary);
-    color: white;
-    padding: 4rem 0;
+    background: transparent !important; /* gradient provided by layout */
 }
 
 /* Statistics Cards */

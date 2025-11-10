@@ -46,7 +46,7 @@
                         </div>
                     </div>
                     <div class="stat-content">
-                        <h4 class="stat-number">{{ $totalBerita }}</h4>
+                        <h4 class="stat-number" id="statTotalBerita">{{ $totalBerita }}</h4>
                         <p class="stat-label">Total Berita</p>
                         <div class="stat-trend">
                             <i class="fas fa-arrow-up text-success me-1"></i>
@@ -69,7 +69,7 @@
                         </div>
                     </div>
                     <div class="stat-content">
-                        <h4 class="stat-number">{{ $totalGaleri }}</h4>
+                        <h4 class="stat-number" id="statTotalGaleri">{{ $totalGaleri }}</h4>
                         <p class="stat-label">Total Galeri</p>
                         <div class="stat-trend">
                             <i class="fas fa-arrow-up text-success me-1"></i>
@@ -92,7 +92,7 @@
                         </div>
                     </div>
                     <div class="stat-content">
-                        <h4 class="stat-number">{{ $totalFoto }}</h4>
+                        <h4 class="stat-number" id="statTotalFoto">{{ $totalFoto }}</h4>
                         <p class="stat-label">Total Foto</p>
                         <div class="stat-trend">
                             <i class="fas fa-arrow-up text-success me-1"></i>
@@ -115,7 +115,7 @@
                         </div>
                     </div>
                     <div class="stat-content">
-                        <h4 class="stat-number">{{ $totalKategori }}</h4>
+                        <h4 class="stat-number" id="statTotalKategori">{{ $totalKategori }}</h4>
                         <p class="stat-label">Total Kategori</p>
                         <div class="stat-trend">
                             <i class="fas fa-arrow-up text-success me-1"></i>
@@ -260,17 +260,17 @@
     </div>
 
     <!-- Latest Content and Today's Agenda -->
-    <div class="row mt-2">
+    <div class="row mt-2 dashboard-equal align-items-stretch">
         <!-- Latest News -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
+        <div class="col-lg-6 mb-4 d-flex">
+            <div class="card w-100 h-100" id="latestNewsCard">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-newspaper me-2"></i>Berita Terbaru</h5>
                     <a href="{{ route('admin.berita.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
                 </div>
                 <div class="card-body">
                     @if(isset($latestPosts) && $latestPosts->count())
-                        <ul class="list-group list-group-flush">
+                        <ul class="list-group list-group-flush" id="listLatestPosts">
                             @foreach($latestPosts as $post)
                                 <li class="list-group-item d-flex justify-content-between align-items-start">
                                     <div class="ms-2 me-auto">
@@ -282,7 +282,7 @@
                             @endforeach
                         </ul>
                     @else
-                        <div class="empty-state">
+                        <div class="empty-state" id="emptyLatestPosts">
                             <div class="empty-icon"><i class="fas fa-newspaper"></i></div>
                             <div class="empty-title">Belum ada berita</div>
                             <div class="empty-text">Tambahkan berita pertama Anda.</div>
@@ -294,15 +294,15 @@
         </div>
 
         <!-- Latest Photos -->
-        <div class="col-lg-6 mb-4">
-            <div class="card">
+        <div class="col-lg-6 mb-4 d-flex">
+            <div class="card w-100 h-100" id="latestPhotosCard">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-camera me-2"></i>Foto Terbaru</h5>
                     <a href="{{ route('admin.galeri.index') }}" class="btn btn-sm btn-outline-primary">Kelola Galeri</a>
                 </div>
                 <div class="card-body">
                     @if(isset($latestFotos) && $latestFotos->count())
-                        <div class="row g-3">
+                        <div class="row g-3" id="gridLatestFotos">
                             @foreach($latestFotos as $foto)
                                 <div class="col-6 col-md-3">
                                     <div class="ratio ratio-1x1" style="border-radius:10px; overflow:hidden; background:#f1f5f9;">
@@ -313,7 +313,7 @@
                             @endforeach
                         </div>
                     @else
-                        <div class="empty-state">
+                        <div class="empty-state" id="emptyLatestFotos">
                             <div class="empty-icon"><i class="fas fa-camera"></i></div>
                             <div class="empty-title">Belum ada foto</div>
                             <div class="empty-text">Upload foto untuk galeri Anda.</div>
@@ -333,7 +333,7 @@
                 </div>
                 <div class="card-body">
                     @if(isset($todaysAgendaList) && $todaysAgendaList->count())
-                        <div class="table-responsive">
+                        <div class="table-responsive" id="tableAgendaWrap">
                             <table class="table table-striped align-middle mb-0">
                                 <thead>
                                     <tr>
@@ -343,7 +343,7 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="tableAgendaBody">
                                 @foreach($todaysAgendaList as $ag)
                                     <tr>
                                         <td>
@@ -385,6 +385,19 @@
 
 @section('styles')
 <style>
+/* Equal heights for the two latest cards */
+.dashboard-equal .card { display: flex; flex-direction: column; }
+.dashboard-equal .card-header { flex: 0 0 auto; }
+.dashboard-equal .card-body { flex: 1 1 auto; min-height: 280px; }
+@media (max-width: 992px) {
+  .dashboard-equal .card-body { min-height: 0; }
+}
+/* Make the news card a bit more compact so bottoms align with photos */
+#latestNewsCard .card-body { padding: 1.25rem !important; }
+#latestNewsCard .empty-state { padding: 1.25rem !important; }
+#latestNewsCard .empty-icon { width: 56px; height: 56px; font-size: 1.5rem; }
+#latestNewsCard .empty-title { margin-bottom: .4rem; }
+#latestNewsCard .empty-text { margin-bottom: .75rem; }
 /* Stat Card Footer */
 .stat-card-footer {
     background: rgba(37, 99, 235, 0.05);
@@ -702,6 +715,107 @@
     }
     updateWIB();
     setInterval(updateWIB, 1000);
+  })();
+
+  // Auto-refresh dashboard widgets every 60s
+  (function(){
+    function equalizeLatestHeights(){
+      try {
+        const a = document.getElementById('latestNewsCard');
+        const b = document.getElementById('latestPhotosCard');
+        if (!a || !b) return;
+        // reset before measure
+        a.style.height = '';
+        b.style.height = '';
+        const h = Math.max(a.offsetHeight, b.offsetHeight);
+        a.style.height = h + 'px';
+        b.style.height = h + 'px';
+      } catch(_) {}
+    }
+    // equalize on resize (debounced)
+    let __eqTimer = null;
+    window.addEventListener('resize', function(){
+      clearTimeout(__eqTimer);
+      __eqTimer = setTimeout(equalizeLatestHeights, 120);
+    });
+
+    const fmtDate = (iso)=>{
+      try { return new Date(iso).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric', hour:'2-digit', minute:'2-digit'}); } catch(_) { return ''; }
+    };
+    function render(){
+      fetch("{{ route('admin.dashboard.latest') }}", { headers: { 'X-Requested-With': 'XMLHttpRequest' }})
+        .then(r=>r.json())
+        .then(data=>{
+          // counts
+          const c = (data && data.counts) || {};
+          const set = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent = (val ?? 0); };
+          set('statTotalBerita', c.berita);
+          set('statTotalGaleri', c.galeri);
+          set('statTotalFoto', c.foto);
+          set('statTotalKategori', c.kategori);
+
+          // latest posts
+          const list = document.getElementById('listLatestPosts');
+          const emptyLP = document.getElementById('emptyLatestPosts');
+          if (Array.isArray(data.latestPosts)) {
+            if (list) list.innerHTML = data.latestPosts.map(p=>`
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div class="ms-2 me-auto">
+                  <div class="fw-semibold">${(p.judul||'Tanpa Judul')}</div>
+                  <small class="text-muted">${fmtDate(p.created_at)}</small>
+                </div>
+                <a href="/admin/berita/${p.id}/edit" class="btn btn-sm btn-outline-secondary">Kelola</a>
+              </li>`).join('');
+            if (emptyLP) emptyLP.style.display = data.latestPosts.length ? 'none' : '';
+          }
+
+          // latest photos
+          const grid = document.getElementById('gridLatestFotos');
+          const emptyLF = document.getElementById('emptyLatestFotos');
+          if (Array.isArray(data.latestFotos) && grid) {
+            grid.innerHTML = data.latestFotos.map(f=>{
+              const base = (f.file||'').startsWith('http') ? f.file : `${location.origin}/${f.file}`;
+              const src = `${base}?t=${Date.now()}`;
+              return `
+              <div class="col-6 col-md-3">
+                <div class="ratio ratio-1x1" style="border-radius:10px; overflow:hidden; background:#f1f5f9;">
+                  <img src="${src}" onerror="this.src='{{ asset('img/no-image.jpg') }}'" alt="${f.judul||'Foto'}" style="width:100%; height:100%; object-fit:cover;">
+                </div>
+                <small class="d-block text-truncate mt-1">${f.judul||'Tanpa judul'}</small>
+              </div>`;
+            }).join('');
+            if (emptyLF) emptyLF.style.display = data.latestFotos.length ? 'none' : '';
+          }
+
+          // today's agenda
+          const tbody = document.getElementById('tableAgendaBody');
+          const emptyAT = document.getElementById('emptyAgendaToday');
+          if (Array.isArray(data.todaysAgenda) && tbody) {
+            tbody.innerHTML = data.todaysAgenda.map(a=>{
+              const wmulai = (a.waktu_mulai||'').toString().slice(0,5);
+              const wselesai = (a.waktu_selesai||'').toString().slice(0,5);
+              const waktu = wselesai ? `${wmulai} - ${wselesai}` : (wmulai||'-');
+              return `
+                <tr>
+                  <td><span class="badge bg-primary">${waktu}</span></td>
+                  <td>${a.judul||''}</td>
+                  <td>${a.lokasi||'-'}</td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="/admin/agenda/${a.id}" class="action-btn info" title="Lihat"><i class="fas fa-eye"></i></a>
+                      <a href="/admin/agenda/${a.id}/edit" class="action-btn primary" title="Edit"><i class="fas fa-edit"></i></a>
+                    </div>
+                  </td>
+                </tr>`;
+            }).join('');
+            if (emptyAT) emptyAT.style.display = data.todaysAgenda.length ? 'none' : '';
+          }
+        })
+        .catch(()=>{});
+    }
+    // first run and interval
+    render();
+    setInterval(render, 60000);
   })();
 </script>
 @endsection

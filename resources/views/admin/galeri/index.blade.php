@@ -1,8 +1,26 @@
-@extends('layouts.admin')
+﻿@extends('layouts.admin')
 
 @section('title', 'Galeri Foto')
 
 @section('content')
+@if(session('success'))
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ session('success') }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+
+@if($errors->any())
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <ul class="mb-0">
+        @foreach($errors->all() as $error)
+            <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+@endif
+
 <div class="fade-in">
     <div class="page-header-modern mb-4">
         <div class="d-flex justify-content-between align-items-center">
@@ -20,7 +38,6 @@
         </div>
     </div>
 
-
     <div class="row">
         @forelse($galeris as $galeri)
         <div class="col-lg-4 col-md-6 mb-4">
@@ -36,19 +53,26 @@
                     </div>
                     @else
                     <div class="empty-gallery-image">
-                        <i class="fas fa-images fa-3x"></i>
-                        <p class="mt-3">Belum ada foto</p>
+                        <i class="fas fa-images fa-3x text-muted"></i>
                     </div>
                     @endif
                     
-                    <div class="gallery-status-badge">
-                        @if($galeri->status == 1)
-                        <span class="status-badge published">
-                            <i class="fas fa-check-circle me-1"></i>Aktif
+                    <div class="gallery-badges" style="position: absolute; top: 10px; left: 0; right: 0; z-index: 2; display: flex; justify-content: space-between; padding: 0 15px;">
+                        @if($galeri->category)
+                        <span style="background: rgba(30, 58, 138, 0.15); color: #1e3a8a; padding: 0.5em 1.2em; border-radius: 20px; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; height: 30px; border: 1px solid rgba(30, 58, 138, 0.3);">
+                            <i class="fas fa-tag me-1" style="font-size: 0.9em; color: #1e3a8a;"></i>{{ $galeri->category->name }}
                         </span>
                         @else
-                        <span class="status-badge draft">
-                            <i class="fas fa-pause-circle me-1"></i>Tidak Aktif
+                        <span></span> <!-- Empty span to maintain flex layout -->
+                        @endif
+                        
+                        @if($galeri->status == 1)
+                        <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; padding: 0.5em 1.2em; border-radius: 20px; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; height: 30px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                            <i class="fas fa-check-circle me-1" style="font-size: 0.9em; color: #10b981;"></i>Aktif
+                        </span>
+                        @else
+                        <span style="background: rgba(245, 158, 11, 0.15); color: #d97706; padding: 0.5em 1.2em; border-radius: 20px; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; height: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
+                            <i class="fas fa-pause-circle me-1" style="font-size: 0.9em; color: #d97706;"></i>Tidak Aktif
                         </span>
                         @endif
                     </div>
@@ -78,12 +102,26 @@
                         <a href="{{ route('admin.galeri.show', $galeri->id) }}" class="action-btn info" title="Detail">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <button class="action-btn primary" onclick="editGaleri({{ $galeri->id }}, '{{ $galeri->judul }}', '{{ $galeri->deskripsi }}', {{ $galeri->post_id ?? 'null' }}, {{ $galeri->position }}, {{ $galeri->status }})" title="Edit">
+                        <button class="action-btn primary edit-galeri"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editGaleriModal"
+                            data-id="{{ $galeri->id }}"
+                            data-judul="{{ addslashes($galeri->judul) }}"
+                            data-deskripsi="{{ addslashes($galeri->deskripsi ?? '') }}"
+                            data-post-id="{{ $galeri->post_id ?? '' }}"
+                            data-category-id="{{ $galeri->category_id ?? '' }}"
+                            data-status="{{ $galeri->status ?? '1' }}"
+                            data-position="{{ $galeri->position ?? '0' }}"
+                            title="Edit">
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="action-btn danger" onclick="deleteGaleri({{ $galeri->id }}, '{{ $galeri->judul }}')" title="Hapus">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <form action="{{ route('admin.galeri.destroy', $galeri->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus galeri ini? Tindakan ini tidak dapat dibatalkan.');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="action-btn danger" title="Hapus">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -114,60 +152,86 @@
 </div>
 
 <!-- Modal Tambah Galeri -->
-<div class="modal fade" id="createGaleriModal" tabindex="-1">
+<div class="modal fade" id="createGaleriModal" tabindex="-1" aria-labelledby="createGaleriModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form action="{{ route('admin.galeri.store') }}" method="POST">
+            <form id="createGaleriForm" action="{{ route('admin.galeri.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-plus me-2"></i>Tambah Galeri Baru</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                <div class="modal-header" style="background-color: #1e3a8a; color: white;">
+                    <h5 class="modal-title"><i class="fas fa-plus-circle me-2"></i>Tambah Galeri Baru</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Judul Galeri *</label>
-                                <input type="text" class="form-control" name="judul" required>
+                                <label class="form-label fw-bold">Judul Galeri <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="judul" id="create_judul" required>
+                                <div class="invalid-feedback" id="create_judul_error"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Posisi</label>
-                                <input type="number" class="form-control" name="position" value="0" min="0" required>
+                                <label class="form-label fw-bold">Kategori Galeri</label>
+                                <select class="form-select" name="category_id" id="create_category_id">
+                                    <option value="">Pilih kategori</option>
+                                    @foreach(\App\Models\GalleryCategory::where('status',1)->orderBy('name')->get() as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback" id="create_category_error"></div>
                             </div>
                         </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Deskripsi</label>
-                        <textarea class="form-control" name="deskripsi" rows="3" placeholder="Deskripsi singkat tentang galeri ini..."></textarea>
+                        <textarea class="form-control" name="deskripsi" id="create_deskripsi" rows="3"></textarea>
+                        <div class="invalid-feedback" id="create_deskripsi_error"></div>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Terkait Berita</label>
-                                <select class="form-control" name="post_id">
+                                <select class="form-select" name="post_id" id="create_post_id">
                                     <option value="">Tidak terkait berita</option>
                                     @foreach(\App\Models\Post::where('status', 'published')->get() as $post)
                                     <option value="{{ $post->id }}">{{ $post->judul }}</option>
                                     @endforeach
                                 </select>
+                                <div class="invalid-feedback" id="create_post_error"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Status</label>
-                                <select class="form-control" name="status" required>
-                                    <option value="1">Aktif</option>
-                                    <option value="0">Tidak Aktif</option>
-                                </select>
+                                <label class="form-label fw-bold">Posisi</label>
+                                <input type="number" class="form-control" name="position" id="create_position" value="0" style="width: 100%;">
+                                <small class="text-muted">Angka lebih kecil akan muncul lebih dulu</small>
+                                <div class="invalid-feedback" id="create_position_error"></div>
                             </div>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold me-3">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="create_status_active" value="1" checked>
+                            <label class="form-check-label" for="create_status_active">Aktif</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="create_status_inactive" value="0">
+                            <label class="form-check-label" for="create_status_inactive">Tidak Aktif</label>
+                        </div>
+                        <div class="invalid-feedback" id="create_status_error"></div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn-modern success"><i class="fas fa-save me-2"></i>Simpan Galeri</button>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="saveCreateBtn">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <i class="fas fa-save me-1"></i> Simpan
+                    </button>
                 </div>
             </form>
         </div>
@@ -175,93 +239,216 @@
 </div>
 
 <!-- Modal Edit Galeri -->
-<div class="modal fade" id="editGaleriModal" tabindex="-1">
+<div class="modal fade" id="editGaleriModal" tabindex="-1" aria-labelledby="editGaleriModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form id="editGaleriForm" method="POST">
+            <div class="modal-header" style="background-color: #1e3a8a; color: white;">
+                <h5 class="modal-title" id="editGaleriModalLabel">
+                    <i class="fas fa-edit me-2"></i>Edit Galeri
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editGaleriForm" method="POST" enctype="multipart/form-data" class="update-gallery-form">
                 @csrf
                 @method('PUT')
-                <div class="modal-header">
-                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Galeri</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
+                <input type="hidden" name="_method" value="PUT">
+                <input type="hidden" name="gallery_id" id="gallery_id" value="">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Judul Galeri *</label>
-                                <input type="text" class="form-control" id="edit_judul" name="judul" required>
+                                <label class="form-label fw-bold">Judul Galeri <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="judul" id="edit_judul" required>
+                                <div class="invalid-feedback" id="judul_error"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Posisi</label>
-                                <input type="number" class="form-control" id="edit_position" name="position" min="1" required>
+                                <label class="form-label fw-bold">Kategori Galeri</label>
+                                <select class="form-select" name="category_id" id="edit_category_id">
+                                    <option value="">Pilih kategori</option>
+                                    @foreach(\App\Models\GalleryCategory::where('status',1)->orderBy('name')->get() as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="invalid-feedback" id="category_error"></div>
                             </div>
                         </div>
                     </div>
+                    
                     <div class="mb-3">
                         <label class="form-label fw-bold">Deskripsi</label>
-                        <textarea class="form-control" id="edit_deskripsi" name="deskripsi" rows="3"></textarea>
+                        <textarea class="form-control" name="deskripsi" id="edit_deskripsi" rows="3"></textarea>
+                        <div class="invalid-feedback" id="deskripsi_error"></div>
                     </div>
+                    
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label class="form-label fw-bold">Terkait Berita</label>
-                                <select class="form-control" id="edit_post_id" name="post_id">
+                                <select class="form-select" name="post_id" id="edit_post_id">
                                     <option value="">Tidak terkait berita</option>
                                     @foreach(\App\Models\Post::where('status', 'published')->get() as $post)
                                     <option value="{{ $post->id }}">{{ $post->judul }}</option>
                                     @endforeach
                                 </select>
+                                <div class="invalid-feedback" id="post_error"></div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Status</label>
-                                <select class="form-control" id="edit_status" name="status" required>
-                                    <option value="1">Aktif</option>
-                                    <option value="0">Tidak Aktif</option>
-                                </select>
+                                <label class="form-label fw-bold">Posisi</label>
+                                <input type="number" class="form-control" name="position" id="edit_position" style="width: 100%;">
+                                <small class="text-muted">Angka lebih kecil akan muncul lebih dulu</small>
+                                <div class="invalid-feedback" id="position_error"></div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold me-3">Status</label>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="status_active" value="1">
+                            <label class="form-check-label" for="status_active">Aktif</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="status" id="status_inactive" value="0">
+                            <label class="form-check-label" for="status_inactive">Tidak Aktif</label>
+                        </div>
+                        <div class="invalid-feedback" id="status_error"></div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn-modern warning"><i class="fas fa-save me-2"></i>Update Galeri</button>
+                
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="saveChangesBtn">
+                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        <i class="fas fa-save me-1"></i> Simpan Perubahan
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-@endsection
-
-@section('scripts')
-<script>
-function editGaleri(id, judul, deskripsi, postId, position, status) {
-    document.getElementById('editGaleriForm').action = '/admin/galeri/' + id;
-    document.getElementById('edit_judul').value = judul || '';
-    document.getElementById('edit_deskripsi').value = deskripsi || '';
-    document.getElementById('edit_post_id').value = postId || '';
-    document.getElementById('edit_position').value = position || 1;
-    document.getElementById('edit_status').value = status || 1;
-    
-    new bootstrap.Modal(document.getElementById('editGaleriModal')).show();
-}
-
-function deleteGaleri(id, judul) {
-    if (confirm('Apakah Anda yakin ingin menghapus galeri "' + judul + '"?\nSemua foto dalam galeri ini akan ikut terhapus.')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '/admin/galeri/' + id;
-        form.innerHTML = `
-            @csrf
-            @method('DELETE')
-        `;
-        document.body.appendChild(form);
-        form.submit();
+@push('styles')
+<style>
+    /* Custom styles for the edit modal */
+    #editGaleriModal .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
-}
+    #editGaleriModal .modal-footer {
+        border-top: 1px solid #eee;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .form-label.required:after {
+        content: ' *';
+        color: #dc3545;
+    }
+    .invalid-feedback {
+        display: none;
+        font-size: 0.875em;
+        color: #dc3545;
+    }
+    .was-validated .form-control:invalid ~ .invalid-feedback,
+    .was-validated .form-select:invalid ~ .invalid-feedback {
+        display: block;
+    }
+    
+    /* Tambahan styling untuk form edit */
+    #editGaleriModal .form-control,
+    #editGaleriModal .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        transition: all 0.3s ease;
+    }
+    
+    #editGaleriModal .form-control:focus,
+    #editGaleriModal .form-select:focus {
+        border-color: #1e3a8a;
+        box-shadow: 0 0 0 0.2rem rgba(30, 58, 138, 0.25);
+    }
+    
+    #editGaleriModal .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    #editGaleriModal .modal-body {
+        padding: 2rem;
+    }
+    
+    /* Animasi untuk modal */
+    #editGaleriModal .modal-content {
+        animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+@endpush
+
+@push('scripts')
+<script>
+$(document).ready(function() {
+    // Event handler untuk saat modal edit ditampilkan
+    $('#editGaleriModal').on('show.bs.modal', function(event) {
+        var button = $(event.relatedTarget); // Tombol yang memicu modal
+
+        // Ekstrak data dari atribut data-*
+        var id = button.data('id');
+        var judul = button.data('judul');
+        var deskripsi = button.data('deskripsi');
+        var postId = button.data('post-id');
+        var categoryId = button.data('category-id');
+        var status = button.data('status');
+        var position = button.data('position');
+
+        // Dapatkan elemen modal
+        var modal = $(this);
+
+        // Isi form di dalam modal dengan data yang diekstrak
+        modal.find('#edit_judul').val(judul);
+        modal.find('#edit_deskripsi').val(deskripsi);
+        modal.find('#edit_post_id').val(postId);
+        modal.find('#edit_category_id').val(categoryId);
+        modal.find('#edit_position').val(position);
+
+        // Atur status radio button
+        if (status == 1) {
+            modal.find('#status_active').prop('checked', true);
+        } else {
+            modal.find('#status_inactive').prop('checked', true);
+        }
+
+        // Atur action form
+        var updateUrl = '{{ url('admin/galeri') }}/' + id;
+        modal.find('#editGaleriForm').attr('action', updateUrl);
+        modal.find('#gallery_id').val(id);
+
+        // Atur judul modal
+        modal.find('#editGaleriModalLabel').html('<i class="fas fa-edit me-2"></i>Edit: ' + judul);
+    });
+
+    // ... (kode lain seperti delete, dll bisa ditambahkan di sini)
+});
 </script>
+@endpush
+
+@endsection

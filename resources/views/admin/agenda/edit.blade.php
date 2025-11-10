@@ -59,7 +59,7 @@
 
                                         <div class="form-group mb-4">
                                             <label for="lokasi" class="form-label fw-bold">Lokasi <span class="text-danger">*</span></label>
-                                            <div class="input-group">
+                                            <div class="input-group merged">
                                                 <span class="input-group-text bg-light"><i class="fas fa-map-marker-alt text-primary"></i></span>
                                                 <input type="text" class="form-control @error('lokasi') is-invalid @enderror" 
                                                        id="lokasi" name="lokasi" value="{{ old('lokasi', $agenda->lokasi) }}" required
@@ -92,22 +92,20 @@
                                         </h5>
                                         
                                         <div class="mb-4">
-                                            <label for="tanggal" class="form-label fw-bold">Tanggal <span class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text bg-light"><i class="far fa-calendar text-primary"></i></span>
-                                                <input type="date" class="form-control @error('tanggal') is-invalid @enderror" 
-                                                       id="tanggal" name="tanggal" value="{{ old('tanggal', $agenda->tanggal->format('Y-m-d')) }}" required>
-                                                @error('tanggal')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <label class="form-label fw-bold">Waktu <span class="text-danger">*</span></label>
+                                            <label class="form-label fw-bold">Tanggal & Waktu <span class="text-danger">*</span></label>
                                             <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <div class="input-group">
+                                                <div class="col-12">
+                                                    <div class="input-group merged">
+                                                        <span class="input-group-text bg-light"><i class="far fa-calendar text-primary"></i></span>
+                                                        <input type="date" class="form-control @error('tanggal') is-invalid @enderror" 
+                                                               id="tanggal" name="tanggal" value="{{ old('tanggal', $agenda->tanggal->format('Y-m-d')) }}" required>
+                                                        @error('tanggal')
+                                                            <div class="invalid-feedback">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="input-group merged">
                                                         <span class="input-group-text bg-light"><i class="far fa-clock text-primary"></i></span>
                                                         <input type="time" class="form-control @error('waktu_mulai') is-invalid @enderror" 
                                                                id="waktu_mulai" name="waktu_mulai" value="{{ old('waktu_mulai', $agenda->waktu_mulai) }}" required>
@@ -115,10 +113,9 @@
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <div class="form-text text-center">Mulai</div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="input-group">
+                                                <div class="col-12">
+                                                    <div class="input-group merged">
                                                         <span class="input-group-text bg-light"><i class="far fa-clock text-primary"></i></span>
                                                         <input type="time" class="form-control @error('waktu_selesai') is-invalid @enderror" 
                                                                id="waktu_selesai" name="waktu_selesai" value="{{ old('waktu_selesai', $agenda->waktu_selesai ? $agenda->waktu_selesai->format('H:i') : '') }}">
@@ -126,8 +123,8 @@
                                                             <div class="invalid-feedback">{{ $message }}</div>
                                                         @enderror
                                                     </div>
-                                                    <div class="form-text text-center">Selesai</div>
                                                 </div>
+                                                
                                             </div>
                                         </div>
 
@@ -158,7 +155,7 @@
                                             <div class="form-check form-check-inline">
                                                 <input class="form-check-input" type="radio" name="status" id="statusPublished" value="1"
                                                     {{ old('status', $agenda->status) == '1' ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="statusPublished">Published</label>
+                                                <label class="form-check-label" for="statusPublished">Publik</label>
                                             </div>
                                             @error('status')
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -198,7 +195,7 @@
         font-weight: 500;
         margin-bottom: 0.5rem;
     }
-    .form-control, .form-select, .form-check-input {
+    .form-control, .form-select {
         width: 100% !important; /* same width */
         border-radius: 0.375rem;
         padding: 0.625rem 0.75rem; /* consistent height for inputs/selects */
@@ -213,12 +210,33 @@
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-right: 0; /* merge with input visually */
-        height: 44px;
+        height: 42px; /* equalize height */
+        display: flex;
+        align-items: center;
+        padding: 0 0.75rem;
+        min-width: 42px;
+        justify-content: center;
+        background: #fff !important;
+        border: 1px solid #e2e8f0 !important;
     }
-    .input-group .form-control { 
-        border-left: 0; /* merge with input-group-text */
-        height: 44px;
+    .input-group { display:flex !important; align-items: stretch; flex-wrap: nowrap !important; gap: 0; }
+    .input-group > .input-group-text { border-right: 0 !important; background:#fff !important; }
+    .input-group > .input-group-text + .form-control { border-left: 0 !important; }
+    .input-group .form-control {
+        border-left: 0 !important; /* safety */
+        height: 42px; /* prevent clipping */
+        padding: 0.5rem 0.75rem;
+        flex: 1 1 auto;
+        border: 1px solid #e2e8f0 !important;
+        border-top-left-radius: 0; /* visually merge with icon */
+        border-bottom-left-radius: 0;
+        background: #fff !important;
+        box-shadow: none !important;
     }
+    .input-group .form-control:focus { border-color: #cbd5e1 !important; outline: none !important; box-shadow: none !important; }
+    .form-check.form-check-inline { margin-right: 1rem; }
+    .form-check-input { width: 1rem !important; height: 1rem !important; border-radius: 50% !important; aspect-ratio: 1/1; padding: 0 !important; }
+    .row.g-3 > [class^="col-"], .row.g-3 > [class*=" col-"] { min-width: 0; }
     /* Add top breathing space so focus ring is not cut */
     .form-group, .mb-4 { scroll-margin-top: 80px; }
     .form-group .form-control, .mb-4 .form-control, .mb-4 .form-select { margin-top: 2px; }

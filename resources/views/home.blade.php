@@ -25,8 +25,9 @@
             </div>
             <!-- Right: image -->
             <div class="col-lg-6 d-none d-lg-block" data-reveal>
-                <div class="hero-image-wrap ms-lg-4">
+                <div class="hero-image-wrap ms-lg-4 position-relative">
                     <img src="{{ isset($profile) && ($profile->foto ?? null) ? asset($profile->foto) : asset('img/hero-school.jpg') }}" onerror="this.src='{{ asset('img/no-image.jpg') }}'" alt="Elunora School" class="img-fluid rounded-4 shadow-lg hero-image">
+                    <div class="hero-image-overlay"></div>
                 </div>
             </div>
         </div>
@@ -35,22 +36,37 @@
 
 
 <style>
-/* Modern Hero Section */
+/* Modern Hero Section (use global gradient from layout) */
 .hero-section {
-    background: var(--elunora-primary);
+    /* do not set background here to allow layout gradient */
     padding: 6rem 0 4rem 0;
     position: relative;
     overflow: hidden;
     min-height: 80vh;
     display: flex;
     align-items: center;
-    margin-top: -76px;
-    padding-top: 120px;
+    margin-top: 0;
+    padding-top: 96px; /* align with navbar height */
 }
 
 /* Hero image */
 .hero-image-wrap { position: relative; }
-.hero-image { width: 100%; height: auto; object-fit: cover; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+.hero-image { width: 100%; max-height: 350px; object-fit: cover; border-radius: 16px; box-shadow: 0 12px 30px rgba(0,0,0,.25); transition: none !important; transform: none !important; }
+.hero-image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 15%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    z-index: 1;
+}
+
+/* Ensure no unintended zoom on hover and overlay stays aligned */
+.hero-image-wrap:hover .hero-image { transform: none !important; }
+.hero-image-overlay { pointer-events: none; }
 
 .hero-overlay {
     position: absolute;
@@ -179,15 +195,8 @@
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 /* Grain overlay for hero background */
-.hero-section::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain2" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain2)"/></svg>') repeat;
-}
+/* Remove per-page grain overlay to avoid any visible panel */
+.hero-section::before { content: none !important; }
 
 .hero-badge {
     display: inline-flex;

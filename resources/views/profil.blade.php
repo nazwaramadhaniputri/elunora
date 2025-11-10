@@ -33,7 +33,7 @@
 
 @section('content')
 <!-- Profil Detail Section -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-light fade-in">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
@@ -184,7 +184,7 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
         </div>
         
         <div class="row">
-            @forelse($fasilitas as $item)
+            @forelse($fasilitas->take(3) as $item)
             <div class="col-md-4 mb-4">
                 <div class="facility-card h-100">
                     <div class="facility-image-container">
@@ -212,13 +212,11 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
             @endforelse
         </div>
         
-        @if($fasilitas->count() > 0)
         <div class="text-center mt-4">
             <a href="{{ route('fasilitas.all') }}" class="btn-modern primary">
                 <i class="fas fa-building me-2"></i>Lihat Semua Fasilitas
             </a>
         </div>
-        @endif
     </div>
 </section>
 
@@ -231,7 +229,7 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
         </div>
         
         <div class="row">
-            @forelse($gurus as $guru)
+            @forelse($gurus->take(3) as $guru)
             <div class="col-md-4 mb-4">
                 <div class="teacher-card h-100">
                     <div class="teacher-image-container">
@@ -262,13 +260,11 @@ Didukung oleh tenaga pendidik profesional serta lingkungan yang inspiratif, Elun
             @endforelse
         </div>
         
-        @if($gurus->count() > 0)
         <div class="text-center mt-4">
             <a href="{{ route('guru.all') }}" class="btn-modern primary">
                 <i class="fas fa-chalkboard-teacher me-2"></i>Lihat Semua Guru & Staff
             </a>
         </div>
-        @endif
     </div>
 </section>
 

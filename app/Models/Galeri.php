@@ -3,23 +3,46 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Galeri extends Model
 {
-    protected $fillable = ['post_id', 'judul', 'deskripsi', 'position', 'status'];
+    use HasFactory;
+
+    protected $fillable = [
+        'post_id',
+        'category_id',
+        'judul',
+        'deskripsi',
+        'position',
+        'status'
+    ];
     
-    public function getStatusTextAttribute()
-    {
-        return $this->status == 1 ? 'Aktif' : 'Tidak Aktif';
-    }
-    
+    protected $with = ['category'];
+
+    protected $casts = [
+        'post_id' => 'integer',
+        'position' => 'integer',
+        'status' => 'boolean'
+    ];
+
     public function post()
     {
         return $this->belongsTo(Post::class);
     }
-    
+
     public function fotos()
     {
         return $this->hasMany(Foto::class, 'galery_id');
+    }
+    
+    public function getStatusTextAttribute()
+    {
+        return $this->status ? 'Aktif' : 'Tidak Aktif';
+    }
+    
+    public function category()
+    {
+        return $this->belongsTo(GalleryCategory::class, 'category_id');
     }
 }

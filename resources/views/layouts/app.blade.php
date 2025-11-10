@@ -16,6 +16,10 @@
     <link rel="stylesheet" href="{{ asset('css/global-spacing.css') }}">
     <!-- Elunora Theme CSS -->
     <link rel="stylesheet" href="{{ asset('css/elunora-theme.css') }}">
+    <!-- Animations CSS -->
+    <link rel="stylesheet" href="{{ asset('css/animations.css') }}">
+    <!-- Background Pattern CSS -->
+    <link rel="stylesheet" href="{{ asset('css/background-pattern.css') }}">
     <!-- Custom CSS -->
     <style>
         body {
@@ -25,27 +29,45 @@
             background: var(--elunora-light);
             min-height: 100vh;
         }
+        /* Global hero icon float animation (applies site-wide) */
+        .hero-icon { animation: heroFloat 3.2s ease-in-out infinite; will-change: transform; }
+        @keyframes heroFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+        /* Make hero larger on non-home pages */
+        .not-home .hero-section { min-height: 58vh; padding-top: 120px; padding-bottom: 70px; }
+
+        /* Navbar CTA pill */
+        .nav-cta {
+            background: rgba(30,58,138,0.08) !important; /* light brand tint */
+            border: 1px solid rgba(30,58,138,0.22) !important;
+            color: var(--elunora-primary) !important;
+            border-radius: 999px !important;
+            box-shadow: 0 1px 2px rgba(2, 6, 23, 0.04);
+        }
+        .nav-cta:hover { background: rgba(30,58,138,0.12) !important; }
         
         .navbar {
-            background: var(--elunora-primary) !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: #ffffff !important;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
             padding: 0.8rem 0;
             transition: all 0.3s ease;
+            border-bottom: none !important; /* remove bottom line */
         }
         
         .navbar.scrolled {
-            padding: 0.5rem 0;
-            background: rgba(30, 58, 138, 0.98) !important;
-            backdrop-filter: blur(10px);
+            padding: 0.6rem 0;
+            background: #ffffff !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
         }
         
-        .navbar-brand {
+        .navbar-brand,
+        nav.navbar.elunora-navbar .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
-            color: white !important;
+            color: var(--elunora-primary) !important; /* navy/brand blue */
             display: flex;
             align-items: center;
         }
+        .navbar-brand .brand-text { color: var(--elunora-primary) !important; font-weight: 800; }
         
         .navbar-brand img {
             height: 35px;
@@ -53,54 +75,95 @@
             margin-right: 10px;
         }
         
+        /* Stronger specificity to beat any theme overrides */
+        .elunora-navbar .navbar-nav .nav-link,
+        .navbar.navbar-light .navbar-nav .nav-link,
         .navbar .nav-link {
-            color: rgba(255, 255, 255, 0.9) !important;
-            font-weight: 500;
-            padding: 0.5rem 1.2rem !important;
+            color: var(--elunora-primary) !important; /* navy text */
+            font-weight: 700;
+            padding: 0.5rem 1.0rem !important;
             margin: 0 0.2rem;
-            border-radius: 25px;
-            transition: all 0.3s ease;
+            border-radius: 999px;
+            transition: background-color 0.2s ease, color 0.2s ease;
             position: relative;
             overflow: hidden;
         }
         
         /* Removed ::after pseudo-elements that created underlines */
         
+        .elunora-navbar .navbar-nav .nav-link:hover,
+        .navbar.navbar-light .navbar-nav .nav-link:hover,
         .navbar .nav-link:hover {
-            color: white !important;
-            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: var(--elunora-primary) !important;
+            background-color: rgba(30,58,138,0.08) !important; /* light brand tint */
             border: none !important;
             text-decoration: none !important;
         }
         
+        .elunora-navbar .navbar-nav .nav-link.active,
+        .navbar.navbar-light .navbar-nav .nav-link.active,
         .navbar .nav-link.active {
-            color: white !important;
-            background-color: rgba(255, 255, 255, 0.25) !important;
-            font-weight: 600;
+            color: var(--elunora-primary) !important;
+            background-color: rgba(30,58,138,0.14) !important; /* brand chip */
+            font-weight: 800;
             border: none !important;
             text-decoration: none !important;
         }
+
+        /* Dropdown menu readability on light navbar */
+        .navbar .dropdown-menu { border-radius: 12px; border: 1px solid #e5e7eb; }
+        .navbar .dropdown-item { color: #0f172a; }
+        .navbar .dropdown-item:hover { background-color: #f1f5f9; color: #0f172a; }
         
         .hero-section {
-            background: var(--elunora-primary);
+            /* Stronger two-stop gradient with subtle highlights for clear contrast */
+            background-image:
+                radial-gradient(900px 420px at 80% 30%, rgba(255,255,255,0.05), rgba(255,255,255,0) 60%),
+                linear-gradient(110deg, #0a1f4a 0%, #183e8a 55%, #103885 100%) !important;
+            background-color: #0a1f4a !important;
+            background-repeat: no-repeat !important;
+            background-size: cover !important;
             color: white;
             padding: 6rem 0 4rem;
             text-align: center; /* center by default */
             position: relative;
             overflow: hidden;
-            margin-top: -76px;
-            padding-top: 120px;
+            margin-top: 0; /* no overlap to avoid seam */
+            padding-top: 96px; /* compensate for navbar height */
+        }
+        /* Ensure inner nodes have no background that creates a visible rectangle */
+        .hero-section > .container,
+        .hero-section .container,
+        .hero-section .row,
+        .hero-section [class^="col-"] {
+            background: transparent !important;
+            box-shadow: none !important;
+        }
+        .hero-section .card,
+        .hero-section .content-box,
+        .hero-section .text-box,
+        .hero-section .news-card {
+            background: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+
+        /* Outline primary tuned to brand navy */
+        .btn-outline-primary { color: var(--elunora-primary) !important; border-color: var(--elunora-primary) !important; }
+        .btn-outline-primary:hover { background: var(--elunora-primary) !important; color: #fff !important; }
+        .btn-outline-primary i { color: inherit !important; }
+
+        /* Translucent pill textbox for hero copy */
+        .hero-textbox {
+            display: inline-block;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 20px;
+            padding: 0.75rem 1.0rem;
+            backdrop-filter: blur(2px);
         }
         
-        .hero-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23000" opacity="0.02"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-        }
+        /* Overlay pola hero dikelola oleh background-pattern.css */
         
         .card {
             background: #ffffff;
@@ -185,6 +248,20 @@
             padding: 1rem 1.5rem;
             margin-bottom: 1.5rem;
         }
+        /* Ensure Bootstrap close button looks and works correctly */
+        .alert .btn-close {
+            float: right;
+            margin-left: 1rem;
+            box-shadow: none !important;
+            outline: none !important;
+            border: 0 !important;
+            width: 1em;
+            height: 1em;
+            opacity: 0.7;
+            cursor: pointer;
+        }
+        .alert .btn-close:hover { opacity: 1; }
+        .alert { position: relative; }
         
         .table {
             border-radius: 10px;
@@ -327,12 +404,12 @@
         window.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     </script>
 </head>
-<body>
+<body class="{{ request()->routeIs('home') ? 'home' : 'not-home' }}">
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark sticky-top elunora-navbar">
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top elunora-navbar">
         <div class="container-fluid px-3 px-lg-4">
             <a class="navbar-brand" href="{{ route('home') }}">
-                <img src="{{ asset('img/logo.png') }}" alt="Elunora School"> Elunora School
+                <img src="{{ asset('img/logo.png') }}" alt="Elunora School"> <span class="brand-text">Elunora School</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -340,31 +417,31 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Beranda</a>
+                        <a class="nav-link text-dark {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Beranda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('berita*') ? 'active' : '' }}" href="{{ route('berita') }}">Berita</a>
+                        <a class="nav-link text-dark {{ request()->routeIs('berita*') ? 'active' : '' }}" href="{{ route('berita') }}">Berita</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('galeri*') ? 'active' : '' }}" href="{{ route('galeri') }}">Galeri</a>
+                        <a class="nav-link text-dark {{ request()->routeIs('galeri*') ? 'active' : '' }}" href="{{ route('galeri') }}">Galeri</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('agenda*') ? 'active' : '' }}" href="{{ route('agenda') }}">Agenda</a>
+                        <a class="nav-link text-dark {{ request()->routeIs('agenda*') ? 'active' : '' }}" href="{{ route('agenda') }}">Agenda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('profil') ? 'active' : '' }}" href="{{ route('profil') }}">Profile</a>
+                        <a class="nav-link text-dark {{ request()->routeIs('profil') ? 'active' : '' }}" href="{{ route('profil') }}">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('kontak') ? 'active' : '' }}" href="{{ route('kontak') }}">Kontak</a>
+                        <a class="nav-link text-dark {{ request()->routeIs('kontak') ? 'active' : '' }}" href="{{ route('kontak') }}">Kontak</a>
                     </li>
                     @guest
                         <li class="nav-item ms-lg-2">
-                            <a class="btn btn-light btn-sm" href="{{ route('login', ['redirect' => request()->fullUrl()]) }}">
+                            <a class="btn btn-outline-primary btn-sm nav-cta" href="{{ route('login', ['redirect' => request()->fullUrl()]) }}">
                                 <i class="fas fa-sign-in-alt me-1"></i> Masuk
                             </a>
                         </li>
                         <li class="nav-item ms-1 mt-2 mt-lg-0">
-                            <a class="btn btn-light btn-sm" href="{{ route('register', ['redirect' => request()->fullUrl()]) }}">
+                            <a class="btn btn-outline-primary btn-sm nav-cta" href="{{ route('register', ['redirect' => request()->fullUrl()]) }}">
                                 <i class="fas fa-user-plus me-1"></i> Daftar
                             </a>
                         </li>
@@ -372,7 +449,7 @@
                         <li class="nav-item dropdown ms-lg-3">
                             <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <span class="avatar rounded-circle bg-light text-primary d-inline-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="fas fa-user"></i></span>
-                                <span class="text-white">{{ auth()->user()->name }}</span>
+                                <span class="text-dark">{{ auth()->user()->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li class="dropdown-header small text-muted px-3">Masuk sebagai<br><strong>{{ auth()->user()->email }}</strong></li>
@@ -395,9 +472,12 @@
 
     <!-- Hero Section (optional) -->
     @hasSection('hero')
-        <div class="hero-section">
+        @yield('hero')
+    @else
+        <div class="hero-section hero-default">
             <div class="container">
-                @yield('hero')
+                <h1 class="display-5 fw-bold mb-2">@yield('title', 'Elunora School')</h1>
+                <p class="mb-0 text-white-50">Selamat datang di Elunora School</p>
             </div>
         </div>
     @endif

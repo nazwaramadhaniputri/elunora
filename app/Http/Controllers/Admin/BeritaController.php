@@ -72,43 +72,129 @@ class BeritaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        // Debug: Log request data
+        \Log::info('Update request data:', $request->except(['gambar'])); // Exclude file content from log
+        \Log::info('Has file gambar: ' . ($request->hasFile('gambar') ? 'Ya' : 'Tidak'));
+        
+        $post = Post::findOrFail($id);
+        
+        // Validasi input
+        $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'isi' => 'required|string',
             'kategori_id' => 'required|exists:kategoris,id',
             'status' => 'required|in:draft,published',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
-        $post = Post::findOrFail($id);
         
-        // Create uploads directory if it doesn't exist
-        if (!file_exists(public_path('uploads/berita'))) {
-            mkdir(public_path('uploads/berita'), 0755, true);
+        // Pastikan direktori upload ada
+        $uploadPath = public_path('uploads/berita');
+        if (!file_exists($uploadPath)) {
+            if (!mkdir($uploadPath, 0755, true)) {
+                \Log::error('Gagal membuat direktori upload: ' . $uploadPath);
+                return back()->with('error', 'Gagal membuat direktori upload. Silakan hubungi administrator.');
+            }
         }
         
-        $gambarPath = $post->gambar;
+        // Handle upload gambar baru
         if ($request->hasFile('gambar')) {
-            // Delete old image if exists
+            // Hapus gambar lama jika ada
             if ($post->gambar && file_exists(public_path($post->gambar))) {
-                unlink(public_path($post->gambar));
+                try {
+                    unlink(public_path($post->gambar));
+                    \Log::info('Gambar lama berhasil dihapus: ' . $post->gambar);
+                } catch (\Exception $e) {
+                    \Log::error('Gagal menghapus gambar lama: ' . $e->getMessage());
+                    // Lanjutkan meskipun gagal hapus gambar lama
+                }
             }
             
+            // Upload gambar baru
             $gambar = $request->file('gambar');
             $gambarName = time() . '_' . uniqid() . '.' . $gambar->getClientOriginalExtension();
-            $gambar->move(public_path('uploads/berita'), $gambarName);
             $gambarPath = 'uploads/berita/' . $gambarName;
+            
+            try {
+                if ($gambar->move($uploadPath, $gambarName)) {
+                    $validated['gambar'] = $gambarPath;
+                    \Log::info('Gambar baru berhasil diupload ke: ' . $gambarPath);
+                } else {
+                    throw new \Exception('Gagal memindahkan file gambar');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Gagal mengunggah gambar: ' . $e->getMessage());
+                return back()
+                    ->with('error', 'Gagal mengunggah gambar. Pastikan direktori upload memiliki izin yang cukup.')
+                    ->withInput();
+            }
+        } else {
+            // Jika tidak ada gambar baru, pertahankan gambar lama
+            $validated['gambar'] = $post->gambar;
+            \Log::info('Tidak ada gambar baru diupload, menggunakan gambar lama: ' . $post->gambar);
         }
 
-        $post->update([
-            'judul' => $request->judul,
-            'isi' => $request->isi,
-            'kategori_id' => $request->kategori_id,
-            'status' => $request->status,
-            'gambar' => $gambarPath,
-        ]);
+        // Pastikan petugas_id tidak null
+        if (empty($post->petugas_id)) {
+            $validated['petugas_id'] = auth()->id() ?? 1;
+            \Log::info('Mengisi petugas_id dengan nilai default: ' . $validated['petugas_id']);
+        }
 
-        return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil diperbarui');
+        // Update timestamp
+        $validated['updated_at'] = now();
+        if (empty($post->created_at)) {
+            $validated['created_at'] = now();
+        }
+
+        try {
+            // Debug log data yang akan diupdate
+            \Log::info('Data yang akan diupdate:', $validated);
+            
+            // Gunakan DB transaction untuk memastikan konsistensi data
+            \DB::beginTransaction();
+            
+            // Update data berita
+            $post->judul = $validated['judul'];
+            $post->isi = $validated['isi'];
+            $post->kategori_id = $validated['kategori_id'];
+            $post->status = $validated['status'];
+            $post->gambar = $validated['gambar'];
+            $post->petugas_id = $validated['petugas_id'] ?? $post->petugas_id;
+            $post->updated_at = $validated['updated_at'];
+            
+            if (isset($validated['created_at'])) {
+                $post->created_at = $validated['created_at'];
+            }
+            
+            $saved = $post->save();
+            
+            if (!$saved) {
+                throw new \Exception('Gagal menyimpan data ke database');
+            }
+            
+            \DB::commit();
+            
+            // Clear cache
+            \Artisan::call('cache:clear');
+            \Artisan::call('view:clear');
+            \Artisan::call('config:clear');
+            
+            return redirect()->route('admin.berita.index')
+                ->with('success', 'Berita berhasil diperbarui');
+                
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            \Log::error('Gagal memperbarui berita: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+            
+            // Hapus file gambar yang baru diupload jika ada error
+            if (isset($gambarPath) && file_exists(public_path($gambarPath))) {
+                unlink(public_path($gambarPath));
+            }
+            
+            return back()
+                ->with('error', 'Gagal memperbarui berita: ' . $e->getMessage())
+                ->withInput();
+        }
     }
 
     public function destroy($id)

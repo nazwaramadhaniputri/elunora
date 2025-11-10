@@ -13,9 +13,9 @@
                 <p class="page-subtitle">Kelola data guru dan staff sekolah</p>
             </div>
             <div class="page-actions">
-                <a href="{{ route('admin.guru.create') }}" class="btn-modern primary">
+                <button type="button" class="btn-modern primary" data-bs-toggle="modal" data-bs-target="#modalCreateGuru">
                     <i class="fas fa-plus me-2"></i>Tambah Guru
-                </a>
+                </button>
             </div>
         </div>
     </div>
@@ -80,9 +80,16 @@
                                             <a href="{{ route('admin.guru.show', $guru->id) }}" class="action-btn info" title="Detail">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('admin.guru.edit', $guru->id) }}" class="action-btn primary" title="Edit">
+                                            <button type="button" class="action-btn primary btn-open-edit" title="Edit"
+                                                    data-id="{{ $guru->id }}"
+                                                    data-nama="{{ $guru->nama }}"
+                                                    data-nip="{{ $guru->nip }}"
+                                                    data-jabatan="{{ $guru->jabatan }}"
+                                                    data-mapel="{{ $guru->mata_pelajaran }}"
+                                                    data-status="{{ $guru->status }}"
+                                                    data-bs-toggle="modal" data-bs-target="#modalEditGuru">
                                                 <i class="fas fa-edit"></i>
-                                            </a>
+                                            </button>
                                             <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus guru ini?')">
                                                 @csrf
                                                 @method('DELETE')
@@ -119,4 +126,149 @@
         </div>
     @endif
 </div>
+@endsection
+
+@section('modals')
+<!-- Modal: Create Guru -->
+<div class="modal fade" id="modalCreateGuru" tabindex="-1" aria-labelledby="modalCreateGuruLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" style="max-width: 800px;">
+    <div class="modal-content" style="min-height: 500px; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalCreateGuruLabel">Tambah Guru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{{ route('admin.guru.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Nama</label>
+                <input type="text" name="nama" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">NIP (opsional)</label>
+                <input type="text" name="nip" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Jabatan</label>
+                <input type="text" name="jabatan" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Mata Pelajaran (opsional)</label>
+                <input type="text" name="mata_pelajaran" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                  <option value="1" selected>Aktif</option>
+                  <option value="0">Tidak Aktif</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Urutan</label>
+                <input type="number" name="urutan" class="form-control" min="1" value="1" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Foto (opsional)</label>
+                <input type="file" name="foto" class="form-control" accept="image/*">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Edit Guru -->
+<div class="modal fade" id="modalEditGuru" tabindex="-1" aria-labelledby="modalEditGuruLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" style="max-width: 800px;">
+    <div class="modal-content" style="min-height: 500px; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditGuruLabel">Edit Guru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="formEditGuru" action="#" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Nama</label>
+                <input type="text" name="nama" id="eg_nama" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">NIP (opsional)</label>
+                <input type="text" name="nip" id="eg_nip" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Jabatan</label>
+                <input type="text" name="jabatan" id="eg_jabatan" class="form-control" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label class="form-label">Mata Pelajaran (opsional)</label>
+                <input type="text" name="mata_pelajaran" id="eg_mapel" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" id="eg_status" class="form-select">
+                  <option value="1">Aktif</option>
+                  <option value="0">Tidak Aktif</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Foto (opsional)</label>
+                <input type="file" name="foto" class="form-control" accept="image/*">
+                <div class="form-text">Biarkan kosong jika tidak mengubah foto.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Urutan</label>
+                <input type="number" name="urutan" id="eg_urutan" class="form-control" min="1" required>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="submit" class="btn btn-primary"><i class="fas fa-save me-1"></i>Simpan Perubahan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+@endsection
+
+@section('scripts')
+@parent
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.btn-open-edit').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      const id = this.dataset.id;
+      const nama = this.dataset.nama || '';
+      const nip = this.dataset.nip || '';
+      const jabatan = this.dataset.jabatan || '';
+      const mapel = this.dataset.mapel || '';
+      const status = String(this.dataset.status || '1');
+      const form = document.getElementById('formEditGuru');
+      form.action = '/admin/guru/' + id;
+      document.getElementById('eg_nama').value = nama;
+      document.getElementById('eg_nip').value = nip;
+      document.getElementById('eg_jabatan').value = jabatan;
+      document.getElementById('eg_mapel').value = mapel;
+      document.getElementById('eg_status').value = status;
+    });
+  });
+});
+</script>
 @endsection

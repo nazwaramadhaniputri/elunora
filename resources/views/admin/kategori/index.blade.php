@@ -20,6 +20,7 @@
         </div>
     </div>
 
+    @php($kategoris = $kategoris ?? ($categories ?? ($kategori ?? collect())))
     <div class="modern-table-card">
         <div class="table-card-body">
             <div class="table-responsive">
@@ -39,7 +40,7 @@
                             <td>{{ $kategori->nama_kategori }}</td>
                             <td class="text-center">
                                 <span class="status-badge published">
-                                    <i class="fas fa-newspaper me-1"></i>{{ $kategori->posts_count }}
+                                    <i class="fas fa-newspaper me-1"></i>{{ $kategori->posts_count ?? 0 }}
                                 </span>
                             </td>
                             <td class="text-center">
@@ -51,38 +52,38 @@
                                             data-bs-target="#editKategoriModal"
                                             title="Edit">
                                         <i class="fas fa-edit"></i>
-                                </button>
-                                <form action="{{ route('admin.berita.kategori.destroy', $kategori->id) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="action-btn danger" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')" title="Hapus">
-                                        <i class="fas fa-trash"></i>
                                     </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="text-center py-5">
-                            <div class="empty-state">
-                                <div class="empty-icon">
-                                    <i class="fas fa-tags"></i>
+                                    <form action="{{ route('admin.berita.kategori.destroy', $kategori->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="action-btn danger" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')" title="Hapus">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </div>
-                                <h5 class="empty-title">Belum Ada Kategori</h5>
-                                <p class="empty-text">Mulai dengan menambahkan kategori pertama</p>
-                                <button type="button" class="btn-modern primary" data-bs-toggle="modal" data-bs-target="#tambahKategoriModal">
-                                    <i class="fas fa-plus me-2"></i>Tambah Kategori
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="4" class="text-center py-4">
+                                <div class="empty-state" style="padding: 2rem;">
+                                    <div class="empty-icon" style="width:64px;height:64px;">
+                                        <i class="fas fa-tags"></i>
+                                    </div>
+                                    <h5 class="empty-title">Belum Ada Kategori</h5>
+                                    <p class="empty-text">Mulai dengan menambahkan kategori pertama</p>
+                                    <button type="button" class="btn-modern primary" data-bs-toggle="modal" data-bs-target="#tambahKategoriModal">
+                                        <i class="fas fa-plus me-2"></i>Tambah Kategori
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 </div>
 
 <!-- Modal Tambah Kategori -->
@@ -111,7 +112,7 @@
             </form>
         </div>
     </div>
-</div>
+    </div>
 
 <!-- Modal Edit Kategori -->
 <div class="modal fade" id="editKategoriModal" tabindex="-1" aria-labelledby="editKategoriModalLabel" aria-hidden="true">
@@ -135,12 +136,22 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn-modern secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn-modern success">Simpan Perubahan</button>
+                    <button type="submit" class="btn-modern primary">Simpan Perubahan</button>
                 </div>
             </form>
         </div>
     </div>
-</div>
+    </div>
+@endsection
+
+@section('styles')
+<style>
+/* Perkecil tinggi tampilan kosong di halaman kategori */
+.modern-table-card .empty-state { padding: 1.5rem !important; }
+.modern-table-card .empty-icon { width: 56px !important; height: 56px !important; }
+.modern-table thead th { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+.modern-table tbody td { padding-top: 0.9rem; padding-bottom: 0.9rem; }
+</style>
 @endsection
 
 @section('scripts')
@@ -150,10 +161,9 @@
         $('.edit-kategori').on('click', function() {
             const id = $(this).data('id');
             const nama = $(this).data('nama');
-            
             $('#edit_nama_kategori').val(nama);
             $('#editKategoriForm').attr('action', `/admin/kategori/${id}`);
         });
     });
-</script>
+    </script>
 @endsection

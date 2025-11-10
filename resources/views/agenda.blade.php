@@ -31,7 +31,7 @@
 @endsection
 
 @section('content')
-<section class="py-5">
+<section class="py-5 fade-in">
     <div class="container">
         @if($todayAgenda->count() > 0)
         <div class="text-center mb-5">
