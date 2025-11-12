@@ -40,7 +40,17 @@ Route::get('/kategori/{id}', [App\Http\Controllers\KategoriController::class, 's
 
 // Rute untuk fitur upload foto pengunjung
 Route::get('/user-photos', [App\Http\Controllers\UserPhotoController::class, 'index'])->name('user-photos.index');
+Route::get('/user-photos/my-photos', [App\Http\Controllers\UserPhotoController::class, 'myPhotos'])
+    ->middleware('auth')
+    ->name('user-photos.my-photos');
+
+// Profile routes
 Route::middleware(['auth'])->group(function () {
+    // Profile routes
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+    
+    // User photos
     Route::get('/my-photos', [App\Http\Controllers\UserPhotoController::class, 'myPhotos'])->name('user-photos.my-photos');
     Route::get('/user-photos/create', [App\Http\Controllers\UserPhotoController::class, 'create'])->name('user-photos.create');
     Route::post('/user-photos', [App\Http\Controllers\UserPhotoController::class, 'store'])->name('user-photos.store');

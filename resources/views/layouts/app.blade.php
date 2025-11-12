@@ -447,12 +447,24 @@
                         </li>
                     @else
                         <li class="nav-item dropdown ms-lg-3">
-                            <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <span class="avatar rounded-circle bg-light text-primary d-inline-flex align-items-center justify-content-center" style="width:32px;height:32px;"><i class="fas fa-user"></i></span>
-                                <span class="text-dark">{{ auth()->user()->name }}</span>
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="padding: 0.25rem 0.5rem;">
+                                @if(auth()->user()->photo)
+                                    <img src="{{ asset(auth()->user()->photo) }}" class="rounded-circle me-1" style="width: 26px; height: 26px; object-fit: cover; border: 1.5px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" alt="{{ auth()->user()->name }}">
+                                @else
+                                    <span class="avatar rounded-circle d-inline-flex align-items-center justify-content-center me-1" 
+                                          style="width:26px; height:26px; background: linear-gradient(135deg, var(--elunora-primary) 0%, var(--elunora-primary-dark) 100%);
+                                                 color: white; font-weight: 600; font-size: 12px; border: 1.5px solid white; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                                    </span>
+                                @endif
+                                <span class="text-dark" style="font-size: 0.9rem;">{{ auth()->user()->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li class="dropdown-header small text-muted px-3">Masuk sebagai<br><strong>{{ auth()->user()->email }}</strong></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('profile.show') }}">
+                                        <i class="fas fa-user-circle me-2"></i> Profil Saya
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="POST" action="{{ route('logout') }}" class="px-3 py-1">
@@ -536,6 +548,31 @@
             </div>
         </div>
     </footer>
+
+    <!-- Toast Notifications -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+        <!-- Success Toast -->
+        <div id="toastSuccess" class="toast align-items-center text-white bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="toastSuccessMessage">Operasi berhasil</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        
+        <!-- Error Toast -->
+        <div id="toastError" class="toast align-items-center text-white bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="toastErrorMessage">Terjadi kesalahan</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -73,27 +73,29 @@ class BeritaController extends Controller
     public function update(Request $request, $id)
     {
         // Debug: Log request data
-        \Log::info('Update request data:', $request->except(['gambar']));
+        \Log::info('Update request data:', $request->all());
+        \Log::info('Method: ' . $request->method());
         \Log::info('Has file gambar: ' . ($request->hasFile('gambar') ? 'Ya' : 'Tidak'));
         
         try {
-            // Mulai transaction
-            \DB::beginTransaction();
-            
             // Dapatkan post yang akan diupdate
             $post = Post::findOrFail($id);
+            \Log::info('Post ditemukan:', $post->toArray());
             
             // Validasi input
             $validated = $request->validate([
                 'judul' => 'required|string|max:255',
                 'isi' => 'required|string',
                 'kategori_id' => 'required|exists:kategoris,id',
-                'status' => 'required|in:draft,published',
                 'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             ]);
             
+            \Log::info('Validasi berhasil, data yang akan diupdate:', $validated);
+            
             // Handle upload gambar baru
             if ($request->hasFile('gambar')) {
+                \Log::info('Memproses upload gambar baru');
+                
                 // Pastikan direktori upload ada
                 $uploadPath = public_path('uploads/berita');
                 if (!file_exists($uploadPath)) {
@@ -124,37 +126,41 @@ class BeritaController extends Controller
                 
                 $validated['gambar'] = $gambarPath;
                 \Log::info('Gambar baru berhasil diupload ke: ' . $gambarPath);
+            } else {
+                \Log::info('Tidak ada gambar baru diupload, menggunakan gambar lama');
             }
             
             // Update data
-            $post->update($validated);
+            $updated = $post->update($validated);
+            \Log::info('Update berhasil dilakukan: ' . ($updated ? 'Ya' : 'Tidak'));
+            \Log::info('Data setelah update:', $post->fresh()->toArray());
             
-            // Commit transaction
-            \DB::commit();
-            
-            // Clear cache
-            \Artisan::call('cache:clear');
-            \Artisan::call('view:clear');
-            \Artisan::call('config:clear');
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berita berhasil diperbarui',
+                    'data' => $post->fresh()
+                ]);
+            }
             
             return redirect()->route('admin.berita.index')
                 ->with('success', 'Berita berhasil diperbarui');
                 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            // Tangkap error validasi
-            throw $e;
+            \Log::error('Validasi gagal:', $e->errors());
+            return back()->withErrors($e->errors())->withInput();
                 
         } catch (\Exception $e) {
-            // Rollback transaction jika ada error
-            \DB::rollBack();
-            
-            // Hapus file gambar yang baru diupload jika ada error
-            if (isset($gambarPath) && isset($uploadPath) && file_exists($uploadPath . '/' . $gambarName)) {
-                @unlink($uploadPath . '/' . $gambarName);
-            }
-            
             \Log::error('Gagal memperbarui berita: ' . $e->getMessage());
             \Log::error($e->getTraceAsString());
+            
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal memperbarui berita: ' . $e->getMessage(),
+                    'errors' => $e->getMessage()
+                ], 500);
+            }
             
             return back()
                 ->with('error', 'Gagal memperbarui berita: ' . $e->getMessage())

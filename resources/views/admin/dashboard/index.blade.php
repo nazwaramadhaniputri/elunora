@@ -269,18 +269,34 @@
                     <a href="{{ route('admin.berita.index') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
                 </div>
                 <div class="card-body">
-                    @if(isset($latestPosts) && $latestPosts->count())
-                        <ul class="list-group list-group-flush" id="listLatestPosts">
-                            @foreach($latestPosts as $post)
-                                <li class="list-group-item d-flex justify-content-between align-items-start">
-                                    <div class="ms-2 me-auto">
-                                        <div class="fw-semibold">{{ $post->judul ?? 'Tanpa Judul' }}</div>
-                                        <small class="text-muted">{{ \Carbon\Carbon::parse($post->created_at)->format('d M Y H:i') }}</small>
-                                    </div>
-                                    <a href="{{ route('admin.berita.edit', $post->id) }}" class="btn btn-sm btn-outline-secondary">Kelola</a>
-                                </li>
-                            @endforeach
-                        </ul>
+                    @php
+                        // Debug: Tampilkan jumlah post yang diambil
+                        // dd($latestPosts);
+                    @endphp
+                    @if($latestPosts->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <tbody>
+                                    @foreach($latestPosts as $post)
+                                        <tr>
+                                            <td style="width: 70%; vertical-align: middle;">
+                                                <div class="fw-semibold text-truncate" style="max-width: 300px;" title="{{ $post->judul }}">
+                                                    {{ $post->judul ?? 'Tanpa Judul' }}
+                                                </div>
+                                                <small class="text-muted">
+                                                    {{ \Carbon\Carbon::parse($post->created_at)->format('d M Y H:i') }}
+                                                </small>
+                                            </td>
+                                            <td class="text-end" style="vertical-align: middle;">
+                                                <a href="{{ route('admin.berita.edit', $post->id) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i> Lihat
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     @else
                         <div class="empty-state" id="emptyLatestPosts">
                             <div class="empty-icon"><i class="fas fa-newspaper"></i></div>

@@ -180,26 +180,29 @@
         <h5 class="modal-title" id="modalEditBeritaLabel"><i class="fas fa-edit me-2"></i>Edit Berita</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form id="formEditBerita" action="#" method="POST" enctype="multipart/form-data">
+      <form id="formEditBerita" action="" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="_method" value="PUT">
         <div class="modal-body">
           <div class="row g-3">
             <div class="col-md-8">
               <label class="form-label fw-semibold">Judul</label>
-              <input type="text" name="judul" id="editjudul" class="form-control" required>
+              <input type="text" name="judul" id="editjudul" class="form-control" value="{{ old('judul') }}" required>
             </div>
             <div class="col-md-4">
               <label class="form-label fw-semibold">Kategori</label>
               <select name="kategori_id" id="editkategori" class="form-select" required>
+                <option value="">Pilih Kategori</option>
                 @foreach($allCategories as $kat)
-                  <option value="{{ $kat->id }}">{{ $kat->nama_kategori }}</option>
+                  <option value="{{ $kat->id }}" {{ old('kategori_id') == $kat->id ? 'selected' : '' }}>{{ $kat->nama_kategori }}</option>
                 @endforeach
               </select>
             </div>
             <div class="col-12">
               <label class="form-label fw-semibold">Isi Berita</label>
-              <textarea name="isi" id="editisi" class="form-control" rows="8" required></textarea>
+              <textarea name="isi" id="editisi" class="form-control" rows="8" required>{{ old('isi') }}</textarea>
             </div>
             <div class="col-12">
               <label class="form-label fw-semibold">Gambar (opsional)</label>
@@ -221,20 +224,136 @@
 @section('scripts')
 @parent
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('.btn-open-edit').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      const id = this.dataset.id;
-      const judul = this.dataset.judul || '';
-      const kategori = this.dataset.kategori || '';
-      const isi = this.dataset.isi || '';
-      const form = document.getElementById('formEditBerita');
-      form.action = '/admin/berita/' + id;
-      document.getElementById('editjudul').value = judul;
-      document.getElementById('editkategori').value = kategori;
-      document.getElementById('editisi').value = isi;
+// Solusi sederhana untuk menangani modal
+$(document).ready(function() {
+    // Fungsi untuk menutup modal dengan animasi smooth
+    function closeModal(modalId) {
+        const $modal = $('#' + modalId);
+        
+        // Trigger animasi fade out
+        $modal.removeClass('show');
+        $modal.css('display', 'block');
+        $modal.addClass('fade-out');
+        
+        // Tunggu animasi selesai (300ms sesuai durasi animasi Bootstrap)
+        setTimeout(() => {
+            // Sembunyikan modal
+            $modal.modal('hide');
+            
+            // Hapus backdrop
+            $('.modal-backdrop').remove();
+            
+            // Reset body
+            $('body')
+                .removeClass('modal-open')
+                .css('overflow', '')
+                .css('padding-right', '');
+                
+            // Reset class modal
+            $modal.removeClass('fade-out');
+        }, 300);
+    }
+    
+    // Handle tombol close dan batal
+    $(document).on('click', '.btn-close, [data-bs-dismiss="modal"], .btn-secondary', function(e) {
+        e.preventDefault();
+        const modal = $(this).closest('.modal');
+        if (modal.length) {
+            closeModal(modal.attr('id'));
+        }
     });
-  });
+    
+    // Handle klik di luar modal (backdrop)
+    $(document).on('click', '.modal', function(e) {
+        if (e.target === this) {
+            closeModal($(this).attr('id'));
+        }
+    });
+    
+    // Handle tombol escape
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('.modal.show').each(function() {
+                closeModal($(this).attr('id'));
+            });
+        }
+    });
+    
+    // Handle tombol edit
+    $('.btn-open-edit').on('click', function(e) {
+        e.preventDefault();
+        
+        const id = $(this).data('id');
+        const judul = $(this).data('judul') || '';
+        const kategori = $(this).data('kategori') || '';
+        const isi = $(this).data('isi') || '';
+        const gambarUrl = $(this).data('gambar-url') || '';
+        
+        // Update form action
+        $('#formEditBerita').attr('action', '{{ url("admin/berita") }}/' + id);
+        
+        // Update form fields
+        $('#editjudul').val(judul);
+        $('#editkategori').val(kategori);
+        $('#editisi').val(isi);
+        
+        // Tampilkan gambar jika ada
+        if (gambarUrl) {
+            $('#currentImage').html(`
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Gambar Saat Ini:</label>
+                    <img src="${gambarUrl}" class="img-fluid rounded" style="max-height: 200px;">
+                </div>
+            `).show();
+        } else {
+            $('#currentImage').hide();
+        }
+    });
+    
+    // Handle form submission
+    $('#formEditBerita').on('submit', function(e) {
+        e.preventDefault();
+        
+        const form = $(this);
+        const formData = new FormData(this);
+        const submitBtn = form.find('button[type="submit"]');
+        const originalBtnText = submitBtn.html();
+        
+        // Tampilkan loading
+        submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Menyimpan...');
+        
+        // Kirim form
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                // Tutup modal
+                closeModal('modalEditBerita');
+                
+                // Tampilkan pesan sukses
+                const toast = new bootstrap.Toast(document.getElementById('toastSuccess'));
+                $('#toastSuccessMessage').text('Berita berhasil diperbarui');
+                toast.show();
+                
+                // Refresh halaman setelah 1 detik
+                setTimeout(() => window.location.reload(), 1000);
+            },
+            error: function(xhr) {
+                let errorMessage = 'Terjadi kesalahan saat menyimpan perubahan';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                alert(errorMessage);
+                submitBtn.prop('disabled', false).html(originalBtnText);
+            }
+        });
+    });
 });
 </script>
 @endsection

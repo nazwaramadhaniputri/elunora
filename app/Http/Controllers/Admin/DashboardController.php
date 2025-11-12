@@ -45,14 +45,11 @@ class DashboardController extends Controller
                             ->take(5)
                             ->get();
 
-        // Konten terbaru untuk dashboard (hanya yang publish/aktif jika ada)
-        $latestPosts = \App\Models\Post::when(Schema::hasColumn('posts', 'status'), function($q){
-                                return $q->where('status', 1);
-                            })
-                            ->orderByDesc('updated_at')
-                            ->orderByDesc('created_at')
-                            ->orderByDesc('id')
-                            ->take(5)
+        // Ambil 4 berita terbaru yang sudah dipublikasikan
+        $latestPosts = \App\Models\Post::where('status', 'published')
+                            ->orWhere('status', 1)
+                            ->orderBy('created_at', 'desc')
+                            ->take(4)
                             ->get();
         $latestFotos = \App\Models\Foto::whereHas('galeri', function($q){
                                 $q->when(Schema::hasColumn('galeris', 'status'), function($qq){ $qq->where('status',1); });
