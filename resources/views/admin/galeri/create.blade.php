@@ -22,8 +22,12 @@
     /* Prevent cards from hugging the sidebar; add safe side gutters on this page */
     .dashboard-safe-gutter { padding-left: 1rem; padding-right: 1rem; }
     @media (min-width: 992px) { .dashboard-safe-gutter { padding-left: 1.5rem; padding-right: 1.5rem; } }
-    /* Give submit button some breathing room from the status select */
-    #galeriForm .btn-modern.primary { margin-top: 0.75rem; }
+    /* Give submit button more breathing room from the status select */
+    #galeriForm .btn-modern.primary { 
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+        padding: 0.75rem 2rem;
+    }
 </style>
 @endsection
 
@@ -135,9 +139,11 @@
                             @enderror
                         </div>
                         
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Simpan Galeri
-                        </button>
+                        <div class="mt-4 mb-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Simpan Galeri
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
