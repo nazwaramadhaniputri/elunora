@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fotos', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('galeri_id');
-            $table->string('file');
-            $table->string('judul');
-            $table->timestamps();
+        Schema::table('activity_logs', function (Blueprint $table) {
+            //
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fotos');
+        Schema::table('activity_logs', function (Blueprint $table) {
+            //
+        });
     }
 };

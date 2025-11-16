@@ -102,19 +102,9 @@
                         <a href="{{ route('admin.galeri.show', $galeri->id) }}" class="action-btn info" title="Detail">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <button class="action-btn primary edit-galeri"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editGaleriModal"
-                            data-id="{{ $galeri->id }}"
-                            data-judul="{{ addslashes($galeri->judul) }}"
-                            data-deskripsi="{{ addslashes($galeri->deskripsi ?? '') }}"
-                            data-post-id="{{ $galeri->post_id ?? '' }}"
-                            data-category-id="{{ $galeri->category_id ?? '' }}"
-                            data-status="{{ $galeri->status ?? '1' }}"
-                            data-position="{{ $galeri->position ?? '0' }}"
-                            title="Edit">
+                        <a href="{{ route('admin.galeri.edit', $galeri->id) }}" class="action-btn primary" title="Edit">
                             <i class="fas fa-edit"></i>
-                        </button>
+                        </a>
                         <form action="{{ route('admin.galeri.destroy', $galeri->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus galeri ini? Tindakan ini tidak dapat dibatalkan.');">
                             @csrf
                             @method('DELETE')

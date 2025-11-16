@@ -11,12 +11,27 @@ use App\Models\Petugas;
 
 class AuthController extends Controller
 {
+    /**
+     * Where to redirect users after login.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/admin/dashboard';
+
+
     public function showLoginForm()
     {
         if (Auth::guard('petugas')->check()) {
             return redirect()->route('admin.dashboard');
         }
-        return view('admin.auth.login');
+        
+        // Ensure we're not redirecting to the user login
+        if (request()->is('admin/*')) {
+            return view('admin.auth.login');
+        }
+        
+        // If somehow we got here but the URL doesn't match, redirect to the admin login
+        return redirect()->route('admin.login');
     }
 
     public function login(Request $request)
@@ -44,8 +59,9 @@ class AuthController extends Controller
             $request->session()->regenerate();
             RateLimiter::clear($throttleKey);
             
-            return redirect()->intended(route('admin.dashboard'))
-                ->with('success', 'Login berhasil! Selamat datang kembali.');
+            return $this->authenticated($request, Auth::guard('petugas')->user())
+                ?: redirect()->intended($this->redirectPath())
+                    ->with('success', 'Login berhasil! Selamat datang kembali.');
         }
 
         // If authentication fails
@@ -56,6 +72,33 @@ class AuthController extends Controller
         ])->withInput($request->only('email', 'remember'));
     }
     
+    /**
+     * Get the post login redirect path.
+     *
+     * @return string
+     */
+    public function redirectPath()
+    {
+        if (method_exists($this, 'redirectTo')) {
+            return $this->redirectTo();
+        }
+
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/admin/dashboard';
+    }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        // You can add any additional logic here after successful authentication
+        return null; // Return null to use the default redirect
+    }
+
     protected function throttleKey(Request $request)
     {
         return 'login.'.$request->ip();
@@ -68,7 +111,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('admin.login');
+        return redirect('/admin/login');
     }
 
     public function showForgotPasswordForm()

@@ -57,4 +57,12 @@
             <span>Profil Sekolah</span>
         </a>
     </li>
+
+    <!-- Log Aktivitas -->
+    <li class="nav-item">
+        <a class="nav-link {{ Request::is('admin/activity-logs*') ? 'active' : '' }}" href="{{ route('admin.activity-logs.index') }}">
+            <i class="fas fa-history"></i>
+            <span>Log Aktivitas</span>
+        </a>
+    </li>
 </ul>

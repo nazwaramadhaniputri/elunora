@@ -58,13 +58,27 @@
         .sidebar {
             /* Solid theme color as requested */
             background: var(--elunora-primary);
-            min-height: 100vh;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
             box-shadow: 0 0 35px 0 rgba(2, 6, 23, 0.25);
             color: #e2e8f0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 1000;
+            padding-top: 1.5rem; /* Menambahkan padding di atas sidebar */
         }
 
         /* Provide a minimal gutter so content cards never stick to sidebar */
-        .content { padding-left: 0.5rem; padding-bottom: 2rem; }
+        .content { 
+            margin-left: 250px; /* Sesuaikan dengan lebar sidebar */
+            padding: 2rem;
+            width: calc(100% - 250px);
+            min-height: 100vh;
+            padding-top: 90px; /* Memberikan ruang lebih untuk navbar di atas */
+        }
         @media (min-width: 992px) { .content { padding-left: 0.75rem; } }
         
         .sidebar .nav-item {
@@ -74,12 +88,16 @@
         .sidebar .nav-item .nav-link {
             text-align: left;
             padding: 0.9rem 1rem;
-            width: 14rem;
+            width: calc(100% - 1.5rem); /* Menyesuaikan lebar dengan container */
+            max-width: 14rem; /* Maksimum lebar */
             color: #cbd5e1;
             font-weight: 600;
             border-radius: 0.5rem;
             margin: 0.2rem 0.75rem;
             transition: all 0.2s ease;
+            white-space: nowrap; /* Mencegah text wrapping */
+            overflow: hidden; /* Menyembunyikan overflow */
+            text-overflow: ellipsis; /* Menambahkan ellipsis jika teks terlalu panjang */
         }
         
         .sidebar .nav-item .nav-link:hover {
@@ -183,18 +201,29 @@
             overflow-x: hidden; /* contain any wide children */
         }
         
-        @media (min-width: 768px) {
-            .main-content {
-                margin-left: 280px;
+        @media (max-width: 991.98px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding-top: 0;
             }
-            /* Make the left sidebar sticky on desktop */
-            .elunora-admin-sidebar {
-                position: sticky;
-                top: 0;
-                height: 100vh;
-                overflow-y: auto;
-                overscroll-behavior: contain;
+            .content {
+                margin-left: 0;
+                width: 100%;
+                padding: 1.5rem;
+                padding-top: 90px;
             }
+            .content > .d-flex.border-bottom {
+                left: 0;
+                right: 0;
+                padding: 0.75rem 1.5rem;
+                height: 70px;
+            }
+            .page-actions {
+                gap: 0.75rem;
+            }
+        }
             /* Remove internal top padding to align with top */
             .elunora-admin-sidebar .position-sticky { padding-top: 0 !important; }
         }
@@ -558,21 +587,30 @@
         }
 
         /* Sticky white top header inside main content */
+        /* Navbar atas */
         .content > .d-flex.border-bottom {
-            position: sticky;
+            position: fixed;
             top: 0;
-            background: #ffffff; /* navbar white */
+            right: 0;
+            left: 250px; /* Sesuaikan dengan lebar sidebar */
+            background: #ffffff;
             z-index: 1050;
-            border-bottom: none !important;
-            box-shadow: none; /* remove shadow to avoid gray line */
-            border-radius: 0; /* no rounded corners */
+            padding: 1rem 2rem;
+            border-bottom: 1px solid #e2e8f0 !important;
             margin-left: 0 !important;
-            margin-right: 0 !important; /* eliminate right gap */
-            width: 100% !important; /* avoid subpixel overflow */
-            padding-left: 1.25rem; /* a bit more space from sidebar */
-            padding-right: 0.75rem; /* give a little breathing room on right */
-            padding-top: 0.5rem; /* tighter top */
-            padding-bottom: 0.5rem; /* tighter bottom */
+            margin-right: 0 !important;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px; /* Tinggi navbar */
+        }
+        
+        /* Tombol notifikasi dan profil */
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
         }
 
         /* Remove subtle bottom line under sidebar brand that can look like a seam */
@@ -1709,6 +1747,11 @@
                                 @endif
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.activity-logs.*') ? 'active' : '' }}" href="{{ route('admin.activity-logs.index') }}">
+                                <i class="fas fa-history me-2"></i> Log Aktivitas
+                            </a>
+                        </li>
                         <!-- Logout removed from sidebar by request -->
                     </ul>
                 </div>
@@ -1730,6 +1773,7 @@
                             elseif (str_starts_with($routeName, 'admin.galeri')) $autoTitle = 'Galeri';
                             elseif (str_starts_with($routeName, 'admin.profil')) $autoTitle = 'Profile Sekolah';
                             elseif (str_starts_with($routeName, 'admin.fasilitas')) $autoTitle = 'Fasilitas';
+                            elseif (str_starts_with($routeName, 'admin.activity-logs')) $autoTitle = 'Log Aktivitas';
                             elseif (str_starts_with($routeName, 'admin.guru')) $autoTitle = 'Guru & Staff';
                             elseif (str_starts_with($routeName, 'admin.agenda')) $autoTitle = 'Agenda';
                             elseif (str_starts_with($routeName, 'admin.contact')) $autoTitle = 'Pesan Kontak';

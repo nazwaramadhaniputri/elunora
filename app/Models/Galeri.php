@@ -33,7 +33,7 @@ class Galeri extends Model
 
     public function fotos()
     {
-        return $this->hasMany(Foto::class, 'galery_id');
+        return $this->hasMany(Foto::class, 'galeri_id');
     }
     
     public function getStatusTextAttribute()

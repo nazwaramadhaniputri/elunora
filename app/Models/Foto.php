@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Foto extends Model
 {
-    protected $fillable = ['galery_id', 'file', 'judul', 'uploader_name', 'likes_count'];
+    protected $fillable = ['galeri_id', 'file', 'judul', 'uploader_name', 'likes_count'];
     
     public $timestamps = false;
     
     public function galeri()
     {
-        return $this->belongsTo(Galeri::class, 'galery_id');
+        return $this->belongsTo(Galeri::class, 'galeri_id');
     }
 
     public function comments()

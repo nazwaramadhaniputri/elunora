@@ -87,18 +87,29 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [GuestAuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
-Route::get('/admin/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('admin.password.request');
-Route::post('/admin/forgot-password', [AuthController::class, 'forgotPassword'])->name('admin.password.email');
-Route::get('/admin/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('admin.password.reset');
-Route::post('/admin/reset-password', [AuthController::class, 'resetPassword'])->name('admin.password.update');
+// Admin auth routes - only accessible to guests
+Route::middleware('guest.petugas')->group(function () {
+    Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
+    Route::get('/admin/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('admin.password.request');
+    Route::post('/admin/forgot-password', [AuthController::class, 'forgotPassword'])->name('admin.password.email');
+    Route::get('/admin/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('admin.password.reset');
+    Route::post('/admin/reset-password', [AuthController::class, 'resetPassword'])->name('admin.password.update');
+});
 
-// Rute untuk admin (tanpa middleware - sesuai sistem asli)
-Route::prefix('admin')->name('admin.')->group(function () {
+// Rute untuk admin dengan middleware LogAdminActivity dan guard petugas
+Route::prefix('admin')
+    ->name('admin.')
+    ->middleware(['web', 'auth:petugas', 'App\Http\Middleware\LogAdminActivity'])
+    ->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/latest', [DashboardController::class, 'latest'])->name('dashboard.latest');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    // Log Aktivitas
+    Route::get('activity-logs', [\App\Http\Controllers\Admin\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('activity-logs/{activityLog}', [\App\Http\Controllers\Admin\ActivityLogController::class, 'show'])->name('activity-logs.show');
+    
     // Admin account profile
     Route::get('/account/profile', [AdminProfileController::class, 'edit'])->name('account.profile');
     Route::put('/account/profile', [AdminProfileController::class, 'update'])->name('account.profile.update');
