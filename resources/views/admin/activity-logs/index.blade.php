@@ -98,6 +98,16 @@
         margin-bottom: 1rem;
         color: #d1d3e2;
     }
+    
+    /* Mengurangi jarak antara tabel dan paginasi */
+    .table-responsive {
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .pagination {
+        margin-top: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+    }
     .empty-state h5 {
         font-size: 1.1rem;
         margin-bottom: 0.5rem;
@@ -246,8 +256,8 @@
                     <div class="text-muted small">
                         Menampilkan {{ $activityLogs->firstItem() }} - {{ $activityLogs->lastItem() }} dari {{ $activityLogs->total() }} entri
                     </div>
-                    <div>
-                        {{ $activityLogs->links() }}
+                    <div class="pagination">
+                        {{ $activityLogs->withQueryString()->onEachSide(0)->links('pagination::simple-bootstrap-4') }}
                     </div>
                 </div>
                 @endif

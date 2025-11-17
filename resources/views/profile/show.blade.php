@@ -66,7 +66,7 @@
                                     <div class="text-muted">Komentar</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="fw-bold fs-4" style="color: var(--elunora-primary);">{{ $photos->total() > 1000 ? number_format($photos->total() / 1000, 1) . 'K' : $photos->total() }}</div>
+                                    <div class="fw-bold fs-4" style="color: var(--elunora-primary);">{{ $photos->count() > 1000 ? number_format($photos->count() / 1000, 1) . 'K' : $photos->count() }}</div>
                                     <div class="text-muted">Foto</div>
                                 </div>
                             </div>
@@ -142,12 +142,12 @@
                     <div class="card-header p-0" style="background: linear-gradient(135deg, var(--elunora-primary) 0%, var(--elunora-primary-dark) 100%);">
                         <h5 class="m-0 text-white p-3"><i class="fas fa-images me-2"></i>Galeri Foto Saya</h5>
                     </div>
-                    <div class="card-body p-3">
+                    <div class="card-body p-2">
                         @if($photos->count() > 0)
-                            <div class="row g-3">
+                            <div class="row g-0">
                                 @foreach($photos->take(4) as $photo)
-                                <div class="col-6 col-md-4 col-lg-3">
-                                    <div class="gallery-item position-relative overflow-hidden rounded-3" style="height: 200px;">
+                                <div class="col-6 col-md-4 col-lg-3 p-1">
+                                    <div class="gallery-item position-relative overflow-hidden rounded-3 w-100" style="height: 150px;">
                                         <img src="{{ asset('storage/' . $photo->image_path) }}" 
                                              alt="{{ $photo->title ?? 'Foto Saya' }}" 
                                              class="img-fluid w-100 h-100"

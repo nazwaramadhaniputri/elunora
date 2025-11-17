@@ -10,7 +10,7 @@ class ActivityLogController extends Controller
 {
     public function index()
     {
-        $activityLogs = ActivityLog::with('petugas')
+        $activityLogs = ActivityLog::with('user')
             ->orderBy('created_at', 'desc')
             ->paginate(15);
             
@@ -19,7 +19,7 @@ class ActivityLogController extends Controller
 
     public function show($id)
     {
-        $activityLog = ActivityLog::with('petugas')->findOrFail($id);
+        $activityLog = ActivityLog::with('user')->findOrFail($id);
         return view('admin.activity-logs.show', compact('activityLog'));
     }
 }

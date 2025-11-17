@@ -40,17 +40,11 @@ class UserPhotoController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
-        // Buat direktori jika belum ada
-        $uploadPath = 'uploads/galeri/user';
-        if (!file_exists(public_path($uploadPath))) {
-            mkdir(public_path($uploadPath), 0777, true);
-        }
+        // Gunakan storage Laravel
+        $path = $request->file('image')->store('user-photos', 'public');
         
-        // Simpan file ke direktori yang benar
-        $image = $request->file('image');
-        $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9_.-]/', '_', $image->getClientOriginalName());
-        $image->move(public_path($uploadPath), $fileName);
-        $imagePath = $uploadPath . '/' . $fileName;
+        // Dapatkan path lengkap untuk disimpan di database
+        $imagePath = 'storage/' . $path;
         
         UserPhoto::create([
             'user_id' => Auth::id(),
@@ -95,100 +89,50 @@ class UserPhotoController extends Controller
     
     public function update(Request $request, $id)
     {
-        $photo = UserPhoto::findOrFail($id);
-        
-        // Hanya pemilik foto yang dapat mengedit
-        if ($photo->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
-        
-        // Foto yang sudah disetujui atau ditolak tidak dapat diedit
-        if ($photo->status !== 'pending') {
-            return redirect()->route('user-photos.my-photos')
-                    ->with('error', 'Foto yang sudah diproses tidak dapat diedit.');
-        }
-        
-        $validated = $request->validate([
+        $request->validate([
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
         
-        // Update data foto
-        $photo->title = $validated['title'] ?? $photo->title;
-        $photo->description = $validated['description'] ?? $photo->description;
+        $photo = UserPhoto::where('user_id', Auth::id())->findOrFail($id);
         
         // Jika ada gambar baru diupload
         if ($request->hasFile('image')) {
             // Hapus gambar lama jika ada
-            if (file_exists(public_path($photo->image_path))) {
-                unlink(public_path($photo->image_path));
+            if ($photo->image_path && strpos($photo->image_path, 'storage/') === 0) {
+                $oldImage = str_replace('storage/', '', $photo->image_path);
+                if (Storage::disk('public')->exists($oldImage)) {
+                    Storage::disk('public')->delete($oldImage);
+                }
             }
             
-            // Buat direktori jika belum ada
-            $uploadPath = 'uploads/galeri/user';
-            if (!file_exists(public_path($uploadPath))) {
-                mkdir(public_path($uploadPath), 0777, true);
-            }
-            
-            // Simpan gambar baru
-            $image = $request->file('image');
-            $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9_.-]/', '_', $image->getClientOriginalName());
-            $image->move(public_path($uploadPath), $fileName);
-            $photo->image_path = $uploadPath . '/' . $fileName;
+            // Simpan file baru
+            $path = $request->file('image')->store('user-photos', 'public');
+            $photo->image_path = 'storage/' . $path;
         }
         
+        $photo->title = $request->title ?? '';
+        $photo->description = $request->description ?: null;
         $photo->save();
-        
-        return redirect()->route('user-photos.my-photos')
-                ->with('success', 'Foto berhasil diperbarui');
-        
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-        
-        $data = [
-            'title' => ($request->title ?? '') === null ? '' : trim((string)$request->title),
-            'description' => $request->description,
-        ];
-        
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama
-            Storage::disk('public')->delete($photo->image_path);
-            
-            // Simpan gambar baru
-            $data['image_path'] = $request->file('image')->store('user-photos', 'public');
-        }
-        
-        $photo->update($data);
         
         return back()->with('success', 'Foto berhasil diperbarui.');
     }
     
     public function destroy($id)
     {
-        $photo = UserPhoto::findOrFail($id);
+        $photo = UserPhoto::where('user_id', Auth::id())->findOrFail($id);
         
-        // Hanya pemilik foto yang dapat menghapus
-        if ($photo->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
-        
-        // Hapus file gambar
-        if (file_exists(public_path($photo->image_path))) {
-            unlink(public_path($photo->image_path));
-            
-            // Coba hapus direktori kosong jika ada
-            $directory = dirname(public_path($photo->image_path));
-            if (is_dir($directory) && count(glob($directory . '/*')) === 0) {
-                rmdir($directory);
+        // Hapus file gambar dari storage
+        if ($photo->image_path && strpos($photo->image_path, 'storage/') === 0) {
+            $filePath = str_replace('storage/', '', $photo->image_path);
+            if (Storage::disk('public')->exists($filePath)) {
+                Storage::disk('public')->delete($filePath);
             }
         }
         
         $photo->delete();
         
-        return back()->with('success', 'Foto berhasil dihapus');
+        return back()->with('success', 'Foto berhasil dihapus.');
     }
 }

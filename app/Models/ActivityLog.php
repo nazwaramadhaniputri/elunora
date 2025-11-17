@@ -8,7 +8,7 @@ use App\Models\User;
 class ActivityLog extends Model
 {
     protected $fillable = [
-        'petugas_id',
+        'user_id',
         'action',
         'description',
         'model_type',
@@ -26,9 +26,9 @@ class ActivityLog extends Model
         'new_data' => 'array',
     ];
 
-    public function petugas()
+    public function user()
     {
-        return $this->belongsTo(\App\Models\Petugas::class);
+        return $this->belongsTo(User::class);
     }
 
     public function model()

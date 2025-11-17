@@ -15,7 +15,7 @@ class ProfileController extends Controller
         $photos = \App\Models\UserPhoto::where('user_id', $user->id)
             ->where('status', 'approved')
             ->latest()
-            ->paginate(12);
+            ->get(); // Menghapus pagination untuk menampilkan semua foto
 
         // Get user's like and comment counts
         $likeCount = \App\Models\FotoLike::where('user_id', $user->id)->count();

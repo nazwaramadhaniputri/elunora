@@ -47,7 +47,8 @@ class UserPhotoController extends Controller
     
     public function approve(Request $request, $id)
     {
-        $photo = UserPhoto::findOrFail($id);
+        // Pastikan relasi user dimuat
+        $photo = UserPhoto::with('user')->findOrFail($id);
 
         // Update status approved
         $photo->status = 'approved';
@@ -60,41 +61,56 @@ class UserPhotoController extends Controller
         if ($request->filled('galery_id')) {
             $galeriId = (int) $request->galery_id;
 
-            // Normalisasi path sumber dari beberapa kemungkinan lokasi
+            // Normalisasi path sumber
             $raw = ltrim((string)($photo->image_path ?? ''), '/');
-            if (str_starts_with($raw, 'storage/')) { $raw = substr($raw, 8); }
-            if (str_starts_with($raw, 'public/')) { $raw = substr($raw, 7); }
-            // Kandidat sumber 1: storage/app/public
-            $source = storage_path('app/public/'.$raw);
-            // Kandidat sumber 2: public/storage
-            if (!File::exists($source)) {
-                $candidate = public_path('storage/'.$raw);
-                if (File::exists($candidate)) { $source = $candidate; }
+            
+            // Hapus awalan path storage jika ada
+            $prefixes = ['storage/', 'public/'];
+            foreach ($prefixes as $prefix) {
+                if (str_starts_with($raw, $prefix)) {
+                    $raw = substr($raw, strlen($prefix));
+                }
             }
-            // Kandidat sumber 3: public root langsung
-            if (!File::exists($source)) {
-                $candidate = public_path($raw);
-                if (File::exists($candidate)) { $source = $candidate; }
+            
+            // Cari lokasi file yang benar
+            $source = null;
+            $possiblePaths = [
+                storage_path('app/public/'.$raw),
+                public_path('storage/'.$raw),
+                public_path($raw),
+                storage_path('app/'.$raw)
+            ];
+            
+            foreach ($possiblePaths as $path) {
+                if (File::exists($path)) {
+                    $source = $path;
+                    break;
+                }
             }
 
-            // Siapkan tujuan di public/uploads/galeri/user untuk menandai sumber user
-            $destDir = public_path('uploads/galeri/user');
-            if (!File::exists($destDir)) {
-                File::makeDirectory($destDir, 0755, true);
-            }
-            $ext = pathinfo($source, PATHINFO_EXTENSION) ?: 'jpg';
-            $destName = time().'_'.uniqid().'.'.$ext;
-            $destPath = $destDir.DIRECTORY_SEPARATOR.$destName;
+            if ($source) {
+                // Siapkan direktori tujuan
+                $destDir = public_path('uploads/galeri/user');
+                if (!File::exists($destDir)) {
+                    File::makeDirectory($destDir, 0755, true);
+                }
+                
+                $ext = pathinfo($source, PATHINFO_EXTENSION) ?: 'jpg';
+                $destName = time().'_'.uniqid().'.'.$ext;
+                $destPath = $destDir.DIRECTORY_SEPARATOR.$destName;
 
-            if (File::exists($source)) {
-                File::copy($source, $destPath);
-                // Simpan record Foto untuk galeri
-                Foto::create([
-                    'galery_id' => $galeriId,
-                    'judul' => $photo->title ?: 'Foto Galeri',
-                    'file' => 'uploads/galeri/user/'.$destName,
-                    'uploader_name' => optional($photo->user)->name ?: 'Pengguna',
-                ]);
+                if (File::copy($source, $destPath)) {
+                    // Gunakan data user yang sudah diload
+                    $uploaderName = $photo->user ? $photo->user->name : 'Pengguna';
+                    
+                    // Simpan record Foto untuk galeri
+                    Foto::create([
+                        'galery_id' => $galeriId,
+                        'judul' => $photo->title ?: 'Foto Galeri',
+                        'file' => 'uploads/galeri/user/'.$destName,
+                        'uploader_name' => $uploaderName,
+                    ]);
+                }
             }
         }
 

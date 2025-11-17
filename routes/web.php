@@ -40,9 +40,6 @@ Route::get('/kategori/{id}', [App\Http\Controllers\KategoriController::class, 's
 
 // Rute untuk fitur upload foto pengunjung
 Route::get('/user-photos', [App\Http\Controllers\UserPhotoController::class, 'index'])->name('user-photos.index');
-Route::get('/user-photos/my-photos', [App\Http\Controllers\UserPhotoController::class, 'myPhotos'])
-    ->middleware('auth')
-    ->name('user-photos.my-photos');
 
 // Profile routes
 Route::middleware(['auth'])->group(function () {

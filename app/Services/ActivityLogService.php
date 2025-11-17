@@ -64,7 +64,7 @@ class ActivityLogService
             }
 
             return ActivityLog::create([
-                'petugas_id' => $petugasId,
+                'user_id' => $petugasId,
                 'action' => $action,
                 'description' => $description,
                 'model_type' => $modelType,
